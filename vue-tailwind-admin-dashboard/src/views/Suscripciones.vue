@@ -147,14 +147,14 @@
           v-for="plan in filteredPlans"
           :key="plan.id"
           :class="planTheme(plan.color).border"
-          class="group cursor-pointer rounded-2xl border bg-white p-5 shadow-theme-xs transition hover:-translate-y-0.5 hover:shadow-theme-sm"
+          class="group cursor-pointer rounded-2xl border bg-white p-5 shadow-theme-xs transition duration-200 hover:-translate-y-1 hover:bg-gray-50/70 hover:shadow-theme-lg hover:ring-2 hover:ring-brand-500/10"
           @click="openDetail(plan)"
         >
           <div class="flex flex-col gap-4 md:flex-row md:items-center">
             <div class="flex min-w-55 items-center gap-4">
               <span
                 :class="planTheme(plan.color).soft"
-                class="flex h-11 w-11 items-center justify-center rounded-xl"
+                class="flex h-11 w-11 items-center justify-center rounded-xl transition duration-200 group-hover:scale-110"
                 ><CreditCard class="h-5 w-5" :stroke-width="1.8" /></span
               >
               <div>
@@ -205,7 +205,7 @@
               >
                 ✎</button
               ><button
-                class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50"
+                class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-brand-600 opacity-70 transition hover:bg-brand-50 hover:text-brand-700 group-hover:opacity-100"
                 @click.stop="openDetail(plan)"
               >
                 Ver detalle ›
