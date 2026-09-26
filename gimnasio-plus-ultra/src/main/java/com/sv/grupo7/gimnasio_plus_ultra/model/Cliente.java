@@ -9,6 +9,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -18,9 +21,11 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "clientes")
 @PrimaryKeyJoinColumn(name = "id_persona")
-public class Cliente {
+public class Cliente extends Persona{
 
-        @Column(name = "id_cliente")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_cliente")
     private int id_cliente;
 
     @ManyToOne
@@ -60,6 +65,8 @@ public class Cliente {
     public List<Asistencia> getAsistencias() { return asistencias; }
     public void setAsistencias(List<Asistencia> asistencias) { this.asistencias = asistencias; }
 
+    @Override
     public LocalDateTime getCreadoEn() { return creado_en; }
+    @Override
     public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
 }
