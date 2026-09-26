@@ -6,9 +6,7 @@
           <p class="text-sm font-medium text-brand-600">Equipo operativo</p>
           <h1 class="mt-1 text-3xl font-semibold text-gray-900">Entrenadores</h1>
         </div>
-        <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white">
-          + Nuevo Entrenador
-        </button>
+        <Button size="sm">+ Nuevo Entrenador</Button>
       </header>
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <article
@@ -20,13 +18,9 @@
             <span
               class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-lg font-semibold text-brand-600"
               >{{ trainer.initials }}</span
-            ><span
-              :class="
-                trainer.active ? 'bg-success-50 text-success-600' : 'bg-gray-100 text-gray-500'
-              "
-              class="rounded-full px-2.5 py-1 text-xs font-medium"
-              >{{ trainer.active ? 'Activo' : 'Inactivo' }}</span
-            >
+            ><Badge :color="trainer.active ? 'primary' : 'light'">{{
+              trainer.active ? 'Activo' : 'Inactivo'
+            }}</Badge>
           </div>
           <h2 class="mt-5 text-lg font-semibold text-gray-900">{{ trainer.name }}</h2>
           <p class="mt-1 text-sm text-brand-600">{{ trainer.specialty }}</p>
@@ -60,6 +54,8 @@
 </template>
 <script setup lang="ts">
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Badge from '@/components/ui/Badge.vue'
+import Button from '@/components/ui/Button.vue'
 import { useGymData } from '@/composables/useGymData'
 const { trainers } = useGymData()
 </script>

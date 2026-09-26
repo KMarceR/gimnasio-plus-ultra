@@ -4,7 +4,7 @@
       <header class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p class="text-sm font-medium text-brand-600">Lunes, 14 de julio de 2026</p>
-          <h1 class="mt-1 text-3xl font-semibold text-gray-900">Dashboard</h1>
+          <h1 class="font-display mt-1 text-3xl font-bold text-gray-900">Dashboard</h1>
         </div>
         <span class="rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700"
           >Operación en tiempo real</span
@@ -21,7 +21,7 @@
               <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {{ metric.label }}
               </p>
-              <p class="mt-3 text-3xl font-semibold text-gray-900">{{ metric.value }}</p>
+              <p class="font-display mt-3 text-3xl font-bold text-gray-900">{{ metric.value }}</p>
             </div>
             <span
               :class="[
@@ -31,7 +31,7 @@
               >{{ metric.icon }}</span
             >
           </div>
-          <p class="mt-4 text-sm font-medium text-success-600">{{ metric.change }}</p>
+          <p class="mt-4 text-sm font-medium text-brand-600">{{ metric.change }}</p>
         </article>
       </section>
       <section class="grid grid-cols-1 gap-6 xl:grid-cols-12">
@@ -85,9 +85,7 @@
             >
               <span
                 :class="
-                  access.status === 'OK'
-                    ? 'bg-success-50 text-success-600'
-                    : 'bg-error-50 text-error-600'
+                  access.status === 'OK' ? 'bg-brand-50 text-brand-600' : 'bg-error-50 text-error-600'
                 "
                 class="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold"
                 >{{ access.status }}</span
@@ -97,7 +95,7 @@
                 <p class="text-xs text-gray-500">{{ access.type }} · {{ access.time }}</p>
               </div>
               <span
-                :class="access.status === 'OK' ? 'bg-success-500' : 'bg-error-500'"
+                :class="access.status === 'OK' ? 'bg-brand-500' : 'bg-error-500'"
                 class="h-2.5 w-2.5 rounded-full"
               ></span>
             </div>
@@ -120,10 +118,9 @@
                 <p class="truncate text-sm font-semibold text-gray-800">{{ member.name }}</p>
                 <p class="text-xs text-gray-500">{{ member.plan }}</p>
               </div>
-              <span
-                class="rounded-full bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-600"
-                >{{ member.status }}</span
-              >
+              <Badge :color="member.status === 'Vencido' ? 'error' : 'warning'">{{
+                member.status
+              }}</Badge>
             </div>
           </div>
         </div>
@@ -137,6 +134,7 @@ import { computed } from 'vue'
 import VueApexCharts from 'vue3-apexcharts'
 import type { ApexOptions } from 'apexcharts'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Badge from '@/components/ui/Badge.vue'
 import { useGymData } from '@/composables/useGymData'
 const { activeMembers, todaySessions, accessLog, members } = useGymData()
 const metrics = computed(() => [
@@ -145,7 +143,7 @@ const metrics = computed(() => [
     value: activeMembers.value,
     change: '+12% vs mes anterior',
     icon: '◎',
-    class: 'bg-success-50 text-success-600',
+    class: 'bg-brand-50 text-brand-600',
   },
   {
     label: 'Ingresos del mes',
@@ -176,7 +174,7 @@ const revenueSeries = [
   { name: 'Ingresos', data: [48500, 52000, 61500, 59000, 68000, 73500, 71800] },
 ]
 const revenueOptions: ApexOptions = {
-  chart: { toolbar: { show: false }, fontFamily: 'Outfit, sans-serif' },
+  chart: { toolbar: { show: false }, fontFamily: 'DM Sans, sans-serif' },
   colors: ['#84cc16'],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 3 },
@@ -192,7 +190,7 @@ const revenueOptions: ApexOptions = {
 }
 const attendanceSeries = [{ name: 'Entradas', data: [68, 82, 75, 96, 112, 124, 54] }]
 const attendanceOptions: ApexOptions = {
-  chart: { toolbar: { show: false }, fontFamily: 'Outfit, sans-serif' },
+  chart: { toolbar: { show: false }, fontFamily: 'DM Sans, sans-serif' },
   colors: ['#f97316'],
   plotOptions: { bar: { borderRadius: 5, columnWidth: '42%' } },
   dataLabels: { enabled: false },

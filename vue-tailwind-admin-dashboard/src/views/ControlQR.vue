@@ -22,26 +22,16 @@
             </div>
           </div>
           <div class="mx-auto mt-5 h-1 max-w-70 animate-pulse rounded-full bg-brand-500"></div>
-          <button
-            class="mt-6 w-full rounded-xl bg-brand-500 py-3 font-medium text-white hover:bg-brand-600"
-            @click="scan"
-          >
+          <Button class-name="mt-6 w-full justify-center" :disabled="scanning" @click="scan">
             {{ scanning ? 'Escaneando...' : 'Escanear código QR' }}
-          </button>
-          <div
+          </Button>
+          <Alert
             v-if="result"
-            class="mt-5 rounded-xl p-4 text-start"
-            :class="result.status === 'OK' ? 'bg-success-50' : 'bg-error-50'"
-          >
-            <p
-              class="text-sm font-semibold"
-              :class="result.status === 'OK' ? 'text-success-700' : 'text-error-700'"
-            >
-              {{ result.status }} · {{ result.type }}
-            </p>
-            <p class="mt-1 font-medium text-gray-800">{{ result.member }}</p>
-            <p class="text-xs text-gray-500">{{ result.time }}</p>
-          </div>
+            class="mt-5 text-start"
+            :variant="result.status === 'OK' ? 'success' : 'error'"
+            :title="`${result.status} · ${result.type}`"
+            :message="`${result.member} · ${result.time}`"
+          />
         </section>
         <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xs">
           <h2 class="text-lg font-semibold text-gray-900">Log de accesos del día</h2>
@@ -54,7 +44,7 @@
               <span
                 :class="
                   access.type === 'Entrada'
-                    ? 'bg-success-50 text-success-600'
+                    ? 'bg-brand-50 text-brand-600'
                     : 'bg-blue-light-50 text-blue-light-600'
                 "
                 class="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold"
@@ -65,7 +55,7 @@
                 <p class="text-xs text-gray-500">{{ access.type }} · {{ access.time }}</p>
               </div>
               <span
-                :class="access.status === 'OK' ? 'text-success-600' : 'text-error-600'"
+                :class="access.status === 'OK' ? 'text-brand-600' : 'text-error-600'"
                 class="text-sm font-semibold"
                 >{{ access.status }}</span
               >
@@ -79,6 +69,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Button from '@/components/ui/Button.vue'
+import Alert from '@/components/ui/Alert.vue'
 import { useGymData } from '@/composables/useGymData'
 const { members, accessLog, registerAccess } = useGymData()
 const scanning = ref(false)

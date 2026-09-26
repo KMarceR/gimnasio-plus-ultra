@@ -6,9 +6,7 @@
           <p class="text-sm font-medium text-brand-600">Accesos del sistema</p>
           <h1 class="mt-1 text-3xl font-semibold text-gray-900">Usuarios</h1>
         </div>
-        <button class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white">
-          + Nuevo Usuario
-        </button>
+        <Button size="sm">+ Nuevo Usuario</Button>
       </header>
       <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6">
         <div class="overflow-x-auto">
@@ -37,15 +35,11 @@
                   </div>
                 </td>
                 <td class="py-4">
-                  <span
-                    :class="roleClass(user.role)"
-                    class="rounded-full px-2.5 py-1 text-xs font-medium"
-                    >{{ user.role }}</span
-                  >
+                  <Badge :color="roleColor(user.role)">{{ user.role }}</Badge>
                 </td>
                 <td class="py-4">
                   <button
-                    :class="user.active ? 'bg-success-500' : 'bg-gray-300'"
+                    :class="user.active ? 'bg-brand-500' : 'bg-gray-300'"
                     class="relative h-5 w-9 rounded-full"
                   >
                     <span
@@ -56,7 +50,7 @@
                 </td>
                 <td class="py-4 text-sm text-gray-600">Hoy, 08:12</td>
                 <td class="py-4 text-end">
-                  <button class="text-sm font-medium text-brand-600">Editar</button>
+                  <Button size="sm" variant="outline">Editar</Button>
                 </td>
               </tr>
             </tbody>
@@ -68,13 +62,15 @@
 </template>
 <script setup lang="ts">
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Badge from '@/components/ui/Badge.vue'
+import Button from '@/components/ui/Button.vue'
 import { useAuth, type UserRole } from '@/composables/useAuth'
 const { demoUsers } = useAuth()
 const users = demoUsers.map(({ password: _password, ...user }) => ({ ...user, active: true }))
-const roleClass = (role: UserRole) =>
+const roleColor = (role: UserRole) =>
   ({
-    Administrador: 'bg-orange-50 text-orange-600',
-    Recepcionista: 'bg-blue-light-50 text-blue-light-600',
-    Entrenador: 'bg-success-50 text-success-600',
-  })[role]
+    Administrador: 'warning',
+    Recepcionista: 'info',
+    Entrenador: 'primary',
+  })[role] as 'warning' | 'info' | 'primary'
 </script>

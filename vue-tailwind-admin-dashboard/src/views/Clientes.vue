@@ -6,13 +6,7 @@
           <h1 class="mt-1 text-3xl font-semibold text-gray-900">Clientes</h1>
           <p class="mt-1 text-sm text-gray-500">{{ members.length }} socios registrados</p>
         </div>
-        <button
-          v-if="canCreate"
-          class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600"
-          @click="openCreate"
-        >
-          + Nuevo Cliente
-        </button>
+        <Button v-if="canCreate" size="sm" @click="openCreate">+ Nuevo Cliente</Button>
       </header>
       <section>
         <div class="flex flex-col gap-3 lg:flex-row">
@@ -65,21 +59,13 @@
                   </div>
                 </td>
                 <td class="py-4">
-                  <span
-                    :class="planClass(member.plan)"
-                    class="rounded-full px-2.5 py-1 text-xs font-medium"
-                    >{{ member.plan }}</span
-                  >
+                  <Badge :color="planColor(member.plan)">{{ member.plan }}</Badge>
                 </td>
                 <td class="py-4 font-mono text-sm text-gray-500">{{ member.startDate }}</td>
                 <td class="py-4 text-sm text-gray-600">{{ member.expiry }}</td>
                 <td class="py-4 text-sm font-semibold text-gray-800">{{ member.attendance.length * 20 + 62 }}</td>
                 <td class="py-4">
-                  <span
-                    :class="badgeClass(member.status)"
-                    class="rounded-full px-2.5 py-1 text-xs font-medium"
-                    >{{ member.status }}</span
-                  >
+                  <Badge :color="statusColor(member.status)">{{ member.status }}</Badge>
                 </td>
                 <td class="py-4 text-end">
                   <button
@@ -98,81 +84,76 @@
         </div>
       </section>
     </div>
-    <div
-      v-if="modal"
-      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-[2px]"
-      @click.self="closeModal"
-    >
-      <form
-        class="max-h-[90vh] w-full max-w-140 overflow-y-auto rounded-2xl bg-white shadow-theme-xl"
-        @submit.prevent="createMember"
-      >
-        <header class="flex items-center justify-between border-b border-gray-200 p-6">
-          <h2 class="text-xl font-semibold text-gray-900">Nuevo Cliente</h2>
-          <button type="button" class="text-2xl text-gray-400" @click="closeModal">×</button>
-        </header>
-          <div class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
-          <label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-            >Nombre completo<input
-              v-model="form.name"
-              required
-              placeholder="Valentina Ríos"
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-          ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-            >Email<input
-              v-model="form.email"
-              required
-              type="email"
-              placeholder="valeria@email.com"
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-          ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-            >Teléfono<input
-              v-model="form.phone"
-              required
-              placeholder="+54 11 0000-0000"
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-          ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-            >Fecha de nacimiento<input
-              v-model="form.birthDate"
-              type="date"
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-          ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
-            >Dirección<input
-              v-model="form.address"
-              placeholder="Av. Corrientes 1234, CABA"
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-          ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
-            >Plan de suscripción<select
-              v-model="form.plan"
-              required
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
-            >
-              <option v-for="plan in plans" :key="plan.id" :value="plan.name">
-                {{ plan.name }} · ${{ plan.price.toLocaleString('es-MX') }}
-              </option>
-            </select></label
-          ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
-            >Notas iniciales<textarea
-              v-model="form.notes"
-              rows="3"
-              placeholder="Objetivos, restricciones médicas, observaciones..."
-              class="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
-            ></textarea>
-          </label>
-        </div>
-        <footer class="flex gap-3 border-t border-gray-100 p-6">
-          <button
-            type="button"
-            class="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600"
-            @click="closeModal"
+    <Modal v-if="modal" full-screen-backdrop @close="closeModal">
+      <template #body>
+        <div class="p-4">
+          <form
+            class="max-h-[90vh] w-full max-w-140 overflow-y-auto rounded-2xl bg-white shadow-theme-xl"
+            @submit.prevent="createMember"
           >
-            Cancelar</button
-          ><button class="flex-1 rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600">
-            Registrar cliente
-          </button>
-        </footer>
-      </form>
-    </div>
+            <header class="flex items-center justify-between border-b border-gray-200 p-6">
+              <h2 class="text-xl font-semibold text-gray-900">Nuevo Cliente</h2>
+              <button type="button" class="text-2xl text-gray-400" @click="closeModal">×</button>
+            </header>
+            <div class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
+              <label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Nombre completo<input
+                  v-model="form.name"
+                  required
+                  placeholder="Valentina Ríos"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Email<input
+                  v-model="form.email"
+                  required
+                  type="email"
+                  placeholder="valeria@email.com"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Teléfono<input
+                  v-model="form.phone"
+                  required
+                  placeholder="+54 11 0000-0000"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Fecha de nacimiento<input
+                  v-model="form.birthDate"
+                  type="date"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+                >Dirección<input
+                  v-model="form.address"
+                  placeholder="Av. Corrientes 1234, CABA"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+                >Plan de suscripción<select
+                  v-model="form.plan"
+                  required
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+                >
+                  <option v-for="plan in plans" :key="plan.id" :value="plan.name">
+                    {{ plan.name }} · ${{ plan.price.toLocaleString('es-MX') }}
+                  </option>
+                </select></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+                >Notas iniciales<textarea
+                  v-model="form.notes"
+                  rows="3"
+                  placeholder="Objetivos, restricciones médicas, observaciones..."
+                  class="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                ></textarea>
+              </label>
+            </div>
+            <footer class="flex gap-3 border-t border-gray-100 p-6">
+              <Button type="button" variant="outline" class-name="flex-1 justify-center" @click="closeModal"
+                >Cancelar</Button
+              >
+              <Button type="submit" class-name="flex-1 justify-center">Registrar cliente</Button>
+            </footer>
+          </form>
+        </div>
+      </template>
+    </Modal>
   </AdminLayout>
 </template>
 
@@ -180,6 +161,9 @@
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Badge from '@/components/ui/Badge.vue'
+import Button from '@/components/ui/Button.vue'
+import Modal from '@/components/ui/Modal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useGymData, type MemberStatus } from '@/composables/useGymData'
 
@@ -207,26 +191,26 @@ const filteredMembers = computed(() =>
       `${member.name} ${member.email}`.toLowerCase().includes(search.value.toLowerCase()),
   ),
 )
-const badgeClass = (status: MemberStatus) =>
+const statusColor = (status: MemberStatus) =>
   ({
-    Activo: 'bg-success-50 text-success-600',
-    'Por vencer': 'bg-warning-50 text-warning-600',
-    Vencido: 'bg-error-50 text-error-600',
-    Inactivo: 'bg-gray-100 text-gray-500',
-  })[status]
-const planClass = (plan: string) => {
+    Activo: 'primary',
+    'Por vencer': 'warning',
+    Vencido: 'error',
+    Inactivo: 'light',
+  })[status] as 'primary' | 'warning' | 'error' | 'light'
+const planColor = (plan: string) => {
   const color = plans.value.find((item) => item.name === plan)?.color
   return (
     (
       {
-        blue: 'bg-blue-light-50 text-blue-light-600',
-        lime: 'bg-success-50 text-success-600',
-        orange: 'bg-orange-50 text-orange-600',
-        violet: 'bg-purple-50 text-purple-600',
-        red: 'bg-error-50 text-error-600',
+        blue: 'info',
+        lime: 'primary',
+        orange: 'warning',
+        violet: 'purple',
+        red: 'error',
       } as Record<string, string>
-    )[color || ''] || 'bg-gray-100 text-gray-500'
-  )
+    )[color || ''] || 'light'
+  ) as 'info' | 'primary' | 'warning' | 'purple' | 'error' | 'light'
 }
 const openCreate = () => {
   form.plan = plans.value[0]?.name || ''
