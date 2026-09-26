@@ -16,6 +16,16 @@ public class AsistenciaResponse {
     public AsistenciaResponse() {
     }
 
+    public AsistenciaResponse(int id_asistencia, String nombre_cliente, String nombre_estado,
+            LocalDate fecha_asistencia, LocalTime hora_sesion, LocalDateTime creado_en) {
+        this.id_asistencia = id_asistencia;
+        this.nombre_cliente = nombre_cliente;
+        this.nombre_estado = nombre_estado;
+        this.fecha_asistencia = fecha_asistencia;
+        this.hora_sesion = hora_sesion;
+        this.creado_en = creado_en;
+    }
+
     public int getIdAsistencia() {
         return id_asistencia;
     }

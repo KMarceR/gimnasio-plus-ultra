@@ -11,6 +11,12 @@ public class RolResponse {
     public RolResponse() {
     }
 
+        public RolResponse(int id_rol, String nombre_rol, LocalDateTime creado_en) {
+        this.id_rol = id_rol;
+        this.nombre_rol = nombre_rol;
+        this.creado_en = creado_en;
+    }
+
     public int getIdRol() {
         return id_rol;
     }

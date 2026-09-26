@@ -10,6 +10,13 @@ public class PlanSuscripcionRequest {
     public PlanSuscripcionRequest() {
     }
 
+    public PlanSuscripcionRequest(int id_estado, String nombre_suscripcion, String detalles, double precio) {
+        this.id_estado = id_estado;
+        this.nombre_suscripcion = nombre_suscripcion;
+        this.detalles = detalles;
+        this.precio = precio;
+    }
+
     public int getIdEstado() {
         return id_estado;
     }

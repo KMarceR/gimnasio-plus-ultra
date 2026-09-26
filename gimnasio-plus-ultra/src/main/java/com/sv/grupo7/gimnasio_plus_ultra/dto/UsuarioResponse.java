@@ -1,16 +1,30 @@
 package com.sv.grupo7.gimnasio_plus_ultra.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class UsuarioResponse extends PersonaResponse {
 
     private int id_usuario;
     private String nombre_usuario;
-    private String nombre_rol; // Para mostrar el texto en Vue
-    private String nombre_estado; // Para mostrar el texto en Vue
+    private String nombre_rol;
+    private String nombre_estado;
     private LocalDateTime creado_en;
 
-    public UsuarioResponse() { super(); }
+    public UsuarioResponse() {
+        super();
+    }
+
+    public UsuarioResponse(int idPersona, String nombres, String apellidos, String genero,
+            LocalDate fechaNacimiento, String direccion, String email,
+            String telefono, String dui, LocalDateTime creadoEn,
+            int id_usuario, String nombre_usuario, String nombre_rol, String nombre_estado) {
+        super(idPersona, nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui, creadoEn);
+        this.id_usuario = id_usuario;
+        this.nombre_usuario = nombre_usuario;
+        this.nombre_rol = nombre_rol;
+        this.nombre_estado = nombre_estado;
+    }
 
     // Getters y Setters
     public int getIdUsuario() {

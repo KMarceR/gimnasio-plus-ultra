@@ -1,5 +1,7 @@
 package com.sv.grupo7.gimnasio_plus_ultra.dto;
 
+import java.time.LocalDate;
+
 public class EntrenadorRequest extends PersonaRequest {
 
     private int id_usuario;
@@ -9,6 +11,16 @@ public class EntrenadorRequest extends PersonaRequest {
 
     public EntrenadorRequest() {
         super();
+    }
+
+    public EntrenadorRequest(String nombres, String apellidos, String genero, LocalDate fechaNacimiento,
+            String direccion, String email, String telefono, String dui,
+            int id_usuario, int id_estado, String especialidad, double tarifa_por_sesion) {
+        super(nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui);
+        this.id_usuario = id_usuario;
+        this.id_estado = id_estado;
+        this.especialidad = especialidad;
+        this.tarifa_por_sesion = tarifa_por_sesion;
     }
 
     // Getters y Setters

@@ -14,6 +14,16 @@ public class PlanSuscripcionResponse {
     public PlanSuscripcionResponse() {
     }
 
+    public PlanSuscripcionResponse(int id_plansuscripcion, String nombre_estado, String nombre_suscripcion,
+            String detalles, double precio, LocalDateTime creado_en) {
+        this.id_plansuscripcion = id_plansuscripcion;
+        this.nombre_estado = nombre_estado;
+        this.nombre_suscripcion = nombre_suscripcion;
+        this.detalles = detalles;
+        this.precio = precio;
+        this.creado_en = creado_en;
+    }
+
     public int getIdPlanSuscripcion() {
         return id_plansuscripcion;
     }

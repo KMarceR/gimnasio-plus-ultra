@@ -18,6 +18,18 @@ public class SesionResponse {
     public SesionResponse() {
     }
 
+    public SesionResponse(int id_sesion, String nombre_cliente, String nombre_entrenador, String nombre_estado,
+            LocalDate fecha_sesion, LocalTime hora_inicio, LocalTime hora_fin, LocalDateTime creado_en) {
+        this.id_sesion = id_sesion;
+        this.nombre_cliente = nombre_cliente;
+        this.nombre_entrenador = nombre_entrenador;
+        this.nombre_estado = nombre_estado;
+        this.fecha_sesion = fecha_sesion;
+        this.hora_inicio = hora_inicio;
+        this.hora_fin = hora_fin;
+        this.creado_en = creado_en;
+    }
+
     public int getIdSesion() {
         return id_sesion;
     }

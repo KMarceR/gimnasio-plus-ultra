@@ -11,6 +11,12 @@ public class EstadoResponse {
     public EstadoResponse() {
     }
 
+    public EstadoResponse(int id_estado, String nombre_estado, LocalDateTime creado_en) {
+        this.id_estado = id_estado;
+        this.nombre_estado = nombre_estado;
+        this.creado_en = creado_en;
+    }
+
     public int getIdEstado() {
         return id_estado;
     }

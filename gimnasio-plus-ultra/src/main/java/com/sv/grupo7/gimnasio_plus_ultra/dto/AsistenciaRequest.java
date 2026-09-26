@@ -13,6 +13,13 @@ public class AsistenciaRequest {
     public AsistenciaRequest() {
     }
 
+    public AsistenciaRequest(int id_cliente, int id_estado, LocalDate fecha_asistencia, LocalTime hora_sesion) {
+        this.id_cliente = id_cliente;
+        this.id_estado = id_estado;
+        this.fecha_asistencia = fecha_asistencia;
+        this.hora_sesion = hora_sesion;
+    }
+
     public int getIdCliente() {
         return id_cliente;
     }

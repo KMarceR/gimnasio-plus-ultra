@@ -1,5 +1,6 @@
 package com.sv.grupo7.gimnasio_plus_ultra.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ClienteResponse extends PersonaResponse {
@@ -12,6 +13,17 @@ public class ClienteResponse extends PersonaResponse {
 
     public ClienteResponse() {
         super();
+    }
+
+    public ClienteResponse(int idPersona, String nombres, String apellidos, String genero,
+            LocalDate fechaNacimiento, String direccion, String email,
+            String telefono, String dui, LocalDateTime creadoEn,
+            int id_cliente, String nombre_suscripcion, String nombre_estado, String notas) {
+        super(idPersona, nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui, creadoEn);
+        this.id_cliente = id_cliente;
+        this.nombre_suscripcion = nombre_suscripcion;
+        this.nombre_estado = nombre_estado;
+        this.notas = notas;
     }
 
     public int getIdCliente() {
