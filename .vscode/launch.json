@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-GimnasioPlusUltraApplication<gimnasio-plus-ultra>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.sv.grupo7.gimnasio_plus_ultra.GimnasioPlusUltraApplication",
+            "projectName": "gimnasio-plus-ultra",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
