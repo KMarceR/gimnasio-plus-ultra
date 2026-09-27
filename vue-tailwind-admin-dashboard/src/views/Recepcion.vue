@@ -21,10 +21,14 @@
               >
               <div>
                 <p class="font-semibold text-gray-800">{{ nombreCompleto(selected) }}</p>
-                <p class="text-sm text-gray-500">{{ planById(selected.planId)?.nombre || 'Sin plan' }} · {{ selected.estado }}</p>
+                <p class="text-sm text-gray-500">
+                  {{ planById(selected.planId)?.nombre || 'Sin plan' }} · {{ selected.estado }}
+                </p>
               </div>
             </div>
-            <Button size="sm" class-name="mt-4 w-full justify-center" @click="checkIn">Registrar Ingreso</Button>
+            <Button size="sm" class-name="mt-4 w-full justify-center" @click="checkIn"
+              >Registrar Ingreso</Button
+            >
           </div>
           <div v-else-if="query" class="mt-3 space-y-2">
             <button

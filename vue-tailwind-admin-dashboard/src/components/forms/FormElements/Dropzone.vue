@@ -181,7 +181,9 @@ onBeforeUnmount(() => {
 .dropzone .dz-preview .dz-error-mark {
   pointer-events: auto !important;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .dropzone .dz-preview .dz-error-mark:hover {

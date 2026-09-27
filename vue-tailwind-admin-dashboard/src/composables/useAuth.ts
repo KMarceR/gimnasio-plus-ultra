@@ -75,7 +75,9 @@ export function useAuth() {
   const isAuthenticated = computed(() => currentUser.value !== null)
 
   const login = (nombreUsuario: string, password: string) => {
-    const user = demoUsers.find((item) => item.nombreUsuario === nombreUsuario && item.password === password)
+    const user = demoUsers.find(
+      (item) => item.nombreUsuario === nombreUsuario && item.password === password,
+    )
     if (!user) return false
     const { password: _password, ...sessionUser } = user
     currentUser.value = sessionUser
@@ -90,7 +92,9 @@ export function useAuth() {
 
   const fillDemo = (role: UserRole) => {
     const user = demoUsers.find((item) => item.role === role)
-    return user ? { nombreUsuario: user.nombreUsuario, password: user.password } : { nombreUsuario: '', password: '' }
+    return user
+      ? { nombreUsuario: user.nombreUsuario, password: user.password }
+      : { nombreUsuario: '', password: '' }
   }
 
   return { currentUser, isAuthenticated, login, logout, fillDemo, demoUsers }

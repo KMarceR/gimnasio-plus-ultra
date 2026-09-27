@@ -5,7 +5,10 @@
       ref="calendarContainerRef"
       class="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]"
     >
-      <div class="custom-calendar relative" :class="{ 'fc-multimonth': currentView === 'multiMonthYear' }">
+      <div
+        class="custom-calendar relative"
+        :class="{ 'fc-multimonth': currentView === 'multiMonthYear' }"
+      >
         <FullCalendar ref="calendarRef" :options="calendarOptions" />
       </div>
 
@@ -46,7 +49,10 @@
 
             <div class="mt-8 space-y-6">
               <div>
-                <label for="event-title" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                <label
+                  for="event-title"
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
                   Event Title
                 </label>
                 <input
@@ -93,7 +99,10 @@
 
               <!-- Start Date -->
               <div>
-                <label for="event-start-date" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                <label
+                  for="event-start-date"
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
                   Enter Start Date
                 </label>
                 <div class="relative">
@@ -128,7 +137,10 @@
 
               <!-- End Date -->
               <div>
-                <label for="event-end-date" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                <label
+                  for="event-end-date"
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
                   Enter End Date
                 </label>
                 <div class="relative">
@@ -217,7 +229,10 @@ const eventLevel = ref('Primary')
 const currentView = ref('dayGridMonth')
 
 const isRtl = typeof document !== 'undefined' && document.documentElement.dir === 'rtl'
-const locale = typeof document !== 'undefined' && document.documentElement.lang ? document.documentElement.lang : 'en'
+const locale =
+  typeof document !== 'undefined' && document.documentElement.lang
+    ? document.documentElement.lang
+    : 'en'
 const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth < 640 : false)
 
 const viewOptions = [
@@ -289,9 +304,7 @@ const handleOpenAddModal = () => {
 const handleDateSelect = (selectInfo: any) => {
   resetModalFields()
   eventStartDate.value = selectInfo.startStr ? selectInfo.startStr.split('T')[0] : ''
-  eventEndDate.value = selectInfo.endStr
-    ? selectInfo.endStr.split('T')[0]
-    : eventStartDate.value
+  eventEndDate.value = selectInfo.endStr ? selectInfo.endStr.split('T')[0] : eventStartDate.value
   openModal()
 }
 
@@ -355,9 +368,7 @@ const handleAddOrUpdateEvent = () => {
 }
 
 const renderEventContent = (eventInfo: any) => {
-  const calendarLevel = (
-    eventInfo.event.extendedProps?.calendar || 'primary'
-  ).toLowerCase()
+  const calendarLevel = (eventInfo.event.extendedProps?.calendar || 'primary').toLowerCase()
 
   const colorMap: Record<string, { bg: string; dot: string; title: string; time: string }> = {
     success: {
@@ -388,9 +399,7 @@ const renderEventContent = (eventInfo: any) => {
 
   const colors = colorMap[calendarLevel] || colorMap.primary
   const isTimeGridView =
-    !eventInfo.event?.allDay &&
-    eventInfo.view?.type &&
-    eventInfo.view.type.startsWith('timeGrid')
+    !eventInfo.event?.allDay && eventInfo.view?.type && eventInfo.view.type.startsWith('timeGrid')
 
   if (isTimeGridView) {
     return {
@@ -450,9 +459,7 @@ function renderViewSelect(containerEl: HTMLElement, activeViewKey: string) {
             type="button"
             data-view-key="${view.key}"
             class="calendar-view-option w-full rounded-lg px-2.5 py-1.5 text-start text-xs text-gray-700 hover:bg-gray-100 sm:text-sm dark:text-gray-300 dark:hover:bg-white/5 ${
-              activeViewKey === view.key
-                ? 'bg-gray-100 font-medium dark:bg-white/5'
-                : 'font-normal'
+              activeViewKey === view.key ? 'bg-gray-100 font-medium dark:bg-white/5' : 'font-normal'
             }"
           >
             ${view.label}
@@ -474,7 +481,9 @@ function renderViewSelect(containerEl: HTMLElement, activeViewKey: string) {
     e.stopPropagation()
     const isHidden = menu.classList.contains('hidden')
     document.querySelectorAll('.calendar-view-menu').forEach((m) => m.classList.add('hidden'))
-    document.querySelectorAll('.calendar-view-chevron').forEach((c) => c.classList.remove('rotate-180'))
+    document
+      .querySelectorAll('.calendar-view-chevron')
+      .forEach((c) => c.classList.remove('rotate-180'))
 
     if (isHidden) {
       menu.classList.remove('hidden')
@@ -509,7 +518,9 @@ function handleWindowClick(event: MouseEvent) {
   const target = event.target as HTMLElement
   if (!target.closest('.calendar-view-dropdown')) {
     document.querySelectorAll('.calendar-view-menu').forEach((m) => m.classList.add('hidden'))
-    document.querySelectorAll('.calendar-view-chevron').forEach((c) => c.classList.remove('rotate-180'))
+    document
+      .querySelectorAll('.calendar-view-chevron')
+      .forEach((c) => c.classList.remove('rotate-180'))
   }
 }
 
@@ -545,13 +556,7 @@ onUnmounted(() => {
 })
 
 const calendarOptions: any = reactive({
-  plugins: [
-    themePlugin,
-    dayGridPlugin,
-    timeGridPlugin,
-    interactionPlugin,
-    multiMonthPlugin,
-  ],
+  plugins: [themePlugin, dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin],
   initialView: 'dayGridMonth',
   direction: (isRtl ? 'rtl' : 'ltr') as 'rtl' | 'ltr',
   height: 'auto',
@@ -563,8 +568,7 @@ const calendarOptions: any = reactive({
   },
   headerToolbarClass:
     'sticky top-0! z-20! bg-white dark:bg-gray-900 flex-wrap! flex-row! items-center justify-between gap-3 sm:gap-4 [padding-inline:16px]! sm:[padding-inline:24px]! pt-4 sm:pt-6 pb-3 sm:pb-4',
-  toolbarTitleClass:
-    'text-base! sm:text-lg! font-semibold! text-gray-800 dark:text-white/90',
+  toolbarTitleClass: 'text-base! sm:text-lg! font-semibold! text-gray-800 dark:text-white/90',
   toolbarSectionClass: (info: any) => {
     if (info.name === 'start') {
       return 'ta-toolbar-section ta-toolbar-start order-2 flex w-full items-center justify-between sm:order-1 sm:w-auto sm:justify-start gap-2'
@@ -614,8 +618,7 @@ const calendarOptions: any = reactive({
       tableBodyClass: 'mt-0!',
       singleMonthMinWidth: 280,
       showNonCurrentDates: true,
-      singleMonthHeaderInnerClass:
-        'text-sm font-medium! text-gray-800 dark:text-white/90',
+      singleMonthHeaderInnerClass: 'text-sm font-medium! text-gray-800 dark:text-white/90',
       dayHeaderRowClass: 'fc-multimonth-day-header-row',
       dayHeaderClass: (data: any) =>
         data.inPopover
@@ -626,13 +629,13 @@ const calendarOptions: any = reactive({
           ? 'text-sm! font-semibold! text-gray-800! dark:text-white/90!'
           : 'py-1 text-[11px] sm:text-xs font-medium text-gray-400 uppercase',
       dayCellClass: (data: any) => {
-        if (data.inPopover) return 'bg-transparent! p-3!';
-        let cls = 'relative! p-0.5 sm:p-1!';
+        if (data.inPopover) return 'bg-transparent! p-3!'
+        let cls = 'relative! p-0.5 sm:p-1!'
         if (data.isToday)
           cls +=
-            ' isolate rounded-sm! bg-gray-100! dark:bg-gray-800/40! font-semibold text-brand-500 dark:text-brand-400';
-        if (data.isOther) cls += ' bg-transparent!';
-        return cls;
+            ' isolate rounded-sm! bg-gray-100! dark:bg-gray-800/40! font-semibold text-brand-500 dark:text-brand-400'
+        if (data.isOther) cls += ' bg-transparent!'
+        return cls
       },
       dayCellInnerClass: (data: any) =>
         data.inPopover
@@ -640,8 +643,7 @@ const calendarOptions: any = reactive({
           : 'h-0 max-h-0 overflow-hidden invisible',
       dayCellTopInnerClass: 'text-xs! sm:text-sm!',
       dayMaxEvents: 0,
-      moreLinkClass:
-        'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
+      moreLinkClass: 'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
       rowMoreLinkClass:
         'absolute! -top-0.5! sm:-top-1! start-0.5! z-10! border-0! bg-transparent! p-0!',
       rowMoreLinkInnerClass: 'overflow-visible!',
@@ -663,24 +665,21 @@ const calendarOptions: any = reactive({
           ? 'text-sm! font-semibold! text-gray-800! dark:text-white/90!'
           : 'px-1! py-2! sm:px-3! sm:py-3! md:px-5! md:py-4! text-xs! sm:text-sm! font-medium! text-gray-400 uppercase',
       dayCellClass: (data: any) => {
-        if (data.inPopover) return 'bg-transparent! p-3!';
+        if (data.inPopover) return 'bg-transparent! p-3!'
         return `bg-transparent! p-1! sm:p-2! ${
           data.isToday ? 'bg-gray-100! dark:bg-gray-800/40!' : ''
         }`
       },
       dayCellInnerClass: (data: any) => {
-        if (data.inPopover)
-          return 'flex custom-scrollbar max-h-60 flex-col gap-1.5 overflow-y-auto'
-        if (isMobile.value)
-          return 'h-0 max-h-0 overflow-hidden invisible'
+        if (data.inPopover) return 'flex custom-scrollbar max-h-60 flex-col gap-1.5 overflow-y-auto'
+        if (isMobile.value) return 'h-0 max-h-0 overflow-hidden invisible'
         return data.isToday ? 'rounded-sm!' : ''
       },
       rowMoreLinkClass: isMobile.value
         ? 'absolute! -top-1! -start-0.5! z-10! border-0! bg-transparent! p-0!'
         : '',
       rowMoreLinkInnerClass: isMobile.value ? 'overflow-visible!' : '',
-      moreLinkClass:
-        'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
+      moreLinkClass: 'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
       moreLinkContent(args: any) {
         if (isMobile.value) {
           return {
@@ -697,8 +696,7 @@ const calendarOptions: any = reactive({
       slotMinHeight: 56,
       allDaySlot: true,
       dayMaxEvents: isMobile.value ? 0 : undefined,
-      moreLinkClass:
-        'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
+      moreLinkClass: 'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
       rowMoreLinkClass: isMobile.value
         ? 'absolute! -top-1! -start-0.5! z-10! border-0! bg-transparent! p-0!'
         : '',
@@ -742,8 +740,7 @@ const calendarOptions: any = reactive({
       slotMinHeight: 48,
       allDaySlot: true,
       dayMaxEvents: isMobile.value ? 0 : undefined,
-      moreLinkClass:
-        'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
+      moreLinkClass: 'border-0! bg-transparent! p-0! hover:bg-transparent! focus:outline-none',
       rowMoreLinkClass: isMobile.value
         ? 'absolute! -top-1! -start-0.5! z-10! border-0! bg-transparent! p-0!'
         : '',
@@ -785,8 +782,7 @@ const calendarOptions: any = reactive({
   },
 
   borderless: true,
-  viewClass:
-    'border-t! border-b-0! border-x-0! border-gray-200! dark:border-gray-800!',
+  viewClass: 'border-t! border-b-0! border-x-0! border-gray-200! dark:border-gray-800!',
   dayHeaderDividerClass:
     'border-b! border-t-0! border-x-0! border-gray-200! p-0! bg-transparent! dark:border-gray-800!',
   slotMinHeight: 56,

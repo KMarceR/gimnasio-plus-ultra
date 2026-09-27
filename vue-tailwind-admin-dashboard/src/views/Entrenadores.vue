@@ -8,7 +8,9 @@
         </div>
         <Button v-if="canCreate" size="sm" @click="openCreate">+ Nuevo Entrenador</Button>
       </header>
-      <section class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6">
+      <section
+        class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6"
+      >
         <table class="min-w-full rounded-2xl">
           <thead>
             <tr class="border-b border-gray-100 text-xs uppercase tracking-wider text-gray-400">
@@ -36,10 +38,14 @@
                 </div>
               </td>
               <td class="py-4 text-sm text-gray-600">{{ trainer.especialidad }}</td>
-              <td class="py-4 text-sm font-semibold text-gray-800">${{ trainer.tarifaPorSesion }}</td>
+              <td class="py-4 text-sm font-semibold text-gray-800">
+                ${{ trainer.tarifaPorSesion }}
+              </td>
               <td class="py-4 font-mono text-sm text-gray-500">{{ trainer.nombreUsuario }}</td>
               <td class="py-4">
-                <Badge :color="trainer.estado === 'Activo' ? 'primary' : 'light'">{{ trainer.estado }}</Badge>
+                <Badge :color="trainer.estado === 'Activo' ? 'primary' : 'light'">{{
+                  trainer.estado
+                }}</Badge>
               </td>
               <td class="py-4 text-end">
                 <RouterLink
@@ -51,7 +57,9 @@
             </tr>
           </tbody>
         </table>
-        <p v-if="!trainers.length" class="p-8 text-center text-sm text-gray-500">No hay entrenadores registrados.</p>
+        <p v-if="!trainers.length" class="p-8 text-center text-sm text-gray-500">
+          No hay entrenadores registrados.
+        </p>
       </section>
     </div>
     <Modal v-if="modal" full-screen-backdrop @close="closeModal">
@@ -136,17 +144,22 @@
                   required
                   placeholder="Culturismo, HIIT y Nutrición Funcional"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+              ><label
+                class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
                 >Tarifa por sesión ($)<input
                   v-model.number="form.tarifaPorSesion"
                   required
                   min="1"
                   type="number"
-                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-              >
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+              /></label>
             </div>
             <footer class="flex gap-3 border-t border-gray-100 p-6">
-              <Button type="button" variant="outline" class-name="flex-1 justify-center" @click="closeModal"
+              <Button
+                type="button"
+                variant="outline"
+                class-name="flex-1 justify-center"
+                @click="closeModal"
                 >Cancelar</Button
               >
               <Button type="submit" class-name="flex-1 justify-center">Registrar entrenador</Button>
@@ -169,7 +182,9 @@ import { useGymData, nombreCompleto, iniciales, type Genero } from '@/composable
 const { currentUser } = useAuth()
 const { trainers, addTrainer } = useGymData()
 const modal = ref(false)
-const canCreate = computed(() => currentUser.value?.role === 'Administrador' || currentUser.value?.role === 'Gerente')
+const canCreate = computed(
+  () => currentUser.value?.role === 'Administrador' || currentUser.value?.role === 'Gerente',
+)
 const form = reactive({
   nombres: '',
   apellidos: '',

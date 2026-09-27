@@ -622,8 +622,8 @@ html.dark .fc-daygrid-day.fc-classic-Jk3 {
   background-color: transparent !important;
 }
 
-html.dark [role="dialog"],
-html.dark [role="dialog"].fc-classic-Jk3,
+html.dark [role='dialog'],
+html.dark [role='dialog'].fc-classic-Jk3,
 html.dark .fc-popover,
 html.dark .fc-popover.fc-classic-Jk3,
 html.dark .fc-more-popover {
@@ -644,7 +644,7 @@ html.dark .fc-classic-C1x {
   color: #ffffff !important;
 }
 
-:root[data-color-scheme="dark"],
+:root[data-color-scheme='dark'],
 :root.dark,
 html.dark,
 html.dark body,
@@ -727,9 +727,7 @@ html.dark full-calendar,
 .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child .fc-button {
   @apply !h-auto !w-auto rounded-md !border-0 bg-transparent !px-5 !py-2 text-sm font-medium text-gray-500 hover:text-gray-700 focus:!shadow-none dark:text-gray-400;
 }
-.fc-header-toolbar.fc-toolbar
-  .fc-toolbar-chunk:last-child
-  .fc-button.fc-button-active {
+.fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child .fc-button.fc-button-active {
   @apply text-gray-900 bg-white dark:bg-gray-800 dark:text-white;
 }
 .fc-theme-standard th {
@@ -931,12 +929,12 @@ html.dark full-calendar,
 }
 
 /* Update year view to show bookmark trigger */
-.custom-calendar.fc-multimonth [role="gridcell"] > .fc-g2,
-.custom-calendar .fc-multimonth [role="gridcell"] > .fc-g2,
-.custom-calendar.fc-multimonth [role="gridcell"] > .fc-GV,
-.custom-calendar .fc-multimonth [role="gridcell"] > .fc-GV,
-.custom-calendar.fc-multimonth [role="gridcell"] > div:nth-child(2),
-.custom-calendar .fc-multimonth [role="gridcell"] > div:nth-child(2) {
+.custom-calendar.fc-multimonth [role='gridcell'] > .fc-g2,
+.custom-calendar .fc-multimonth [role='gridcell'] > .fc-g2,
+.custom-calendar.fc-multimonth [role='gridcell'] > .fc-GV,
+.custom-calendar .fc-multimonth [role='gridcell'] > .fc-GV,
+.custom-calendar.fc-multimonth [role='gridcell'] > div:nth-child(2),
+.custom-calendar .fc-multimonth [role='gridcell'] > div:nth-child(2) {
   max-height: 0 !important;
   min-height: 0 !important;
   flex-grow: 0 !important;
@@ -951,10 +949,10 @@ html.dark full-calendar,
   }
 
   /* Month Title sticks below the dashboard AppHeader (56px) */
-  .custom-calendar:has(.fc-multimonth) [role="grid"] [id*="month-"],
-  .custom-calendar .fc-multimonth [role="grid"] [id*="month-"],
-  .custom-calendar.fc-multimonth [role="grid"] [id*="month-"],
-  .custom-calendar [role="grid"].fc-multimonth [id*="month-"] {
+  .custom-calendar:has(.fc-multimonth) [role='grid'] [id*='month-'],
+  .custom-calendar .fc-multimonth [role='grid'] [id*='month-'],
+  .custom-calendar.fc-multimonth [role='grid'] [id*='month-'],
+  .custom-calendar [role='grid'].fc-multimonth [id*='month-'] {
     position: sticky !important;
     top: 56px !important;
     z-index: 10 !important;
@@ -963,111 +961,74 @@ html.dark full-calendar,
     padding-top: 8px !important;
     padding-bottom: 8px !important;
   }
-  .dark .custom-calendar:has(.fc-multimonth) [role="grid"] [id*="month-"],
-  .dark .custom-calendar .fc-multimonth [role="grid"] [id*="month-"],
-  .dark .custom-calendar.fc-multimonth [role="grid"] [id*="month-"],
-  .dark .custom-calendar [role="grid"].fc-multimonth [id*="month-"] {
+  .dark .custom-calendar:has(.fc-multimonth) [role='grid'] [id*='month-'],
+  .dark .custom-calendar .fc-multimonth [role='grid'] [id*='month-'],
+  .dark .custom-calendar.fc-multimonth [role='grid'] [id*='month-'],
+  .dark .custom-calendar [role='grid'].fc-multimonth [id*='month-'] {
     background-color: #111827 !important;
   }
 
   /* Day Header (SUN MON TUE...) sticks directly below the Month Title */
-  .custom-calendar:has(.fc-multimonth)
-    [role="grid"]
-    [role="row"]:has([role="columnheader"]),
-  .custom-calendar:has(.fc-multimonth)
-    [role="grid"]
-    .fc-multimonth-day-header-row,
-  .custom-calendar:has(.fc-multimonth) [role="grid"] .fc-daygrid-header,
-  .custom-calendar
-    .fc-multimonth
-    [role="grid"]
-    [role="row"]:has([role="columnheader"]),
-  .custom-calendar .fc-multimonth [role="grid"] .fc-multimonth-day-header-row,
-  .custom-calendar .fc-multimonth [role="grid"] .fc-daygrid-header,
-  .custom-calendar.fc-multimonth
-    [role="grid"]
-    [role="row"]:has([role="columnheader"]),
-  .custom-calendar.fc-multimonth [role="grid"] .fc-multimonth-day-header-row,
-  .custom-calendar.fc-multimonth [role="grid"] .fc-daygrid-header,
-  .custom-calendar
-    [role="grid"].fc-multimonth
-    [role="row"]:has([role="columnheader"]),
-  .custom-calendar [role="grid"].fc-multimonth .fc-multimonth-day-header-row,
-  .custom-calendar [role="grid"].fc-multimonth .fc-daygrid-header {
+  .custom-calendar:has(.fc-multimonth) [role='grid'] [role='row']:has([role='columnheader']),
+  .custom-calendar:has(.fc-multimonth) [role='grid'] .fc-multimonth-day-header-row,
+  .custom-calendar:has(.fc-multimonth) [role='grid'] .fc-daygrid-header,
+  .custom-calendar .fc-multimonth [role='grid'] [role='row']:has([role='columnheader']),
+  .custom-calendar .fc-multimonth [role='grid'] .fc-multimonth-day-header-row,
+  .custom-calendar .fc-multimonth [role='grid'] .fc-daygrid-header,
+  .custom-calendar.fc-multimonth [role='grid'] [role='row']:has([role='columnheader']),
+  .custom-calendar.fc-multimonth [role='grid'] .fc-multimonth-day-header-row,
+  .custom-calendar.fc-multimonth [role='grid'] .fc-daygrid-header,
+  .custom-calendar [role='grid'].fc-multimonth [role='row']:has([role='columnheader']),
+  .custom-calendar [role='grid'].fc-multimonth .fc-multimonth-day-header-row,
+  .custom-calendar [role='grid'].fc-multimonth .fc-daygrid-header {
     position: sticky !important;
     top: 92px !important;
     z-index: 9 !important;
     background-color: #f9fafb !important;
   }
-  .dark
-    .custom-calendar:has(.fc-multimonth)
-    [role="grid"]
-    [role="row"]:has([role="columnheader"]),
-  .dark
-    .custom-calendar:has(.fc-multimonth)
-    [role="grid"]
-    .fc-multimonth-day-header-row,
-  .dark .custom-calendar:has(.fc-multimonth) [role="grid"] .fc-daygrid-header,
-  .dark
-    .custom-calendar
-    .fc-multimonth
-    [role="grid"]
-    [role="row"]:has([role="columnheader"]),
-  .dark
-    .custom-calendar
-    .fc-multimonth
-    [role="grid"]
-    .fc-multimonth-day-header-row,
-  .dark .custom-calendar .fc-multimonth [role="grid"] .fc-daygrid-header,
-  .dark
-    .custom-calendar.fc-multimonth
-    [role="grid"]
-    [role="row"]:has([role="columnheader"]),
-  .dark
-    .custom-calendar.fc-multimonth
-    [role="grid"]
-    .fc-multimonth-day-header-row,
-  .dark .custom-calendar.fc-multimonth [role="grid"] .fc-daygrid-header,
-  .dark
-    .custom-calendar
-    [role="grid"].fc-multimonth
-    [role="row"]:has([role="columnheader"]),
-  .dark
-    .custom-calendar
-    [role="grid"].fc-multimonth
-    .fc-multimonth-day-header-row,
-  .dark .custom-calendar [role="grid"].fc-multimonth .fc-daygrid-header {
+  .dark .custom-calendar:has(.fc-multimonth) [role='grid'] [role='row']:has([role='columnheader']),
+  .dark .custom-calendar:has(.fc-multimonth) [role='grid'] .fc-multimonth-day-header-row,
+  .dark .custom-calendar:has(.fc-multimonth) [role='grid'] .fc-daygrid-header,
+  .dark .custom-calendar .fc-multimonth [role='grid'] [role='row']:has([role='columnheader']),
+  .dark .custom-calendar .fc-multimonth [role='grid'] .fc-multimonth-day-header-row,
+  .dark .custom-calendar .fc-multimonth [role='grid'] .fc-daygrid-header,
+  .dark .custom-calendar.fc-multimonth [role='grid'] [role='row']:has([role='columnheader']),
+  .dark .custom-calendar.fc-multimonth [role='grid'] .fc-multimonth-day-header-row,
+  .dark .custom-calendar.fc-multimonth [role='grid'] .fc-daygrid-header,
+  .dark .custom-calendar [role='grid'].fc-multimonth [role='row']:has([role='columnheader']),
+  .dark .custom-calendar [role='grid'].fc-multimonth .fc-multimonth-day-header-row,
+  .dark .custom-calendar [role='grid'].fc-multimonth .fc-daygrid-header {
     background-color: #111827 !important;
   }
 
   /* Reset FullCalendar margin math to avoid whitespace gaps */
-  .custom-calendar:has(.fc-multimonth) [role="grid"] > div,
-  .custom-calendar .fc-multimonth [role="grid"] > div,
-  .custom-calendar.fc-multimonth [role="grid"] > div,
-  .custom-calendar [role="grid"].fc-multimonth > div {
+  .custom-calendar:has(.fc-multimonth) [role='grid'] > div,
+  .custom-calendar .fc-multimonth [role='grid'] > div,
+  .custom-calendar.fc-multimonth [role='grid'] > div,
+  .custom-calendar [role='grid'].fc-multimonth > div {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
-  .custom-calendar:has(.fc-multimonth) [role="grid"] > div > div,
-  .custom-calendar .fc-multimonth [role="grid"] > div > div,
-  .custom-calendar.fc-multimonth [role="grid"] > div > div,
-  .custom-calendar [role="grid"].fc-multimonth > div > div {
+  .custom-calendar:has(.fc-multimonth) [role='grid'] > div > div,
+  .custom-calendar .fc-multimonth [role='grid'] > div > div,
+  .custom-calendar.fc-multimonth [role='grid'] > div > div,
+  .custom-calendar [role='grid'].fc-multimonth > div > div {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
 
   /* Remove inner month border and border radius on small devices */
-  .custom-calendar:has(.fc-multimonth) [role="grid"] > div:last-child,
-  .custom-calendar .fc-multimonth [role="grid"] > div:last-child,
-  .custom-calendar.fc-multimonth [role="grid"] > div:last-child,
-  .custom-calendar [role="grid"].fc-multimonth > div:last-child {
+  .custom-calendar:has(.fc-multimonth) [role='grid'] > div:last-child,
+  .custom-calendar .fc-multimonth [role='grid'] > div:last-child,
+  .custom-calendar.fc-multimonth [role='grid'] > div:last-child,
+  .custom-calendar [role='grid'].fc-multimonth > div:last-child {
     border: 0 !important;
     border-radius: 0 !important;
   }
-  .custom-calendar:has(.fc-multimonth) [role="grid"] [role="columnheader"],
-  .custom-calendar .fc-multimonth [role="grid"] [role="columnheader"],
-  .custom-calendar.fc-multimonth [role="grid"] [role="columnheader"],
-  .custom-calendar [role="grid"].fc-multimonth [role="columnheader"] {
+  .custom-calendar:has(.fc-multimonth) [role='grid'] [role='columnheader'],
+  .custom-calendar .fc-multimonth [role='grid'] [role='columnheader'],
+  .custom-calendar.fc-multimonth [role='grid'] [role='columnheader'],
+  .custom-calendar [role='grid'].fc-multimonth [role='columnheader'] {
     border-radius: 0 !important;
   }
 }
@@ -1094,7 +1055,6 @@ html.dark full-calendar,
   right: auto;
   left: 0;
 }
-
 
 .social-button {
   @apply flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200;
@@ -1376,18 +1336,14 @@ pre[class*='language-'] {
   animation: fadeIn 0.15s ease-out forwards;
 }
 
-
-
 /* Force code blocks and syntax highlighting to always remain LTR */
 pre,
 code,
 pre code,
 .line-numbers,
-[class*="language-"],
+[class*='language-'],
 .prism-code {
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: isolate;
 }
-
-

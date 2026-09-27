@@ -15,7 +15,9 @@
           /><Button size="sm" @click="openCreate">+ Nuevo Usuario</Button>
         </div>
       </header>
-      <section class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6">
+      <section
+        class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6"
+      >
         <table class="min-w-full rounded-2xl">
           <thead>
             <tr class="border-b border-gray-100 text-xs uppercase tracking-wider text-gray-400">
@@ -27,14 +29,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="user in filteredUsers" :key="user.id" class="border-b border-gray-100 transition hover:bg-gray-50">
+            <tr
+              v-for="user in filteredUsers"
+              :key="user.id"
+              class="border-b border-gray-100 transition hover:bg-gray-50"
+            >
               <td class="py-4">
                 <div class="flex items-center gap-3">
                   <span
                     class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600"
                     >{{ user.initials }}</span
                   >
-                  <p class="text-sm font-semibold text-gray-800">{{ user.nombres }} {{ user.apellidos }}</p>
+                  <p class="text-sm font-semibold text-gray-800">
+                    {{ user.nombres }} {{ user.apellidos }}
+                  </p>
                 </div>
               </td>
               <td class="py-4 font-mono text-sm text-gray-500">{{ user.nombreUsuario }}</td>
@@ -69,7 +77,11 @@
           >
             <header class="flex items-center justify-between border-b border-gray-200 p-6">
               <h2 class="text-xl font-semibold text-gray-900">
-                {{ editingUser ? `Editar — ${editingUser.nombres} ${editingUser.apellidos}` : 'Nuevo Usuario' }}
+                {{
+                  editingUser
+                    ? `Editar — ${editingUser.nombres} ${editingUser.apellidos}`
+                    : 'Nuevo Usuario'
+                }}
               </h2>
               <button type="button" class="text-2xl text-gray-400" @click="closeModal">×</button>
             </header>
@@ -150,11 +162,15 @@
                   :required="!editingUser"
                   type="password"
                   :placeholder="editingUser ? 'Dejar en blanco para no cambiarla' : ''"
-                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-              >
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+              /></label>
             </div>
             <footer class="flex gap-3 border-t border-gray-100 p-6">
-              <Button type="button" variant="outline" class-name="flex-1 justify-center" @click="closeModal"
+              <Button
+                type="button"
+                variant="outline"
+                class-name="flex-1 justify-center"
+                @click="closeModal"
                 >Cancelar</Button
               >
               <Button type="submit" class-name="flex-1 justify-center">{{
@@ -180,7 +196,9 @@ const users = ref<SessionUser[]>(demoUsers.map(({ password: _password, ...user }
 const search = ref('')
 const filteredUsers = computed(() =>
   users.value.filter((user) =>
-    `${user.nombres} ${user.apellidos} ${user.nombreUsuario}`.toLowerCase().includes(search.value.toLowerCase()),
+    `${user.nombres} ${user.apellidos} ${user.nombreUsuario}`
+      .toLowerCase()
+      .includes(search.value.toLowerCase()),
   ),
 )
 const modal = ref(false)

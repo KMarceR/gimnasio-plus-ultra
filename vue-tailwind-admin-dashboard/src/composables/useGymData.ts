@@ -124,7 +124,8 @@ const initialPlans: GymPlan[] = [
   {
     id: '1',
     nombre: 'Membresía Plus Ultra Black',
-    detalles: 'Acceso completo ilimitado a zona de pesas, cardio, spinning y evaluaciones mensuales.',
+    detalles:
+      'Acceso completo ilimitado a zona de pesas, cardio, spinning y evaluaciones mensuales.',
     precio: 45,
     estado: 'Activo',
   },
@@ -138,8 +139,24 @@ const initialPlans: GymPlan[] = [
 ]
 
 const initialSessions: GymSession[] = [
-  { id: '1', clienteId: '1', entrenadorId: '1', fecha: '2026-09-23', horaInicio: '08:00', horaFin: '09:00', estado: 'Completada' },
-  { id: '2', clienteId: '2', entrenadorId: '1', fecha: '2026-09-26', horaInicio: '16:00', horaFin: '17:00', estado: 'Programada' },
+  {
+    id: '1',
+    clienteId: '1',
+    entrenadorId: '1',
+    fecha: '2026-09-23',
+    horaInicio: '08:00',
+    horaFin: '09:00',
+    estado: 'Completada',
+  },
+  {
+    id: '2',
+    clienteId: '2',
+    entrenadorId: '1',
+    fecha: '2026-09-26',
+    horaInicio: '16:00',
+    horaFin: '17:00',
+    estado: 'Programada',
+  },
 ]
 
 const initialAsistencia: AsistenciaRecord[] = [
@@ -156,14 +173,19 @@ const asistencia = ref<AsistenciaRecord[]>(initialAsistencia)
 const presentMembers = ref<Member[]>([])
 
 export function useGymData() {
-  const activeMembers = computed(() => members.value.filter((member) => member.estado === 'Activo').length)
+  const activeMembers = computed(
+    () => members.value.filter((member) => member.estado === 'Activo').length,
+  )
   const today = computed(() => sessions.value[sessions.value.length - 1]?.fecha || '')
-  const todaySessions = computed(() => sessions.value.filter((session) => session.fecha === today.value).length)
+  const todaySessions = computed(
+    () => sessions.value.filter((session) => session.fecha === today.value).length,
+  )
 
   const memberById = (id: string) => members.value.find((member) => member.id === id)
   const trainerById = (id: string) => trainers.value.find((trainer) => trainer.id === id)
   const planById = (id: string | null) => plans.value.find((plan) => plan.id === id)
-  const attendanceByMember = (id: string) => asistencia.value.filter((record) => record.clienteId === id)
+  const attendanceByMember = (id: string) =>
+    asistencia.value.filter((record) => record.clienteId === id)
 
   const addMember = (member: Member) => members.value.unshift(member)
   const updateMember = (id: string, changes: Partial<Member>) => {

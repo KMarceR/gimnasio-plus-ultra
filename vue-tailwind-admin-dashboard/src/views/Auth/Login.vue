@@ -1,14 +1,20 @@
 <template>
   <FullScreenLayout>
-    <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 p-4">
+    <div
+      class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 p-4"
+    >
       <div class="pointer-events-none absolute inset-0">
         <div class="absolute left-1/3 top-1/4 h-96 w-96 rounded-full bg-brand-500/5 blur-3xl"></div>
-        <div class="absolute bottom-1/4 right-1/3 h-80 w-80 rounded-full bg-orange-500/5 blur-3xl"></div>
+        <div
+          class="absolute bottom-1/4 right-1/3 h-80 w-80 rounded-full bg-orange-500/5 blur-3xl"
+        ></div>
       </div>
 
       <div class="relative w-full max-w-md">
         <div class="mb-8 text-center">
-          <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500">
+          <div
+            class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500"
+          >
             <ZapIcon :size="24" class="text-white" />
           </div>
           <h1 class="font-body text-3xl font-bold tracking-wide text-gray-900">Plus Ultra</h1>
@@ -23,11 +29,15 @@
 
           <form class="space-y-4" @submit.prevent="submit">
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
+              <label
+                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Usuario</label
               >
               <div class="relative">
-                <UserIcon :size="15" class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <UserIcon
+                  :size="15"
+                  class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   v-model="nombreUsuario"
                   type="text"
@@ -39,11 +49,15 @@
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
+              <label
+                class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Contraseña</label
               >
               <div class="relative">
-                <LockIcon :size="15" class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <LockIcon
+                  :size="15"
+                  class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   v-model="password"
                   :type="showPassword ? 'text' : 'password'"

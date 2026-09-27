@@ -5,17 +5,93 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior: () => ({ left: 0, top: 0 }),
   routes: [
-    { path: '/login', name: 'Login', component: () => import('@/views/Auth/Login.vue'), meta: { title: 'Iniciar sesión', public: true } },
-    { path: '/', name: 'Dashboard', component: () => import('@/views/Dashboard.vue'), meta: { title: 'Dashboard' } },
-    { path: '/clientes', name: 'Clientes', component: () => import('@/views/Clientes.vue'), meta: { title: 'Clientes', roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[] } },
-    { path: '/clientes/:id', name: 'ClientePerfil', component: () => import('@/views/ClientePerfil.vue'), meta: { title: 'Perfil de cliente', roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[] } },
-    { path: '/suscripciones', name: 'Suscripciones', component: () => import('@/views/Suscripciones.vue'), meta: { title: 'Suscripciones', roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[] } },
-    { path: '/qr', name: 'Control QR', component: () => import('@/views/ControlQR.vue'), meta: { title: 'Control QR', roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[] } },
-    { path: '/recepcion', name: 'Recepción', component: () => import('@/views/Recepcion.vue'), meta: { title: 'Recepción', roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[] } },
-    { path: '/entrenadores', name: 'Entrenadores', component: () => import('@/views/Entrenadores.vue'), meta: { title: 'Entrenadores', roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[] } },
-    { path: '/entrenadores/:id', name: 'EntrenadorPerfil', component: () => import('@/views/EntrenadorPerfil.vue'), meta: { title: 'Perfil de entrenador', roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[] } },
-    { path: '/sesiones', name: 'Sesiones', component: () => import('@/views/Sesiones.vue'), meta: { title: 'Sesiones', roles: ['Administrador', 'Gerente', 'Entrenador'] as UserRole[] } },
-    { path: '/usuarios', name: 'Usuarios', component: () => import('@/views/Usuarios.vue'), meta: { title: 'Usuarios', roles: ['Administrador'] as UserRole[] } },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/Auth/Login.vue'),
+      meta: { title: 'Iniciar sesión', public: true },
+    },
+    {
+      path: '/',
+      name: 'Dashboard',
+      component: () => import('@/views/Dashboard.vue'),
+      meta: { title: 'Dashboard' },
+    },
+    {
+      path: '/clientes',
+      name: 'Clientes',
+      component: () => import('@/views/Clientes.vue'),
+      meta: {
+        title: 'Clientes',
+        roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[],
+      },
+    },
+    {
+      path: '/clientes/:id',
+      name: 'ClientePerfil',
+      component: () => import('@/views/ClientePerfil.vue'),
+      meta: {
+        title: 'Perfil de cliente',
+        roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[],
+      },
+    },
+    {
+      path: '/suscripciones',
+      name: 'Suscripciones',
+      component: () => import('@/views/Suscripciones.vue'),
+      meta: {
+        title: 'Suscripciones',
+        roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[],
+      },
+    },
+    {
+      path: '/qr',
+      name: 'Control QR',
+      component: () => import('@/views/ControlQR.vue'),
+      meta: {
+        title: 'Control QR',
+        roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[],
+      },
+    },
+    {
+      path: '/recepcion',
+      name: 'Recepción',
+      component: () => import('@/views/Recepcion.vue'),
+      meta: {
+        title: 'Recepción',
+        roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[],
+      },
+    },
+    {
+      path: '/entrenadores',
+      name: 'Entrenadores',
+      component: () => import('@/views/Entrenadores.vue'),
+      meta: {
+        title: 'Entrenadores',
+        roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[],
+      },
+    },
+    {
+      path: '/entrenadores/:id',
+      name: 'EntrenadorPerfil',
+      component: () => import('@/views/EntrenadorPerfil.vue'),
+      meta: {
+        title: 'Perfil de entrenador',
+        roles: ['Administrador', 'Gerente', 'Recepcionista', 'Entrenador'] as UserRole[],
+      },
+    },
+    {
+      path: '/sesiones',
+      name: 'Sesiones',
+      component: () => import('@/views/Sesiones.vue'),
+      meta: { title: 'Sesiones', roles: ['Administrador', 'Gerente', 'Entrenador'] as UserRole[] },
+    },
+    {
+      path: '/usuarios',
+      name: 'Usuarios',
+      component: () => import('@/views/Usuarios.vue'),
+      meta: { title: 'Usuarios', roles: ['Administrador'] as UserRole[] },
+    },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })

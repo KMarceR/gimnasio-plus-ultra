@@ -22,7 +22,9 @@
           <h1 class="mt-1 text-3xl font-semibold text-gray-900">{{ nombreCompleto(trainer) }}</h1>
           <p class="mt-1 text-brand-600">{{ trainer.especialidad }}</p>
         </div>
-        <Badge :color="trainer.estado === 'Activo' ? 'primary' : 'light'">{{ trainer.estado }}</Badge>
+        <Badge :color="trainer.estado === 'Activo' ? 'primary' : 'light'">{{
+          trainer.estado
+        }}</Badge>
       </section>
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section class="rounded-2xl border border-gray-200 bg-white p-6 lg:col-span-2">
@@ -54,11 +56,15 @@
             </div>
             <div class="sm:col-span-2">
               <dt class="text-xs text-gray-500">Dirección</dt>
-              <dd class="mt-1 text-sm font-medium text-gray-800">{{ trainer.direccion || 'No registrada' }}</dd>
+              <dd class="mt-1 text-sm font-medium text-gray-800">
+                {{ trainer.direccion || 'No registrada' }}
+              </dd>
             </div>
             <div>
               <dt class="text-xs text-gray-500">Usuario</dt>
-              <dd class="mt-1 font-mono text-sm font-medium text-gray-800">{{ trainer.nombreUsuario }}</dd>
+              <dd class="mt-1 font-mono text-sm font-medium text-gray-800">
+                {{ trainer.nombreUsuario }}
+              </dd>
             </div>
           </dl>
         </section>
@@ -85,12 +91,22 @@
       <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xs">
         <h2 class="text-lg font-semibold text-gray-900">Historial de sesiones</h2>
         <div class="mt-5 divide-y divide-gray-100">
-          <div v-for="session in misSesiones" :key="session.id" class="flex items-center justify-between py-3">
+          <div
+            v-for="session in misSesiones"
+            :key="session.id"
+            class="flex items-center justify-between py-3"
+          >
             <div>
               <p class="text-sm font-semibold text-gray-800">
-                {{ memberById(session.clienteId) ? nombreCompleto(memberById(session.clienteId)!) : 'Cliente eliminado' }}
+                {{
+                  memberById(session.clienteId)
+                    ? nombreCompleto(memberById(session.clienteId)!)
+                    : 'Cliente eliminado'
+                }}
               </p>
-              <p class="text-xs text-gray-500">{{ session.fecha }} · {{ session.horaInicio }} - {{ session.horaFin }}</p>
+              <p class="text-xs text-gray-500">
+                {{ session.fecha }} · {{ session.horaInicio }} - {{ session.horaFin }}
+              </p>
             </div>
             <Badge :color="sessionColor(session.estado)">{{ session.estado }}</Badge>
           </div>
@@ -113,12 +129,14 @@ const route = useRoute()
 const router = useRouter()
 const { trainerById, memberById, sessions } = useGymData()
 const trainer = trainerById(String(route.params.id))
-const misSesiones = computed(() => sessions.value.filter((session) => session.entrenadorId === trainer?.id))
-const completadas = computed(() => misSesiones.value.filter((session) => session.estado === 'Completada'))
+const misSesiones = computed(() =>
+  sessions.value.filter((session) => session.entrenadorId === trainer?.id),
+)
+const completadas = computed(() =>
+  misSesiones.value.filter((session) => session.estado === 'Completada'),
+)
 const sessionColor = (estado: SessionStatus) =>
-  ({ Programada: 'info', Confirmada: 'primary', Completada: 'success', Cancelada: 'light' })[estado] as
-    | 'info'
-    | 'primary'
-    | 'success'
-    | 'light'
+  ({ Programada: 'info', Confirmada: 'primary', Completada: 'success', Cancelada: 'light' })[
+    estado
+  ] as 'info' | 'primary' | 'success' | 'light'
 </script>

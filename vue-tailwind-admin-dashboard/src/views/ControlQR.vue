@@ -47,17 +47,27 @@
               >
               <div class="flex-1">
                 <p class="text-sm font-semibold text-gray-800">
-                  {{ memberById(record.clienteId) ? nombreCompleto(memberById(record.clienteId)!) : 'Cliente eliminado' }}
+                  {{
+                    memberById(record.clienteId)
+                      ? nombreCompleto(memberById(record.clienteId)!)
+                      : 'Cliente eliminado'
+                  }}
                 </p>
                 <p class="text-xs text-gray-500">{{ record.fecha }} · {{ record.hora }}</p>
               </div>
               <span
-                :class="record.estado === 'Activo' || record.estado === 'Completada' ? 'text-brand-600' : 'text-error-600'"
+                :class="
+                  record.estado === 'Activo' || record.estado === 'Completada'
+                    ? 'text-brand-600'
+                    : 'text-error-600'
+                "
                 class="text-sm font-semibold"
                 >{{ record.estado }}</span
               >
             </div>
-            <p v-if="!asistencia.length" class="py-6 text-center text-sm text-gray-500">Sin registros hoy.</p>
+            <p v-if="!asistencia.length" class="py-6 text-center text-sm text-gray-500">
+              Sin registros hoy.
+            </p>
           </div>
         </section>
       </div>

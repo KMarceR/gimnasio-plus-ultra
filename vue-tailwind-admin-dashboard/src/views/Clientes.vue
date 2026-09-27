@@ -54,7 +54,9 @@
                       >{{ iniciales(member) }}</span
                     >
                     <div>
-                      <p class="text-sm font-semibold text-gray-800">{{ nombreCompleto(member) }}</p>
+                      <p class="text-sm font-semibold text-gray-800">
+                        {{ nombreCompleto(member) }}
+                      </p>
                       <p class="text-xs text-gray-500">{{ member.email }}</p>
                     </div>
                   </div>
@@ -195,7 +197,13 @@ import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import { useAuth } from '@/composables/useAuth'
-import { useGymData, nombreCompleto, iniciales, type EstadoGeneral, type Genero } from '@/composables/useGymData'
+import {
+  useGymData,
+  nombreCompleto,
+  iniciales,
+  type EstadoGeneral,
+  type Genero,
+} from '@/composables/useGymData'
 
 const router = useRouter()
 const { currentUser } = useAuth()
@@ -221,7 +229,9 @@ const filteredMembers = computed(() =>
   members.value.filter(
     (member) =>
       (filter.value === 'Todos' || member.estado === filter.value) &&
-      `${nombreCompleto(member)} ${member.email} ${member.dui}`.toLowerCase().includes(search.value.toLowerCase()),
+      `${nombreCompleto(member)} ${member.email} ${member.dui}`
+        .toLowerCase()
+        .includes(search.value.toLowerCase()),
   ),
 )
 const statusColor = (estado: EstadoGeneral) =>

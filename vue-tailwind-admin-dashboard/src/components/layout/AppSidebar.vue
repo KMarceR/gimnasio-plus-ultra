@@ -1,12 +1,15 @@
 <template>
-  <aside class="fixed start-0 top-0 z-999 flex h-screen w-60 shrink-0 flex-col border-e border-gray-200 bg-white">
+  <aside
+    class="fixed start-0 top-0 z-999 flex h-screen w-60 shrink-0 flex-col border-e border-gray-200 bg-white"
+  >
     <div class="border-b border-gray-200 px-5 py-5">
       <router-link to="/" class="flex items-center gap-3">
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500">
           <ZapIcon :size="17" class="text-white" />
         </span>
         <span>
-          <strong class="font-body block text-sm font-bold uppercase leading-none tracking-widest text-gray-900"
+          <strong
+            class="font-body block text-sm font-bold uppercase leading-none tracking-widest text-gray-900"
             >Plus Ultra</strong
           >
           <small class="mt-0.5 block text-xs text-gray-500">Gestión Integral</small>
@@ -39,7 +42,9 @@
           {{ currentUser?.initials }}
         </div>
         <div class="min-w-0 flex-1">
-          <p class="truncate text-xs font-semibold text-gray-800">{{ currentUser?.nombres }} {{ currentUser?.apellidos }}</p>
+          <p class="truncate text-xs font-semibold text-gray-800">
+            {{ currentUser?.nombres }} {{ currentUser?.apellidos }}
+          </p>
           <p class="truncate text-xs text-gray-500">{{ currentUser?.role }}</p>
         </div>
       </div>
@@ -88,16 +93,38 @@ interface NavItem {
 const allNavItems: NavItem[] = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboardIcon },
   { name: 'Clientes', path: '/clientes', icon: UsersIcon },
-  { name: 'Suscripciones', path: '/suscripciones', icon: CreditCardIcon, roles: ['Administrador', 'Gerente', 'Recepcionista'] },
-  { name: 'Control QR', path: '/qr', icon: QrCodeIcon, roles: ['Administrador', 'Gerente', 'Recepcionista'] },
-  { name: 'Recepción', path: '/recepcion', icon: ShieldIcon, roles: ['Administrador', 'Gerente', 'Recepcionista'] },
+  {
+    name: 'Suscripciones',
+    path: '/suscripciones',
+    icon: CreditCardIcon,
+    roles: ['Administrador', 'Gerente', 'Recepcionista'],
+  },
+  {
+    name: 'Control QR',
+    path: '/qr',
+    icon: QrCodeIcon,
+    roles: ['Administrador', 'Gerente', 'Recepcionista'],
+  },
+  {
+    name: 'Recepción',
+    path: '/recepcion',
+    icon: ShieldIcon,
+    roles: ['Administrador', 'Gerente', 'Recepcionista'],
+  },
   { name: 'Entrenadores', path: '/entrenadores', icon: DumbbellIcon },
-  { name: 'Sesiones', path: '/sesiones', icon: CalendarIcon, roles: ['Administrador', 'Gerente', 'Entrenador'] },
+  {
+    name: 'Sesiones',
+    path: '/sesiones',
+    icon: CalendarIcon,
+    roles: ['Administrador', 'Gerente', 'Entrenador'],
+  },
   { name: 'Usuarios', path: '/usuarios', icon: SettingsIcon, roles: ['Administrador'] },
 ]
 
 const navItems = computed(() =>
-  allNavItems.filter((item) => !item.roles || item.roles.includes(currentUser.value?.role as UserRole)),
+  allNavItems.filter(
+    (item) => !item.roles || item.roles.includes(currentUser.value?.role as UserRole),
+  ),
 )
 
 const roleAvatarColor: Record<UserRole, string> = {

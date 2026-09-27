@@ -71,5 +71,4 @@ const optionsTwo = [
 ]
 
 const singleSelect = ref('')
-
 </script>
