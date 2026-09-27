@@ -30,6 +30,29 @@ public class EstadoService {
                 .map(this::convertirAResponse).toList();
     }
 
+    public EstadoResponse obtenerPorId(Integer id) {
+        return estadoRepository.findById(id)
+                .map(this::convertirAResponse)
+                .orElse(null);
+    }
+
+    public EstadoResponse actualizar(Integer id, EstadoRequest request) {
+        Estado estado = estadoRepository.findById(id).orElse(null);
+        if (estado == null) {
+            return null;
+        }
+        estado.setNombreEstado(request.getNombreEstado());
+        return convertirAResponse(estadoRepository.save(estado));
+    }
+
+    public boolean eliminar(Integer id) {
+        if (!estadoRepository.existsById(id)) {
+            return false;
+        }
+        estadoRepository.deleteById(id);
+        return true;
+    }
+
     private EstadoResponse convertirAResponse(Estado estado) {
         EstadoResponse response = new EstadoResponse();
         response.setIdEstado(estado.getIdEstado());

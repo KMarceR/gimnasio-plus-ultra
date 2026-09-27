@@ -28,6 +28,41 @@ public class AsistenciaService {
 
     public AsistenciaResponse crear(AsistenciaRequest request) {
         Asistencia asistencia = new Asistencia();
+        aplicarDatos(asistencia, request);
+
+        Asistencia nuevaAsistencia = asistenciaRepository.save(asistencia);
+        return convertirAResponse(nuevaAsistencia);
+    }
+
+    public List<AsistenciaResponse> obtenerTodos() {
+        return asistenciaRepository.findAll().stream()
+                .map(this::convertirAResponse).toList();
+    }
+
+    public AsistenciaResponse obtenerPorId(Integer id) {
+        return asistenciaRepository.findById(id)
+                .map(this::convertirAResponse)
+                .orElse(null);
+    }
+
+    public AsistenciaResponse actualizar(Integer id, AsistenciaRequest request) {
+        Asistencia asistencia = asistenciaRepository.findById(id).orElse(null);
+        if (asistencia == null) {
+            return null;
+        }
+        aplicarDatos(asistencia, request);
+        return convertirAResponse(asistenciaRepository.save(asistencia));
+    }
+
+    public boolean eliminar(Integer id) {
+        if (!asistenciaRepository.existsById(id)) {
+            return false;
+        }
+        asistenciaRepository.deleteById(id);
+        return true;
+    }
+
+    private void aplicarDatos(Asistencia asistencia, AsistenciaRequest request) {
         asistencia.setFechaAsistencia(request.getFechaAsistencia());
         asistencia.setHoraSesion(request.getHoraSesion());
 
@@ -38,14 +73,6 @@ public class AsistenciaService {
         Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
                 .orElseThrow(() -> new RuntimeException("Estado inválido"));
         asistencia.setEstado(estado);
-
-        Asistencia nuevaAsistencia = asistenciaRepository.save(asistencia);
-        return convertirAResponse(nuevaAsistencia);
-    }
-
-    public List<AsistenciaResponse> obtenerTodos() {
-        return asistenciaRepository.findAll().stream()
-                .map(this::convertirAResponse).toList();
     }
 
     private AsistenciaResponse convertirAResponse(Asistencia asistencia) {

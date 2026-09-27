@@ -28,28 +28,7 @@ public class EntrenadorService {
 
     public EntrenadorResponse crear(EntrenadorRequest request) {
         Entrenador entrenador = new Entrenador();
-        
-        // Atributos de Persona (Padre)
-        entrenador.setNombres(request.getNombres());
-        entrenador.setApellidos(request.getApellidos());
-        entrenador.setEmail(request.getEmail());
-        entrenador.setTelefono(request.getTelefono());
-        entrenador.setDireccion(request.getDireccion());
-        entrenador.setGenero(request.getGenero());
-        entrenador.setDui(request.getDui());
-        entrenador.setFechaNacimiento(request.getFechaNacimiento());
-
-        // Atributos de Entrenador (Hijo)
-        entrenador.setEspecialidad(request.getEspecialidad());
-        entrenador.setTarifaPorSesion(request.getTarifaPorSesion());
-
-        Usuario usuario = usuarioRepository.findById(Integer.valueOf(request.getIdUsuario()))
-                .orElseThrow(() -> new RuntimeException("Usuario del sistema no encontrado"));
-        entrenador.setUsuario(usuario);
-
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
-        entrenador.setEstado(estado);
+        aplicarDatos(entrenador, request);
 
         Entrenador nuevoEntrenador = entrenadorRepository.save(entrenador);
         return convertirAResponse(nuevoEntrenador);
@@ -60,9 +39,54 @@ public class EntrenadorService {
                 .map(this::convertirAResponse).toList();
     }
 
+    public EntrenadorResponse obtenerPorId(Integer id) {
+        return entrenadorRepository.findById(id)
+                .map(this::convertirAResponse)
+                .orElse(null);
+    }
+
+    public EntrenadorResponse actualizar(Integer id, EntrenadorRequest request) {
+        Entrenador entrenador = entrenadorRepository.findById(id).orElse(null);
+        if (entrenador == null) {
+            return null;
+        }
+        aplicarDatos(entrenador, request);
+        return convertirAResponse(entrenadorRepository.save(entrenador));
+    }
+
+    public boolean eliminar(Integer id) {
+        if (!entrenadorRepository.existsById(id)) {
+            return false;
+        }
+        entrenadorRepository.deleteById(id);
+        return true;
+    }
+
+    private void aplicarDatos(Entrenador entrenador, EntrenadorRequest request) {
+        entrenador.setNombres(request.getNombres());
+        entrenador.setApellidos(request.getApellidos());
+        entrenador.setEmail(request.getEmail());
+        entrenador.setTelefono(request.getTelefono());
+        entrenador.setDireccion(request.getDireccion());
+        entrenador.setGenero(request.getGenero());
+        entrenador.setDui(request.getDui());
+        entrenador.setFechaNacimiento(request.getFechaNacimiento());
+
+        entrenador.setEspecialidad(request.getEspecialidad());
+        entrenador.setTarifaPorSesion(request.getTarifaPorSesion());
+
+        Usuario usuario = usuarioRepository.findById(Integer.valueOf(request.getIdUsuario()))
+                .orElseThrow(() -> new RuntimeException("Usuario del sistema no encontrado"));
+        entrenador.setUsuario(usuario);
+
+        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+        entrenador.setEstado(estado);
+    }
+
     private EntrenadorResponse convertirAResponse(Entrenador entrenador) {
         EntrenadorResponse response = new EntrenadorResponse();
-        
+
         response.setIdPersona(entrenador.getIdPersona());
         response.setNombres(entrenador.getNombres());
         response.setApellidos(entrenador.getApellidos());

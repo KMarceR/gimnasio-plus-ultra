@@ -2,11 +2,14 @@ package com.sv.grupo7.gimnasio_plus_ultra.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.sv.grupo7.gimnasio_plus_ultra.dto.PersonaRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.PersonaResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Persona;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 
+@Service
 public class PersonaService {
 
     private final PersonaRepository personaRepository;
@@ -15,11 +18,8 @@ public class PersonaService {
         this.personaRepository = personaRepository;
     }
 
-    // Al ser Persona abstracta, creamos una subclase anónima temporal para permitir
-    // el mapeo base
     public PersonaResponse crear(PersonaRequest personaRequest) {
-        Persona persona = new Persona() {
-        };
+        Persona persona = new Persona();
 
         persona.setNombres(personaRequest.getNombres());
         persona.setApellidos(personaRequest.getApellidos());
@@ -30,7 +30,6 @@ public class PersonaService {
         persona.setDui(personaRequest.getDui());
         persona.setFechaNacimiento(personaRequest.getFechaNacimiento());
 
-        // Se usa personaRepository.save() sobre la entidad Persona, no sobre el repositorio mismo
         Persona nuevaPersona = personaRepository.save(persona);
         return convertirAResponse(nuevaPersona);
     }
@@ -74,7 +73,6 @@ public class PersonaService {
         return true;
     }
 
-    // Mapeador auxiliar encapsulado
     private PersonaResponse convertirAResponse(Persona persona) {
         PersonaResponse response = new PersonaResponse();
         response.setIdPersona(persona.getIdPersona());

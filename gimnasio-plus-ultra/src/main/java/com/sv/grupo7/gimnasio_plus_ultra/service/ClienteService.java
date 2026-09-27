@@ -30,27 +30,7 @@ public class ClienteService {
 
     public ClienteResponse crear(ClienteRequest request) {
         Cliente cliente = new Cliente();
-
-        cliente.setNombres(request.getNombres());
-        cliente.setApellidos(request.getApellidos());
-        cliente.setEmail(request.getEmail());
-        cliente.setTelefono(request.getTelefono());
-        cliente.setDireccion(request.getDireccion());
-        cliente.setGenero(request.getGenero());
-        cliente.setDui(request.getDui());
-        cliente.setFechaNacimiento(request.getFechaNacimiento());
-        cliente.setNotas(request.getNotas());
-
-        // Conversión segura de tipo primitivo int a objeto Integer para JpaRepository
-        if (request.getIdPlanSuscripcion() > 0) {
-            PlanSuscripcion plan = planSuscripcionRepository.findById(Integer.valueOf(request.getIdPlanSuscripcion()))
-                    .orElse(null);
-            cliente.setPlanSuscripcion(plan);
-        }
-
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
-        cliente.setEstado(estado);
+        aplicarDatos(cliente, request);
 
         Cliente nuevoCliente = clienteRepository.save(cliente);
         return convertirAResponse(nuevoCliente);
@@ -65,6 +45,47 @@ public class ClienteService {
         return clienteRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
+    }
+
+    public ClienteResponse actualizar(Integer id, ClienteRequest request) {
+        Cliente cliente = clienteRepository.findById(id).orElse(null);
+        if (cliente == null) {
+            return null;
+        }
+        aplicarDatos(cliente, request);
+        return convertirAResponse(clienteRepository.save(cliente));
+    }
+
+    public boolean eliminar(Integer id) {
+        if (!clienteRepository.existsById(id)) {
+            return false;
+        }
+        clienteRepository.deleteById(id);
+        return true;
+    }
+
+    private void aplicarDatos(Cliente cliente, ClienteRequest request) {
+        cliente.setNombres(request.getNombres());
+        cliente.setApellidos(request.getApellidos());
+        cliente.setEmail(request.getEmail());
+        cliente.setTelefono(request.getTelefono());
+        cliente.setDireccion(request.getDireccion());
+        cliente.setGenero(request.getGenero());
+        cliente.setDui(request.getDui());
+        cliente.setFechaNacimiento(request.getFechaNacimiento());
+        cliente.setNotas(request.getNotas());
+
+        if (request.getIdPlanSuscripcion() > 0) {
+            PlanSuscripcion plan = planSuscripcionRepository.findById(Integer.valueOf(request.getIdPlanSuscripcion()))
+                    .orElse(null);
+            cliente.setPlanSuscripcion(plan);
+        } else {
+            cliente.setPlanSuscripcion(null);
+        }
+
+        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+        cliente.setEstado(estado);
     }
 
     private ClienteResponse convertirAResponse(Cliente cliente) {

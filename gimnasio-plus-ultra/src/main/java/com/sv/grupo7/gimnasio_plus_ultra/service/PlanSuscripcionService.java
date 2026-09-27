@@ -24,13 +24,7 @@ public class PlanSuscripcionService {
 
     public PlanSuscripcionResponse crear(PlanSuscripcionRequest request) {
         PlanSuscripcion plan = new PlanSuscripcion();
-        plan.setNombreSuscripcion(request.getNombreSuscripcion());
-        plan.setDetalles(request.getDetalles());
-        plan.setPrecio(request.getPrecio());
-
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
-        plan.setEstado(estado);
+        aplicarDatos(plan, request);
 
         PlanSuscripcion nuevoPlan = planSuscripcionRepository.save(plan);
         return convertirAResponse(nuevoPlan);
@@ -41,6 +35,39 @@ public class PlanSuscripcionService {
                 .map(this::convertirAResponse).toList();
     }
 
+    public PlanSuscripcionResponse obtenerPorId(Integer id) {
+        return planSuscripcionRepository.findById(id)
+                .map(this::convertirAResponse)
+                .orElse(null);
+    }
+
+    public PlanSuscripcionResponse actualizar(Integer id, PlanSuscripcionRequest request) {
+        PlanSuscripcion plan = planSuscripcionRepository.findById(id).orElse(null);
+        if (plan == null) {
+            return null;
+        }
+        aplicarDatos(plan, request);
+        return convertirAResponse(planSuscripcionRepository.save(plan));
+    }
+
+    public boolean eliminar(Integer id) {
+        if (!planSuscripcionRepository.existsById(id)) {
+            return false;
+        }
+        planSuscripcionRepository.deleteById(id);
+        return true;
+    }
+
+    private void aplicarDatos(PlanSuscripcion plan, PlanSuscripcionRequest request) {
+        plan.setNombreSuscripcion(request.getNombreSuscripcion());
+        plan.setDetalles(request.getDetalles());
+        plan.setPrecio(request.getPrecio());
+
+        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+        plan.setEstado(estado);
+    }
+
     private PlanSuscripcionResponse convertirAResponse(PlanSuscripcion plan) {
         PlanSuscripcionResponse response = new PlanSuscripcionResponse();
         response.setIdPlanSuscripcion(plan.getIdPlanSuscripcion());
@@ -48,7 +75,7 @@ public class PlanSuscripcionService {
         response.setDetalles(plan.getDetalles());
         response.setPrecio(plan.getPrecio());
         response.setCreadoEn(plan.getCreadoEn());
-        
+
         if (plan.getEstado() != null) {
             response.setNombreEstado(plan.getEstado().getNombreEstado());
         }

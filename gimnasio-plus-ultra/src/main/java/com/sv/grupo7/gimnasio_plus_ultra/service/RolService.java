@@ -30,6 +30,29 @@ public class RolService {
                 .map(this::convertirAResponse).toList();
     }
 
+    public RolResponse obtenerPorId(Integer id) {
+        return rolRepository.findById(id)
+                .map(this::convertirAResponse)
+                .orElse(null);
+    }
+
+    public RolResponse actualizar(Integer id, RolRequest request) {
+        Rol rol = rolRepository.findById(id).orElse(null);
+        if (rol == null) {
+            return null;
+        }
+        rol.setNombreRol(request.getNombreRol());
+        return convertirAResponse(rolRepository.save(rol));
+    }
+
+    public boolean eliminar(Integer id) {
+        if (!rolRepository.existsById(id)) {
+            return false;
+        }
+        rolRepository.deleteById(id);
+        return true;
+    }
+
     private RolResponse convertirAResponse(Rol rol) {
         RolResponse response = new RolResponse();
         response.setIdRol(rol.getIdRol());
