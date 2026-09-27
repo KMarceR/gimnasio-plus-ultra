@@ -18,6 +18,7 @@ public class Rol {
     @Column(name = "id_rol")
     private int id_rol;
 
+    @Column(nullable = false, unique = true)
     private String nombre_rol;
 
     @Column(name = "creado_en", insertable = false, updatable = false)

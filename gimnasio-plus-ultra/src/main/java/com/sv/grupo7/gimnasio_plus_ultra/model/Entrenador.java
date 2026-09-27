@@ -1,22 +1,31 @@
 package com.sv.grupo7.gimnasio_plus_ultra.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "entrenadores")
-@PrimaryKeyJoinColumn(name = "id_persona")
-public class Entrenador extends Persona{
+public class Entrenador {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_entrenador")
     private int id_entrenador;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_persona", nullable = false, unique = true)
+    private Persona persona = new Persona();
 
     @OneToOne
     @JoinColumn(name = "id_usuario", nullable = false, unique = true)
@@ -34,13 +43,32 @@ public class Entrenador extends Persona{
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creado_en;
 
-    public Entrenador() {
-        super(); 
-    }
+    public Entrenador() {}
 
-    // Getters y Setters con encapsulamiento estricto
     public int getIdEntrenador() { return id_entrenador; }
     public void setIdEntrenador(int id_entrenador) { this.id_entrenador = id_entrenador; }
+
+    public Persona getPersona() { return persona; }
+    public void setPersona(Persona persona) { this.persona = persona; }
+
+    // Delegados hacia Persona
+    public int getIdPersona() { return persona.getIdPersona(); }
+    public String getNombres() { return persona.getNombres(); }
+    public void setNombres(String nombres) { persona.setNombres(nombres); }
+    public String getApellidos() { return persona.getApellidos(); }
+    public void setApellidos(String apellidos) { persona.setApellidos(apellidos); }
+    public String getGenero() { return persona.getGenero(); }
+    public void setGenero(String genero) { persona.setGenero(genero); }
+    public LocalDate getFechaNacimiento() { return persona.getFechaNacimiento(); }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { persona.setFechaNacimiento(fechaNacimiento); }
+    public String getDireccion() { return persona.getDireccion(); }
+    public void setDireccion(String direccion) { persona.setDireccion(direccion); }
+    public String getEmail() { return persona.getEmail(); }
+    public void setEmail(String email) { persona.setEmail(email); }
+    public String getTelefono() { return persona.getTelefono(); }
+    public void setTelefono(String telefono) { persona.setTelefono(telefono); }
+    public String getDui() { return persona.getDui(); }
+    public void setDui(String dui) { persona.setDui(dui); }
 
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }

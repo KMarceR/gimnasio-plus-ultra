@@ -18,6 +18,7 @@ public class Estado {
     @Column(name = "id_estado")
     private int id_estado;
 
+    @Column(nullable = false, unique = true)
     private String nombre_estado;
 
     @Column(name = "creado_en", insertable = false, updatable = false)

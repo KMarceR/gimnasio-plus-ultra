@@ -1,53 +1,81 @@
 package com.sv.grupo7.gimnasio_plus_ultra.model;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
-@Entity 
+@Entity
 @Table(name = "usuarios")
-@PrimaryKeyJoinColumn(name = "id_persona") 
-public class Usuario extends Persona { 
+public class Usuario {
 
-    @Id 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private int id_usuario;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_persona", nullable = false, unique = true)
+    private Persona persona = new Persona();
+
     @ManyToOne
     @JoinColumn(name = "id_rol", nullable = false)
-    private Rol id_rol; 
+    private Rol rol;
 
     @ManyToOne
     @JoinColumn(name = "id_estado", nullable = false)
-    private Estado id_estado;
+    private Estado estado;
 
     @Column(name = "nombre_usuario", nullable = false, unique = true)
     private String nombre_usuario;
-    
+
     @Column(nullable = false)
     private String contrasena;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creado_en;
 
-    public Usuario() {
-        super();
-    }
+    public Usuario() {}
 
-    // Getters y Setters específicos de Usuario
     public int getIdUsuario() { return id_usuario; }
     public void setIdUsuario(int id_usuario) { this.id_usuario = id_usuario; }
 
-    public Rol getIdRol() { return id_rol; }
-    public void setIdRol(Rol id_rol) { this.id_rol = id_rol; }
+    public Persona getPersona() { return persona; }
+    public void setPersona(Persona persona) { this.persona = persona; }
 
-    public Estado getIdEstado() { return id_estado; }
-    public void setIdEstado(Estado id_estado) { this.id_estado = id_estado; }
+    // Delegados hacia Persona
+    public int getIdPersona() { return persona.getIdPersona(); }
+    public String getNombres() { return persona.getNombres(); }
+    public void setNombres(String nombres) { persona.setNombres(nombres); }
+    public String getApellidos() { return persona.getApellidos(); }
+    public void setApellidos(String apellidos) { persona.setApellidos(apellidos); }
+    public String getGenero() { return persona.getGenero(); }
+    public void setGenero(String genero) { persona.setGenero(genero); }
+    public LocalDate getFechaNacimiento() { return persona.getFechaNacimiento(); }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { persona.setFechaNacimiento(fechaNacimiento); }
+    public String getDireccion() { return persona.getDireccion(); }
+    public void setDireccion(String direccion) { persona.setDireccion(direccion); }
+    public String getEmail() { return persona.getEmail(); }
+    public void setEmail(String email) { persona.setEmail(email); }
+    public String getTelefono() { return persona.getTelefono(); }
+    public void setTelefono(String telefono) { persona.setTelefono(telefono); }
+    public String getDui() { return persona.getDui(); }
+    public void setDui(String dui) { persona.setDui(dui); }
+
+    public Rol getRol() { return rol; }
+    public void setRol(Rol rol) { this.rol = rol; }
+
+    public Estado getEstado() { return estado; }
+    public void setEstado(Estado estado) { this.estado = estado; }
 
     public String getNombreUsuario() { return nombre_usuario; }
     public void setNombreUsuario(String nombre_usuario) { this.nombre_usuario = nombre_usuario; }

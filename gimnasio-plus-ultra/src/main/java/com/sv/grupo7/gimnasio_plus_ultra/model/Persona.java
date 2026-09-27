@@ -5,31 +5,39 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 
-@Entity 
+@Entity
 @Table(name = "persona")
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Persona {
+public class Persona {
 
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_persona")
     private int id_persona;
 
+    @Column(nullable = false)
     private String nombres;
+
+    @Column(nullable = false)
     private String apellidos;
+
+    @Column(nullable = false)
     private String genero;
-    
-    @Column(name = "fecha_nacimiento")
+
+    @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fecha_nacimiento;
-    
+
     private String direccion;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
     private String telefono;
+
+    @Column(nullable = false, unique = true)
     private String dui;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
@@ -37,7 +45,6 @@ public abstract class Persona {
 
     public Persona() {}
 
-    // Getters y Setters con encapsulamiento estricto de Persona
     public int getIdPersona() { return id_persona; }
     public void setIdPersona(int id_persona) { this.id_persona = id_persona; }
 
