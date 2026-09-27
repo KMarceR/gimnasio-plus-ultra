@@ -8,7 +8,6 @@
         <div class="flex gap-2">
           <Button size="sm" variant="outline" @click="openEdit(selectedPlan)">Editar plan</Button>
           <Button
-            v-if="!selectedPlan.isBase"
             size="sm"
             variant="outline"
             class-name="!ring-error-200 !text-error-600 hover:!bg-error-50"
@@ -18,50 +17,29 @@
           </Button>
         </div>
       </div>
-      <section
-        :class="planTheme(selectedPlan.color).border"
-        class="rounded-2xl border bg-white p-6 shadow-theme-xs sm:p-8"
-      >
+      <section class="rounded-2xl border border-brand-200 bg-white p-6 shadow-theme-xs sm:p-8">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
-          <span
-            :class="planTheme(selectedPlan.color).soft"
-            class="flex h-14 w-14 items-center justify-center rounded-2xl text-2xl"
-            ><CreditCard class="h-7 w-7" :stroke-width="1.8"
+          <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-2xl"
+            ><CreditCard class="h-7 w-7 text-brand-600" :stroke-width="1.8"
           /></span>
           <div class="flex-1">
             <div class="flex flex-wrap items-center gap-2">
-              <span
-                :class="planTheme(selectedPlan.color).text"
-                class="text-sm font-semibold uppercase"
-                >{{ selectedPlan.duration }}</span
-              ><span
-                class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600"
-                >{{ membersForPlan(selectedPlan.name).length }} socios activos</span
+              <Badge :color="selectedPlan.estado === 'Activo' ? 'primary' : 'light'">{{
+                selectedPlan.estado
+              }}</Badge>
+              <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600"
+                >{{ membersForPlan(selectedPlan.id).length }} socios</span
               >
             </div>
-            <h1 class="mt-2 text-3xl font-semibold text-gray-900">{{ selectedPlan.name }}</h1>
-            <p :class="planTheme(selectedPlan.color).text" class="mt-3 text-4xl font-bold">
-              ${{ selectedPlan.price.toLocaleString('es-MX')
-              }}<small class="text-base font-normal text-gray-500">
-                / {{ selectedPlan.duration }}</small
-              >
-            </p>
+            <h1 class="mt-2 text-3xl font-semibold text-gray-900">{{ selectedPlan.nombre }}</h1>
+            <p class="mt-3 max-w-xl text-sm text-gray-600">{{ selectedPlan.detalles }}</p>
           </div>
           <div class="text-end">
-            <p class="text-xs text-gray-500">Facturación mensual</p>
-            <p :class="planTheme(selectedPlan.color).text" class="mt-1 text-2xl font-bold">
-              ${{
-                (membersForPlan(selectedPlan.name).length * selectedPlan.price).toLocaleString(
-                  'es-MX',
-                )
-              }}
+            <p class="text-xs text-gray-500">Precio</p>
+            <p class="mt-1 text-3xl font-bold text-brand-600">
+              ${{ selectedPlan.precio.toLocaleString('es-SV') }}
             </p>
           </div>
-        </div>
-        <div class="mt-8 grid grid-cols-1 gap-3 border-t border-gray-100 pt-6 sm:grid-cols-2">
-          <p v-for="feature in selectedPlan.features" :key="feature" class="text-sm text-gray-600">
-            <span :class="planTheme(selectedPlan.color).text">✓</span> {{ feature }}
-          </p>
         </div>
       </section>
       <section class="rounded-2xl border border-gray-200 bg-white shadow-theme-xs">
@@ -82,14 +60,15 @@
         >
           <span
             class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600"
-            >{{ member.initials }}</span
+            >{{ iniciales(member) }}</span
           >
           <div class="flex-1">
-            <p class="text-sm font-semibold text-gray-800">{{ member.name }}</p>
+            <p class="text-sm font-semibold text-gray-800">{{ nombreCompleto(member) }}</p>
             <p class="text-xs text-gray-500">{{ member.email }}</p>
           </div>
-          <p class="hidden text-sm text-gray-500 sm:block">Vence {{ member.expiry }}</p>
-          <Badge :color="memberStatusColor(member.status)">{{ member.status }}</Badge>
+          <Badge :color="member.estado === 'Activo' ? 'primary' : 'light'">{{
+            member.estado
+          }}</Badge>
         </div>
         <p v-if="!planMembers.length" class="p-8 text-center text-sm text-gray-500">
           No hay socios asignados a este plan.
@@ -125,199 +104,137 @@
           <p class="mt-1 text-xs text-gray-500">{{ stat.caption }}</p>
         </article>
       </section>
-      <section class="space-y-4">
-        <article
-          v-for="plan in filteredPlans"
-          :key="plan.id"
-          :class="planTheme(plan.color).border"
-          class="group cursor-pointer rounded-2xl border bg-white p-5 shadow-theme-xs transition duration-200 hover:-translate-y-1 hover:bg-gray-50/70 hover:shadow-theme-lg hover:ring-2 hover:ring-brand-500/10"
-          @click="openDetail(plan)"
-        >
-          <div class="flex flex-col gap-4 md:flex-row md:items-center">
-            <div class="flex min-w-55 items-center gap-4">
-              <span
-                :class="planTheme(plan.color).soft"
-                class="flex h-11 w-11 items-center justify-center rounded-xl transition duration-200 group-hover:scale-110"
-                ><CreditCard class="h-5 w-5" :stroke-width="1.8" /></span
-              >
-              <div>
-                <h2 class="text-lg font-semibold text-gray-900">{{ plan.name }}</h2>
-                <p :class="planTheme(plan.color).text" class="text-sm font-medium">
-                  {{ plan.duration }}
-                </p>
-              </div>
-            </div>
-            <div class="md:w-36">
-              <p class="text-xs text-gray-500">Precio</p>
-              <p :class="planTheme(plan.color).text" class="mt-1 text-xl font-semibold">
-                ${{ plan.price.toLocaleString('es-MX') }}
-              </p>
-            </div>
-            <div class="flex-1">
-              <div class="flex justify-between text-xs text-gray-500">
-                <span>{{ membersForPlan(plan.name).length }} socios</span
-                ><span>{{ plan.features.length * 10 }}%</span>
-              </div>
-              <div class="mt-2 h-2 rounded-full bg-gray-100">
-                <div
-                  :class="planTheme(plan.color).bar"
-                  class="h-2 rounded-full"
-                  :style="{ width: `${Math.min(plan.features.length * 10, 100)}%` }"
-                ></div>
-              </div>
-            </div>
-            <div class="md:w-36">
-              <p class="text-xs text-gray-500">Facturación</p>
-              <p class="mt-1 font-semibold text-gray-800">
-                ${{ (membersForPlan(plan.name).length * plan.price).toLocaleString('es-MX') }}
-              </p>
-            </div>
-            <div class="min-w-44 text-sm text-gray-600">
-              <p v-for="feature in plan.features.slice(0, 2)" :key="feature">
-                <span :class="planTheme(plan.color).text">✓</span> {{ feature }}
-              </p>
-              <p v-if="plan.features.length > 2" class="text-xs text-gray-400">
-                +{{ plan.features.length - 2 }} más
-              </p>
-            </div>
-            <div class="flex items-center gap-2 md:ms-auto">
-              <button
-                class="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100"
-                title="Editar plan"
-                @click.stop="openEdit(plan)"
-              >
-                ✎</button
-              ><button
-                class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-brand-600 opacity-70 transition hover:bg-brand-50 hover:text-brand-700 group-hover:opacity-100"
-                @click.stop="openDetail(plan)"
-              >
-                Ver detalle ›
-              </button>
-            </div>
-          </div>
-        </article>
-      </section>
-      <p
-        v-if="!filteredPlans.length"
-        class="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500"
+      <section
+        class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6"
       >
-        No hay planes que coincidan con la búsqueda.
-      </p>
+        <table class="min-w-full rounded-2xl">
+          <thead>
+            <tr class="border-b border-gray-100 text-xs uppercase tracking-wider text-gray-400">
+              <th class="py-3 text-start">Plan</th>
+              <th class="py-3 text-start">Precio</th>
+              <th class="py-3 text-start">Socios</th>
+              <th class="py-3 text-start">Estado</th>
+              <th class="py-3 text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="plan in filteredPlans"
+              :key="plan.id"
+              class="cursor-pointer border-b border-gray-100 transition hover:bg-gray-50"
+              @click="openDetail(plan)"
+            >
+              <td class="py-4">
+                <div class="flex items-center gap-3">
+                  <span
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50"
+                    ><CreditCard class="h-5 w-5 text-brand-600" :stroke-width="1.8"
+                  /></span>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-800">{{ plan.nombre }}</p>
+                    <p class="max-w-xs truncate text-xs text-gray-500">{{ plan.detalles }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 text-sm font-semibold text-brand-600">
+                ${{ plan.precio.toLocaleString('es-SV') }}
+              </td>
+              <td class="py-4 text-sm font-semibold text-gray-800">
+                {{ membersForPlan(plan.id).length }}
+              </td>
+              <td class="py-4">
+                <Badge :color="plan.estado === 'Activo' ? 'primary' : 'light'">{{
+                  plan.estado
+                }}</Badge>
+              </td>
+              <td class="py-4 text-end">
+                <button
+                  class="rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-100"
+                  title="Editar plan"
+                  @click.stop="openEdit(plan)"
+                >
+                  Editar
+                </button>
+                <button
+                  class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 hover:text-brand-700"
+                  @click.stop="openDetail(plan)"
+                >
+                  Ver detalle
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-if="!filteredPlans.length" class="p-8 text-center text-sm text-gray-500">
+          No hay planes que coincidan con la búsqueda.
+        </p>
+      </section>
     </div>
 
     <Modal v-if="modal" full-screen-backdrop @close="closeModal">
       <template #body>
-      <div class="p-4">
-      <form
-        class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white shadow-theme-xl"
-        @submit.prevent="savePlan"
-      >
-        <header class="flex items-center justify-between border-b border-gray-200 p-6">
-          <h2 class="text-xl font-semibold text-gray-900">
-            {{ editingPlan ? `Editar — ${editingPlan.name}` : 'Nuevo Plan' }}
-          </h2>
-          <button type="button" class="text-2xl text-gray-400" @click="closeModal">×</button>
-        </header>
-        <div class="space-y-5 p-6">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
-            >Nombre del plan<input
-              v-model="form.name"
-              required
-              class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
-              placeholder="Ej: Semestral Elite"
-          /></label>
-          <div class="grid grid-cols-2 gap-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
-              >Precio ($)<input
-                v-model.number="form.price"
-                required
-                min="1"
-                type="number"
-                class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-            ><label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
-              >Duración<select
-                v-model="form.duration"
-                class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
-              >
-                <option>1 mes</option>
-                <option>3 meses</option>
-                <option>6 meses</option>
-                <option>12 meses</option>
-              </select></label
-            >
-          </div>
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Color del plan
-            </p>
-            <div class="mt-2 grid grid-cols-5 gap-2">
-              <button
-                v-for="color in colors"
-                :key="color.value"
-                type="button"
-                :class="
-                  form.color === color.value
-                    ? `${planTheme(color.value).selected} ${planTheme(color.value).text}`
-                    : 'border-gray-200 text-gray-500'
-                "
-                class="rounded-full border px-3 py-2 text-xs font-medium"
-                @click="form.color = color.value"
-              >
-                {{ color.label }}
-              </button>
-            </div>
-          </div>
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Beneficios incluidos
-            </p>
-            <div class="mt-2 flex gap-2">
-              <input
-                v-model="benefitInput"
-                class="h-11 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
-                placeholder="Ej: Acceso 24/7"
-                @keyup.enter.prevent="addBenefit"
-              /><button
-                type="button"
-                class="h-11 w-11 rounded-xl border border-brand-200 bg-brand-50 text-brand-600"
-                @click="addBenefit"
-              >
-                +
-              </button>
-            </div>
-            <p v-if="!form.features.length" class="mt-2 text-xs italic text-gray-400">
-              Agregá al menos un beneficio
-            </p>
-            <div
-              v-for="(benefit, index) in form.features"
-              :key="benefit"
-              class="mt-2 flex items-center justify-between rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700"
-            >
-              <span><span class="text-brand-600">✓</span> {{ benefit }}</span
-              ><button type="button" class="text-gray-400" @click="removeBenefit(index)">×</button>
-            </div>
-          </div>
-          <div :class="planTheme(form.color).soft" class="rounded-xl border p-4">
-            <p class="text-xs text-gray-500">Vista previa</p>
-            <p :class="planTheme(form.color).text" class="mt-1 text-lg font-semibold">
-              {{ form.name || 'Nombre del plan' }}
-            </p>
-            <p class="font-semibold text-gray-800">
-              ${{ Number(form.price || 0).toLocaleString('es-MX') }} / {{ form.duration }}
-            </p>
-          </div>
-          <Alert v-if="error" variant="error" title="No se pudo guardar" :message="error" />
-        </div>
-        <footer class="flex gap-3 border-t border-gray-100 p-6">
-          <Button type="button" variant="outline" class-name="flex-1 justify-center" @click="closeModal"
-            >Cancelar</Button
+        <div class="p-4">
+          <form
+            class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white shadow-theme-xl"
+            @submit.prevent="savePlan"
           >
-          <Button type="submit" class-name="flex-1 justify-center">{{
-            editingPlan ? 'Guardar cambios' : 'Crear Plan'
-          }}</Button>
-        </footer>
-      </form>
-      </div>
+            <header class="flex items-center justify-between border-b border-gray-200 p-6">
+              <h2 class="text-xl font-semibold text-gray-900">
+                {{ editingPlan ? `Editar — ${editingPlan.nombre}` : 'Nuevo Plan' }}
+              </h2>
+              <button type="button" class="text-2xl text-gray-400" @click="closeModal">×</button>
+            </header>
+            <div class="space-y-5 p-6">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Nombre del plan<input
+                  v-model="form.nombre"
+                  required
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+                  placeholder="Membresía Plus Ultra Black"
+              /></label>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Precio ($)<input
+                  v-model.number="form.precio"
+                  required
+                  min="1"
+                  type="number"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+              /></label>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Detalles<textarea
+                  v-model="form.detalles"
+                  rows="3"
+                  required
+                  placeholder="Acceso completo ilimitado a zona de pesas, cardio, spinning..."
+                  class="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                ></textarea>
+              </label>
+              <label
+                class="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
+              >
+                <input
+                  v-model="form.activo"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300"
+                />
+                Plan activo
+              </label>
+              <Alert v-if="error" variant="error" title="No se pudo guardar" :message="error" />
+            </div>
+            <footer class="flex gap-3 border-t border-gray-100 p-6">
+              <Button
+                type="button"
+                variant="outline"
+                class-name="flex-1 justify-center"
+                @click="closeModal"
+                >Cancelar</Button
+              >
+              <Button type="submit" class-name="flex-1 justify-center">{{
+                editingPlan ? 'Guardar cambios' : 'Crear Plan'
+              }}</Button>
+            </footer>
+          </form>
+        </div>
       </template>
     </Modal>
   </AdminLayout>
@@ -331,7 +248,7 @@ import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import Alert from '@/components/ui/Alert.vue'
-import { useGymData, type GymPlan, type PlanColor, type MemberStatus } from '@/composables/useGymData'
+import { useGymData, nombreCompleto, iniciales, type GymPlan } from '@/composables/useGymData'
 
 const { plans, members, addPlan, updatePlan, deletePlan } = useGymData()
 const search = ref('')
@@ -339,38 +256,20 @@ const selectedPlan = ref<GymPlan | null>(null)
 const memberSearch = ref('')
 const modal = ref(false)
 const editingPlan = ref<GymPlan | null>(null)
-const benefitInput = ref('')
 const error = ref('')
-const form = reactive<{
-  name: string
-  price: number
-  duration: string
-  color: PlanColor
-  features: string[]
-}>({ name: '', price: 0, duration: '1 mes', color: 'blue', features: [] })
-const colors: Array<{ label: string; value: PlanColor }> = [
-  { label: 'Azul', value: 'blue' },
-  { label: 'Lima', value: 'lime' },
-  { label: 'Naranja', value: 'orange' },
-  { label: 'Violeta', value: 'violet' },
-  { label: 'Rojo', value: 'red' },
-]
+const form = reactive({ nombre: '', precio: 0, detalles: '', activo: true })
 const filteredPlans = computed(() =>
   plans.value.filter((plan) =>
-    `${plan.name} ${plan.duration} ${plan.price}`
-      .toLowerCase()
-      .includes(search.value.toLowerCase()),
+    `${plan.nombre} ${plan.detalles}`.toLowerCase().includes(search.value.toLowerCase()),
   ),
 )
 const activeMembers = computed(
-  () =>
-    members.value.filter((member) => member.status === 'Activo' || member.status === 'Por vencer')
-      .length,
+  () => members.value.filter((member) => member.estado === 'Activo').length,
 )
 const stats = computed(() => [
   {
     label: 'Ingresos estimados',
-    value: `$${plans.value.reduce((total, plan) => total + membersForPlan(plan.name).length * plan.price, 0).toLocaleString('es-MX')}`,
+    value: `$${plans.value.reduce((total, plan) => total + membersForPlan(plan.id).length * plan.precio, 0).toLocaleString('es-SV')}`,
     caption: 'por periodo',
   },
   {
@@ -384,66 +283,21 @@ const stats = computed(() => [
     caption: `${filteredPlans.value.length} en vista`,
   },
 ])
-const membersForPlan = (name: string) => members.value.filter((member) => member.plan === name)
-const memberStatusColor = (status: MemberStatus) =>
-  ({
-    Activo: 'primary',
-    'Por vencer': 'warning',
-    Vencido: 'error',
-    Inactivo: 'light',
-  })[status] as 'primary' | 'warning' | 'error' | 'light'
+const membersForPlan = (id: string) => members.value.filter((member) => member.planId === id)
 const planMembers = computed(() =>
   selectedPlan.value
-    ? membersForPlan(selectedPlan.value.name).filter((member) =>
-        `${member.name} ${member.email}`.toLowerCase().includes(memberSearch.value.toLowerCase()),
+    ? membersForPlan(selectedPlan.value.id).filter((member) =>
+        `${nombreCompleto(member)} ${member.email}`
+          .toLowerCase()
+          .includes(memberSearch.value.toLowerCase()),
       )
     : [],
 )
-const planTheme = (color: PlanColor) =>
-  ({
-    blue: {
-      text: 'text-blue-light-600',
-      border: 'border-blue-light-200',
-      soft: 'bg-blue-light-50 border-blue-light-200',
-      selected: 'border-blue-light-300 bg-blue-light-50',
-      bar: 'bg-blue-light-500',
-    },
-    lime: {
-      text: 'text-brand-600',
-      border: 'border-brand-200',
-      soft: 'bg-brand-50 border-brand-200',
-      selected: 'border-brand-300 bg-brand-50',
-      bar: 'bg-brand-500',
-    },
-    orange: {
-      text: 'text-orange-600',
-      border: 'border-orange-200',
-      soft: 'bg-orange-50 border-orange-200',
-      selected: 'border-orange-300 bg-orange-50',
-      bar: 'bg-orange-500',
-    },
-    violet: {
-      text: 'text-theme-purple-500',
-      border: 'border-purple-200',
-      soft: 'bg-purple-50 border-purple-200',
-      selected: 'border-purple-300 bg-purple-50',
-      bar: 'bg-theme-purple-500',
-    },
-    red: {
-      text: 'text-error-600',
-      border: 'border-error-200',
-      soft: 'bg-error-50 border-error-200',
-      selected: 'border-error-300 bg-error-50',
-      bar: 'bg-error-500',
-    },
-  })[color]
 const resetForm = () => {
-  form.name = ''
-  form.price = 0
-  form.duration = '1 mes'
-  form.color = 'blue'
-  form.features = []
-  benefitInput.value = ''
+  form.nombre = ''
+  form.precio = 0
+  form.detalles = ''
+  form.activo = true
   error.value = ''
 }
 const openCreate = () => {
@@ -453,11 +307,10 @@ const openCreate = () => {
 }
 const openEdit = (plan: GymPlan) => {
   editingPlan.value = plan
-  form.name = plan.name
-  form.price = plan.price
-  form.duration = plan.duration
-  form.color = plan.color
-  form.features = [...plan.features]
+  form.nombre = plan.nombre
+  form.precio = plan.precio
+  form.detalles = plan.detalles
+  form.activo = plan.estado === 'Activo'
   error.value = ''
   modal.value = true
 }
@@ -465,26 +318,15 @@ const closeModal = () => {
   modal.value = false
   editingPlan.value = null
 }
-const addBenefit = () => {
-  const value = benefitInput.value.trim()
-  if (value && !form.features.includes(value)) form.features.push(value)
-  benefitInput.value = ''
-}
-const removeBenefit = (index: number) => form.features.splice(index, 1)
 const savePlan = () => {
-  if (!form.features.length) {
-    error.value = 'Agrega al menos un beneficio.'
-    return
-  }
   const data = {
-    name: form.name.trim(),
-    price: Number(form.price),
-    duration: form.duration,
-    color: form.color,
-    features: [...form.features],
+    nombre: form.nombre.trim(),
+    precio: Number(form.precio),
+    detalles: form.detalles.trim(),
+    estado: form.activo ? ('Activo' as const) : ('Inactivo' as const),
   }
   if (editingPlan.value) updatePlan(editingPlan.value.id, data)
-  else addPlan({ ...data, id: `p${Date.now()}`, isBase: false })
+  else addPlan({ ...data, id: `${Date.now()}` })
   closeModal()
 }
 const openDetail = (plan: GymPlan) => {
@@ -492,7 +334,6 @@ const openDetail = (plan: GymPlan) => {
   memberSearch.value = ''
 }
 const removePlan = (plan: GymPlan) => {
-  if (plan.isBase) return
   deletePlan(plan.id)
   selectedPlan.value = null
 }

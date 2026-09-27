@@ -17,11 +17,11 @@
             <div class="flex items-center gap-3">
               <span
                 class="flex h-12 w-12 items-center justify-center rounded-full bg-white font-semibold text-brand-600"
-                >{{ selected.initials }}</span
+                >{{ iniciales(selected) }}</span
               >
               <div>
-                <p class="font-semibold text-gray-800">{{ selected.name }}</p>
-                <p class="text-sm text-gray-500">{{ selected.plan }} · {{ selected.status }}</p>
+                <p class="font-semibold text-gray-800">{{ nombreCompleto(selected) }}</p>
+                <p class="text-sm text-gray-500">{{ planById(selected.planId)?.nombre || 'Sin plan' }} · {{ selected.estado }}</p>
               </div>
             </div>
             <Button size="sm" class-name="mt-4 w-full justify-center" @click="checkIn">Registrar Ingreso</Button>
@@ -35,8 +35,8 @@
             >
               <span
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600"
-                >{{ member.initials }}</span
-              ><span class="text-sm font-medium text-gray-800">{{ member.name }}</span>
+                >{{ iniciales(member) }}</span
+              ><span class="text-sm font-medium text-gray-800">{{ nombreCompleto(member) }}</span>
             </button>
           </div>
         </section>
@@ -58,10 +58,10 @@
             >
               <span
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600"
-                >{{ member.initials }}</span
+                >{{ iniciales(member) }}</span
               >
               <div>
-                <p class="text-sm font-semibold text-gray-800">{{ member.name }}</p>
+                <p class="text-sm font-semibold text-gray-800">{{ nombreCompleto(member) }}</p>
                 <p class="text-xs text-gray-500">Ingreso registrado hoy</p>
               </div>
             </div>
@@ -75,13 +75,13 @@
 import { computed, ref } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import Button from '@/components/ui/Button.vue'
-import { useGymData, type Member } from '@/composables/useGymData'
-const { members, presentMembers, registerAccess } = useGymData()
+import { useGymData, nombreCompleto, iniciales, type Member } from '@/composables/useGymData'
+const { members, presentMembers, planById, registerAccess } = useGymData()
 const query = ref('')
 const selected = ref<Member | null>(null)
 const suggestions = computed(() =>
   members.value.filter(
-    (m) => m.name.toLowerCase().includes(query.value.toLowerCase()) && query.value,
+    (m) => nombreCompleto(m).toLowerCase().includes(query.value.toLowerCase()) && query.value,
   ),
 )
 const checkIn = () => {

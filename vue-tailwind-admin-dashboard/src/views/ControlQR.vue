@@ -28,38 +28,36 @@
           <Alert
             v-if="result"
             class="mt-5 text-start"
-            :variant="result.status === 'OK' ? 'success' : 'error'"
-            :title="`${result.status} · ${result.type}`"
-            :message="`${result.member} · ${result.time}`"
+            :variant="result.ok ? 'success' : 'error'"
+            :title="result.ok ? 'Acceso registrado' : 'Cliente inactivo'"
+            :message="`${result.nombre} · ${result.hora}`"
           />
         </section>
         <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xs">
           <h2 class="text-lg font-semibold text-gray-900">Log de accesos del día</h2>
           <div class="mt-5 divide-y divide-gray-100">
             <div
-              v-for="access in accessLog"
-              :key="access.id"
+              v-for="record in asistencia"
+              :key="record.id"
               class="flex items-center gap-3 py-4 first:pt-0"
             >
               <span
-                :class="
-                  access.type === 'Entrada'
-                    ? 'bg-brand-50 text-brand-600'
-                    : 'bg-blue-light-50 text-blue-light-600'
-                "
-                class="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold"
-                >{{ access.type === 'Entrada' ? '↓' : '↑' }}</span
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-xs font-bold text-brand-600"
+                >↓</span
               >
               <div class="flex-1">
-                <p class="text-sm font-semibold text-gray-800">{{ access.member }}</p>
-                <p class="text-xs text-gray-500">{{ access.type }} · {{ access.time }}</p>
+                <p class="text-sm font-semibold text-gray-800">
+                  {{ memberById(record.clienteId) ? nombreCompleto(memberById(record.clienteId)!) : 'Cliente eliminado' }}
+                </p>
+                <p class="text-xs text-gray-500">{{ record.fecha }} · {{ record.hora }}</p>
               </div>
               <span
-                :class="access.status === 'OK' ? 'text-brand-600' : 'text-error-600'"
+                :class="record.estado === 'Activo' || record.estado === 'Completada' ? 'text-brand-600' : 'text-error-600'"
                 class="text-sm font-semibold"
-                >{{ access.status }}</span
+                >{{ record.estado }}</span
               >
             </div>
+            <p v-if="!asistencia.length" class="py-6 text-center text-sm text-gray-500">Sin registros hoy.</p>
           </div>
         </section>
       </div>
@@ -71,21 +69,19 @@ import { ref } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import Alert from '@/components/ui/Alert.vue'
-import { useGymData } from '@/composables/useGymData'
-const { members, accessLog, registerAccess } = useGymData()
+import { useGymData, nombreCompleto } from '@/composables/useGymData'
+const { members, asistencia, memberById, registerAccess } = useGymData()
 const scanning = ref(false)
-const result = ref<{ member: string; type: string; time: string; status: string } | null>(null)
+const result = ref<{ nombre: string; hora: string; ok: boolean } | null>(null)
 const scan = () => {
   scanning.value = true
   window.setTimeout(() => {
     const member = members.value[Math.floor(Math.random() * members.value.length)]
-    const type = Math.random() > 0.5 ? 'Entrada' : 'Salida'
-    registerAccess(member, type)
+    registerAccess(member)
     result.value = {
-      member: member.name,
-      type,
-      time: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-      status: member.status === 'Vencido' ? 'Error' : 'OK',
+      nombre: nombreCompleto(member),
+      hora: new Date().toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' }),
+      ok: member.estado === 'Activo',
     }
     scanning.value = false
   }, 450)

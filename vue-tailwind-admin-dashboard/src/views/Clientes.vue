@@ -13,7 +13,7 @@
           <input
             v-model="search"
             class="h-11 flex-1 rounded-lg border border-gray-200 px-4 text-sm outline-none focus:border-brand-500"
-            placeholder="Buscar por nombre o email..."
+            placeholder="Buscar por nombre, DUI o email..."
           />
           <div class="flex flex-wrap gap-2">
             <button
@@ -27,14 +27,15 @@
             </button>
           </div>
         </div>
-        <div class="mt-5 overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6">
+        <div
+          class="mt-5 overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6"
+        >
           <table class="min-w-full rounded-2xl">
             <thead>
               <tr class="border-b border-gray-100 text-xs uppercase tracking-wider text-gray-400">
                 <th class="py-3 text-start">Cliente</th>
+                <th class="py-3 text-start">DUI</th>
                 <th class="py-3 text-start">Plan</th>
-                <th class="py-3 text-start">Ingreso</th>
-                <th class="py-3 text-start">Vencimiento</th>
                 <th class="py-3 text-start">Asistencias</th>
                 <th class="py-3 text-start">Estado</th>
                 <th class="py-3 text-end">Acciones</th>
@@ -50,22 +51,23 @@
                   <div class="flex items-center gap-3">
                     <span
                       class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600"
-                      >{{ member.initials }}</span
+                      >{{ iniciales(member) }}</span
                     >
                     <div>
-                      <p class="text-sm font-semibold text-gray-800">{{ member.name }}</p>
+                      <p class="text-sm font-semibold text-gray-800">{{ nombreCompleto(member) }}</p>
                       <p class="text-xs text-gray-500">{{ member.email }}</p>
                     </div>
                   </div>
                 </td>
+                <td class="py-4 font-mono text-sm text-gray-500">{{ member.dui }}</td>
                 <td class="py-4">
-                  <Badge :color="planColor(member.plan)">{{ member.plan }}</Badge>
+                  <Badge color="info">{{ planById(member.planId)?.nombre || 'Sin plan' }}</Badge>
                 </td>
-                <td class="py-4 font-mono text-sm text-gray-500">{{ member.startDate }}</td>
-                <td class="py-4 text-sm text-gray-600">{{ member.expiry }}</td>
-                <td class="py-4 text-sm font-semibold text-gray-800">{{ member.attendance.length * 20 + 62 }}</td>
+                <td class="py-4 text-sm font-semibold text-gray-800">
+                  {{ attendanceByMember(member.id).length }}
+                </td>
                 <td class="py-4">
-                  <Badge :color="statusColor(member.status)">{{ member.status }}</Badge>
+                  <Badge :color="statusColor(member.estado)">{{ member.estado }}</Badge>
                 </td>
                 <td class="py-4 text-end">
                   <button
@@ -97,55 +99,83 @@
             </header>
             <div class="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
               <label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-                >Nombre completo<input
-                  v-model="form.name"
+                >Nombres<input
+                  v-model="form.nombres"
                   required
-                  placeholder="Valentina Ríos"
+                  placeholder="Roberto Antonio"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Apellidos<input
+                  v-model="form.apellidos"
+                  required
+                  placeholder="Zelaya Flores"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Género<select
+                  v-model="form.genero"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+                >
+                  <option value="Masculino">Masculino</option>
+                  <option value="Femenino">Femenino</option>
+                </select></label
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >DUI<input
+                  v-model="form.dui"
+                  required
+                  placeholder="02564718-9"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Email<input
                   v-model="form.email"
                   required
                   type="email"
-                  placeholder="valeria@email.com"
+                  placeholder="roberto.zelaya@outlook.com"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Teléfono<input
-                  v-model="form.phone"
+                  v-model="form.telefono"
                   required
-                  placeholder="+54 11 0000-0000"
+                  placeholder="6102-3344"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Fecha de nacimiento<input
-                  v-model="form.birthDate"
+                  v-model="form.fechaNacimiento"
+                  required
                   type="date"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+              ><label
+                class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
                 >Dirección<input
-                  v-model="form.address"
-                  placeholder="Av. Corrientes 1234, CABA"
+                  v-model="form.direccion"
+                  placeholder="Colonia Utila, Santa Tecla, La Libertad"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+              ><label
+                class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
                 >Plan de suscripción<select
-                  v-model="form.plan"
+                  v-model="form.planId"
                   required
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
                 >
-                  <option v-for="plan in plans" :key="plan.id" :value="plan.name">
-                    {{ plan.name }} · ${{ plan.price.toLocaleString('es-MX') }}
+                  <option v-for="plan in plans" :key="plan.id" :value="plan.id">
+                    {{ plan.nombre }} · ${{ plan.precio.toLocaleString('es-SV') }}
                   </option>
                 </select></label
-              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
-                >Notas iniciales<textarea
-                  v-model="form.notes"
+              ><label
+                class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+                >Notas<textarea
+                  v-model="form.notas"
                   rows="3"
-                  placeholder="Objetivos, restricciones médicas, observaciones..."
+                  placeholder="Lesiones, objetivos, observaciones..."
                   class="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
                 ></textarea>
               </label>
             </div>
             <footer class="flex gap-3 border-t border-gray-100 p-6">
-              <Button type="button" variant="outline" class-name="flex-1 justify-center" @click="closeModal"
+              <Button
+                type="button"
+                variant="outline"
+                class-name="flex-1 justify-center"
+                @click="closeModal"
                 >Cancelar</Button
               >
               <Button type="submit" class-name="flex-1 justify-center">Registrar cliente</Button>
@@ -165,84 +195,62 @@ import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import { useAuth } from '@/composables/useAuth'
-import { useGymData, type MemberStatus } from '@/composables/useGymData'
+import { useGymData, nombreCompleto, iniciales, type EstadoGeneral, type Genero } from '@/composables/useGymData'
 
 const router = useRouter()
 const { currentUser } = useAuth()
-const { members, plans, addMember } = useGymData()
+const { members, plans, planById, attendanceByMember, addMember } = useGymData()
 const search = ref('')
 const filter = ref('Todos')
 const modal = ref(false)
-const statuses = ['Todos', 'Activo', 'Por vencer', 'Vencido', 'Inactivo']
+const statuses = ['Todos', 'Activo', 'Inactivo']
 const canCreate = computed(() => currentUser.value?.role !== 'Entrenador')
 const form = reactive({
-  name: '',
+  nombres: '',
+  apellidos: '',
+  genero: 'Masculino' as Genero,
+  dui: '',
   email: '',
-  phone: '',
-  address: '',
-  birthDate: '',
-  plan: plans.value[0]?.name || '',
-  notes: '',
+  telefono: '',
+  fechaNacimiento: '',
+  direccion: '',
+  planId: plans.value[0]?.id || '',
+  notas: '',
 })
 const filteredMembers = computed(() =>
   members.value.filter(
     (member) =>
-      (filter.value === 'Todos' || member.status === filter.value) &&
-      `${member.name} ${member.email}`.toLowerCase().includes(search.value.toLowerCase()),
+      (filter.value === 'Todos' || member.estado === filter.value) &&
+      `${nombreCompleto(member)} ${member.email} ${member.dui}`.toLowerCase().includes(search.value.toLowerCase()),
   ),
 )
-const statusColor = (status: MemberStatus) =>
+const statusColor = (estado: EstadoGeneral) =>
   ({
     Activo: 'primary',
-    'Por vencer': 'warning',
-    Vencido: 'error',
     Inactivo: 'light',
-  })[status] as 'primary' | 'warning' | 'error' | 'light'
-const planColor = (plan: string) => {
-  const color = plans.value.find((item) => item.name === plan)?.color
-  return (
-    (
-      {
-        blue: 'info',
-        lime: 'primary',
-        orange: 'warning',
-        violet: 'purple',
-        red: 'error',
-      } as Record<string, string>
-    )[color || ''] || 'light'
-  ) as 'info' | 'primary' | 'warning' | 'purple' | 'error' | 'light'
-}
+  })[estado] as 'primary' | 'light'
 const openCreate = () => {
-  form.plan = plans.value[0]?.name || ''
+  form.planId = plans.value[0]?.id || ''
   modal.value = true
 }
 const closeModal = () => {
   modal.value = false
 }
 const createMember = () => {
-  const plan = plans.value.find((item) => item.name === form.plan)
-  if (!plan) return
   addMember({
-    id: `m${Date.now()}`,
-    name: form.name,
+    id: `${Date.now()}`,
+    nombres: form.nombres,
+    apellidos: form.apellidos,
+    genero: form.genero,
+    fechaNacimiento: form.fechaNacimiento,
+    direccion: form.direccion,
     email: form.email,
-    phone: form.phone,
-    plan: plan.name,
-    startDate: '2026-07-14',
-    expiry: plan.duration === '12 meses' ? '2027-07-14' : '2026-08-14',
-    status: 'Activo',
-    trainer: '',
-    initials: form.name
-      .split(' ')
-      .map((part) => part[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase(),
-    attendance: [],
-    address: form.address,
-    birthDate: form.birthDate,
-    notes: form.notes,
-    qrCode: `PU-${Date.now()}`,
+    telefono: form.telefono,
+    dui: form.dui,
+    planId: form.planId || null,
+    estado: 'Activo',
+    notas: form.notas,
+    creadoEn: new Date().toISOString().slice(0, 10),
   })
   closeModal()
 }
