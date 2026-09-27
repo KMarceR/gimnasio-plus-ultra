@@ -2,8 +2,14 @@
   <AdminLayout>
     <div v-if="selectedPlan" class="space-y-6">
       <div class="flex items-center justify-between">
-        <button class="text-sm font-medium text-brand-600" @click="selectedPlan = null">
-          ← Volver a Suscripciones
+        <button
+          class="flex items-center gap-2 text-sm font-medium text-gray-600"
+          @click="selectedPlan = null"
+        >
+          <span class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200"
+            >←</span
+          >
+          Volver a Suscripciones
         </button>
         <div class="flex gap-2">
           <Button size="sm" variant="outline" @click="openEdit(selectedPlan)">Editar plan</Button>

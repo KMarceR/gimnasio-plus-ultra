@@ -1,8 +1,14 @@
 <template>
   <AdminLayout
     ><div v-if="trainer" class="space-y-6">
-      <button class="text-sm font-medium text-brand-600" @click="router.push('/entrenadores')">
-        ← Volver a entrenadores
+      <button
+        class="flex items-center gap-2 text-sm font-medium text-gray-600"
+        @click="router.push('/entrenadores')"
+      >
+        <span class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200"
+          >←</span
+        >
+        Volver a entrenadores
       </button>
       <section
         class="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xs sm:flex-row sm:items-center"
