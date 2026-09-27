@@ -24,15 +24,15 @@
           <form class="space-y-4" @submit.prevent="submit">
             <div>
               <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
-                >Correo electrónico</label
+                >Usuario</label
               >
               <div class="relative">
-                <MailIcon :size="15" class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <UserIcon :size="15" class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  v-model="email"
-                  type="email"
+                  v-model="nombreUsuario"
+                  type="text"
                   required
-                  placeholder="tu@email.com"
+                  placeholder="nombre_usuario"
                   class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 ps-10 pe-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-400 focus:outline-none"
                 />
               </div>
@@ -76,14 +76,14 @@
             <div class="space-y-2">
               <button
                 v-for="demo in demoUsers"
-                :key="demo.email"
+                :key="demo.nombreUsuario"
                 type="button"
                 class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-start transition-colors hover:border-brand-300 hover:bg-brand-50"
                 @click="selectDemo(demo.role)"
               >
                 <div>
-                  <p class="text-sm font-semibold text-gray-900">{{ demo.name }}</p>
-                  <p class="font-mono-custom text-xs text-gray-500">{{ demo.email }}</p>
+                  <p class="text-sm font-semibold text-gray-900">{{ demo.nombres }} {{ demo.apellidos }}</p>
+                  <p class="font-mono-custom text-xs text-gray-500">{{ demo.nombreUsuario }}</p>
                 </div>
                 <span class="text-xs font-bold" :class="roleTag[demo.role]">{{ demo.role }}</span>
               </button>
@@ -100,7 +100,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Zap as ZapIcon,
-  Mail as MailIcon,
+  User as UserIcon,
   Lock as LockIcon,
   Eye as EyeIcon,
   EyeOff as EyeOffIcon,
@@ -115,7 +115,7 @@ import { useAuth, type UserRole } from '@/composables/useAuth'
 const router = useRouter()
 const { login, fillDemo, demoUsers } = useAuth()
 
-const email = ref('')
+const nombreUsuario = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
@@ -123,13 +123,14 @@ const error = ref('')
 
 const roleTag: Record<UserRole, string> = {
   Administrador: 'text-orange-500',
+  Gerente: 'text-purple-500',
   Recepcionista: 'text-blue-light-500',
   Entrenador: 'text-brand-500',
 }
 
 const selectDemo = (role: UserRole) => {
   const demo = fillDemo(role)
-  email.value = demo.email
+  nombreUsuario.value = demo.nombreUsuario
   password.value = demo.password
 }
 
@@ -137,11 +138,11 @@ const submit = () => {
   loading.value = true
   error.value = ''
   setTimeout(() => {
-    const ok = login(email.value, password.value)
+    const ok = login(nombreUsuario.value, password.value)
     if (ok) {
       router.push('/')
     } else {
-      error.value = 'Credenciales incorrectas. Revisá el email y contraseña.'
+      error.value = 'Credenciales incorrectas. Revisá el usuario y contraseña.'
       loading.value = false
     }
   }, 600)

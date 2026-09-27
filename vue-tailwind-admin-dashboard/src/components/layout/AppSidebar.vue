@@ -39,7 +39,7 @@
           {{ currentUser?.initials }}
         </div>
         <div class="min-w-0 flex-1">
-          <p class="truncate text-xs font-semibold text-gray-800">{{ currentUser?.name }}</p>
+          <p class="truncate text-xs font-semibold text-gray-800">{{ currentUser?.nombres }} {{ currentUser?.apellidos }}</p>
           <p class="truncate text-xs text-gray-500">{{ currentUser?.role }}</p>
         </div>
       </div>
@@ -88,11 +88,11 @@ interface NavItem {
 const allNavItems: NavItem[] = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboardIcon },
   { name: 'Clientes', path: '/clientes', icon: UsersIcon },
-  { name: 'Suscripciones', path: '/suscripciones', icon: CreditCardIcon, roles: ['Administrador', 'Recepcionista'] },
-  { name: 'Control QR', path: '/qr', icon: QrCodeIcon, roles: ['Administrador', 'Recepcionista'] },
-  { name: 'Recepción', path: '/recepcion', icon: ShieldIcon, roles: ['Administrador', 'Recepcionista'] },
+  { name: 'Suscripciones', path: '/suscripciones', icon: CreditCardIcon, roles: ['Administrador', 'Gerente', 'Recepcionista'] },
+  { name: 'Control QR', path: '/qr', icon: QrCodeIcon, roles: ['Administrador', 'Gerente', 'Recepcionista'] },
+  { name: 'Recepción', path: '/recepcion', icon: ShieldIcon, roles: ['Administrador', 'Gerente', 'Recepcionista'] },
   { name: 'Entrenadores', path: '/entrenadores', icon: DumbbellIcon },
-  { name: 'Sesiones', path: '/sesiones', icon: CalendarIcon, roles: ['Administrador', 'Entrenador'] },
+  { name: 'Sesiones', path: '/sesiones', icon: CalendarIcon, roles: ['Administrador', 'Gerente', 'Entrenador'] },
   { name: 'Usuarios', path: '/usuarios', icon: SettingsIcon, roles: ['Administrador'] },
 ]
 
@@ -102,6 +102,7 @@ const navItems = computed(() =>
 
 const roleAvatarColor: Record<UserRole, string> = {
   Administrador: 'bg-orange-100 text-orange-600',
+  Gerente: 'bg-purple-100 text-purple-600',
   Recepcionista: 'bg-blue-light-100 text-blue-light-600',
   Entrenador: 'bg-brand-100 text-brand-600',
 }
