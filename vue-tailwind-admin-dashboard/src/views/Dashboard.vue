@@ -4,11 +4,8 @@
       <header class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p class="text-sm font-medium text-brand-600">Lunes, 14 de julio de 2026</p>
-          <h1 class="font-display mt-1 text-3xl font-bold text-gray-900">Dashboard</h1>
+          <h1 class="font-body mt-1 text-3xl font-bold text-gray-900">Dashboard</h1>
         </div>
-        <span class="rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700"
-          >Operación en tiempo real</span
-        >
       </header>
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article
@@ -21,7 +18,7 @@
               <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {{ metric.label }}
               </p>
-              <p class="font-display mt-3 text-3xl font-bold text-gray-900">{{ metric.value }}</p>
+              <p class="font-body mt-3 text-3xl font-bold text-gray-900">{{ metric.value }}</p>
             </div>
             <span
               :class="[
@@ -54,11 +51,17 @@
                     : 'bg-error-50 text-error-600'
                 "
                 class="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold"
-                >{{ record.estado === 'Activo' || record.estado === 'Completada' ? 'OK' : 'X' }}</span
+                >{{
+                  record.estado === 'Activo' || record.estado === 'Completada' ? 'OK' : 'X'
+                }}</span
               >
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-gray-800">
-                  {{ memberById(record.clienteId) ? nombreCompleto(memberById(record.clienteId)!) : 'Cliente eliminado' }}
+                  {{
+                    memberById(record.clienteId)
+                      ? nombreCompleto(memberById(record.clienteId)!)
+                      : 'Cliente eliminado'
+                  }}
                 </p>
                 <p class="text-xs text-gray-500">{{ record.fecha }} · {{ record.hora }}</p>
               </div>
@@ -109,5 +112,4 @@ const metrics = computed(() => [
     class: 'bg-brand-50 text-brand-600',
   },
 ])
-
 </script>

@@ -6,7 +6,7 @@
           <ZapIcon :size="17" class="text-white" />
         </span>
         <span>
-          <strong class="font-display block text-sm font-bold uppercase leading-none tracking-widest text-gray-900"
+          <strong class="font-body block text-sm font-bold uppercase leading-none tracking-widest text-gray-900"
             >Plus Ultra</strong
           >
           <small class="mt-0.5 block text-xs text-gray-500">Gestión Integral</small>
@@ -33,7 +33,7 @@
     <div class="space-y-3 border-t border-gray-200 p-4">
       <div class="flex items-center gap-3 px-1">
         <div
-          class="font-mono-custom flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+          class="font-body flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
           :class="roleAvatarColor[currentUser?.role ?? 'Recepcionista']"
         >
           {{ currentUser?.initials }}

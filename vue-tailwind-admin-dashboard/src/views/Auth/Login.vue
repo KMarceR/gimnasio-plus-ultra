@@ -11,7 +11,7 @@
           <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500">
             <ZapIcon :size="24" class="text-white" />
           </div>
-          <h1 class="font-display text-3xl font-bold tracking-wide text-gray-900">Plus Ultra</h1>
+          <h1 class="font-body text-3xl font-bold tracking-wide text-gray-900">Plus Ultra</h1>
           <p class="mt-1.5 text-sm text-gray-500">Sistema de Gestión de Gimnasio</p>
         </div>
 
@@ -70,25 +70,6 @@
               {{ loading ? 'Verificando...' : 'Ingresar al sistema' }}
             </Button>
           </form>
-
-          <div class="border-t border-gray-200 pt-5">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Acceso rápido (demo)</p>
-            <div class="space-y-2">
-              <button
-                v-for="demo in demoUsers"
-                :key="demo.nombreUsuario"
-                type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-start transition-colors hover:border-brand-300 hover:bg-brand-50"
-                @click="selectDemo(demo.role)"
-              >
-                <div>
-                  <p class="text-sm font-semibold text-gray-900">{{ demo.nombres }} {{ demo.apellidos }}</p>
-                  <p class="font-mono-custom text-xs text-gray-500">{{ demo.nombreUsuario }}</p>
-                </div>
-                <span class="text-xs font-bold" :class="roleTag[demo.role]">{{ demo.role }}</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -110,29 +91,16 @@ import {
 import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
 import Alert from '@/components/ui/Alert.vue'
 import Button from '@/components/ui/Button.vue'
-import { useAuth, type UserRole } from '@/composables/useAuth'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
-const { login, fillDemo, demoUsers } = useAuth()
+const { login } = useAuth()
 
 const nombreUsuario = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
-
-const roleTag: Record<UserRole, string> = {
-  Administrador: 'text-orange-500',
-  Gerente: 'text-purple-500',
-  Recepcionista: 'text-blue-light-500',
-  Entrenador: 'text-brand-500',
-}
-
-const selectDemo = (role: UserRole) => {
-  const demo = fillDemo(role)
-  nombreUsuario.value = demo.nombreUsuario
-  password.value = demo.password
-}
 
 const submit = () => {
   loading.value = true

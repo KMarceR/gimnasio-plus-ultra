@@ -84,7 +84,7 @@
                   class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 hover:text-brand-700"
                   @click.stop="openDetail(session)"
                 >
-                  Ver detalle ›
+                  Ver detalle
                 </button>
               </td>
             </tr>
