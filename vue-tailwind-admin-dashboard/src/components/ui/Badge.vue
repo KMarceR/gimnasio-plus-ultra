@@ -15,7 +15,7 @@ import { computed } from 'vue'
 
 type BadgeVariant = 'light' | 'solid'
 type BadgeSize = 'sm' | 'md'
-type BadgeColor = 'primary' | 'success' | 'error' | 'warning' | 'info' | 'light' | 'dark'
+type BadgeColor = 'primary' | 'success' | 'error' | 'warning' | 'info' | 'purple' | 'light' | 'dark'
 
 interface BadgeProps {
   variant?: BadgeVariant
@@ -46,6 +46,7 @@ const variants = {
     error: 'bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500',
     warning: 'bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400',
     info: 'bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500',
+    purple: 'bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400',
     light: 'bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80',
     dark: 'bg-gray-500 text-white dark:bg-white/5 dark:text-white',
   },
@@ -55,6 +56,7 @@ const variants = {
     error: 'bg-error-500 text-white dark:text-white',
     warning: 'bg-warning-500 text-white dark:text-white',
     info: 'bg-blue-light-500 text-white dark:text-white',
+    purple: 'bg-purple-500 text-white dark:text-white',
     light: 'bg-gray-400 dark:bg-white/5 text-white dark:text-white/80',
     dark: 'bg-gray-700 text-white dark:text-white',
   },

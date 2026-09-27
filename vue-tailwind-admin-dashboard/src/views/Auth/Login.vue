@@ -1,54 +1,149 @@
 <template>
   <FullScreenLayout>
-    <main class="flex min-h-screen items-center justify-center bg-gray-50 p-5">
-      <section class="grid w-full max-w-5xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-theme-lg lg:grid-cols-[1.05fr_0.95fr]">
-        <div class="hidden bg-brand-500 p-12 text-white lg:flex lg:flex-col lg:justify-between">
-          <div>
-            <div class="flex items-center gap-3"><span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-2xl font-bold text-brand-600">P</span><strong class="text-xl tracking-[0.18em]">PLUS ULTRA</strong></div>
-            <h1 class="mt-20 max-w-sm text-5xl font-semibold leading-tight">Tu gimnasio, bajo control.</h1>
-            <p class="mt-5 max-w-sm text-brand-50">Administra socios, sesiones, accesos y entrenadores desde un solo lugar.</p>
+    <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 p-4">
+      <div class="pointer-events-none absolute inset-0">
+        <div class="absolute left-1/3 top-1/4 h-96 w-96 rounded-full bg-brand-500/5 blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/3 h-80 w-80 rounded-full bg-orange-500/5 blur-3xl"></div>
+      </div>
+
+      <div class="relative w-full max-w-md">
+        <div class="mb-8 text-center">
+          <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500">
+            <ZapIcon :size="24" class="text-white" />
           </div>
-          <p class="text-sm text-brand-100">Gestión Integral · 2026</p>
+          <h1 class="font-display text-3xl font-bold tracking-wide text-gray-900">Plus Ultra</h1>
+          <p class="mt-1.5 text-sm text-gray-500">Sistema de Gestión de Gimnasio</p>
         </div>
-        <div class="p-7 sm:p-12">
-          <div class="mb-8 lg:hidden"><span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500 text-xl font-bold text-white">P</span><p class="mt-3 text-lg font-bold tracking-[0.16em] text-gray-900">PLUS ULTRA</p></div>
-          <p class="text-sm font-medium text-brand-600">Bienvenido de nuevo</p>
-          <h2 class="mt-2 text-3xl font-semibold text-gray-900">Inicia sesión</h2>
-          <p class="mt-2 text-sm text-gray-500">Usa una cuenta demo para explorar el sistema.</p>
-          <form class="mt-8 space-y-5" @submit.prevent="submit">
-            <div><label class="mb-2 block text-sm font-medium text-gray-700">Email</label><input v-model="email" type="email" class="h-12 w-full rounded-xl border border-gray-200 px-4 text-sm outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10" placeholder="admin@plusultra.com" /></div>
-            <div><label class="mb-2 block text-sm font-medium text-gray-700">Contraseña</label><div class="relative"><input v-model="password" :type="showPassword ? 'text' : 'password'" class="h-12 w-full rounded-xl border border-gray-200 px-4 pe-12 text-sm outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10" placeholder="••••••••" /><button type="button" class="absolute inset-y-0 inset-e-4 text-xs font-medium text-gray-500" @click="showPassword = !showPassword">{{ showPassword ? 'Ocultar' : 'Mostrar' }}</button></div></div>
-            <p v-if="error" class="rounded-lg bg-error-50 px-3 py-2 text-sm text-error-600">{{ error }}</p>
-            <button class="h-12 w-full rounded-xl bg-brand-500 font-medium text-white transition hover:bg-brand-600">Iniciar Sesión</button>
+
+        <div class="space-y-5 rounded-2xl border border-gray-200 bg-white p-7 shadow-theme-xs">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Iniciar sesión</h2>
+            <p class="mt-0.5 text-sm text-gray-500">Ingresá tus credenciales para continuar</p>
+          </div>
+
+          <form class="space-y-4" @submit.prevent="submit">
+            <div>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Correo electrónico</label
+              >
+              <div class="relative">
+                <MailIcon :size="15" class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  v-model="email"
+                  type="email"
+                  required
+                  placeholder="tu@email.com"
+                  class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 ps-10 pe-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-400 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Contraseña</label
+              >
+              <div class="relative">
+                <LockIcon :size="15" class="absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  required
+                  placeholder="••••••••"
+                  class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 ps-10 pe-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-400 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  class="absolute end-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  @click="showPassword = !showPassword"
+                >
+                  <EyeOffIcon v-if="showPassword" :size="15" />
+                  <EyeIcon v-else :size="15" />
+                </button>
+              </div>
+            </div>
+
+            <Alert v-if="error" variant="error" title="No se pudo ingresar" :message="error" />
+
+            <Button type="submit" :disabled="loading" class-name="w-full justify-center">
+              <RefreshCwIcon v-if="loading" :size="15" class="animate-spin" />
+              <LogInIcon v-else :size="15" />
+              {{ loading ? 'Verificando...' : 'Ingresar al sistema' }}
+            </Button>
           </form>
-          <div class="mt-8"><p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Acceso rápido</p><div class="mt-3 grid gap-2 sm:grid-cols-3"><button v-for="demo in demos" :key="demo.role" type="button" class="rounded-xl border border-gray-200 p-3 text-start transition hover:border-brand-300 hover:bg-brand-50" @click="selectDemo(demo.role)"><span class="block text-sm font-semibold text-gray-800">{{ demo.role }}</span><span class="mt-1 block text-xs text-gray-500">{{ demo.email }}</span></button></div></div>
+
+          <div class="border-t border-gray-200 pt-5">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Acceso rápido (demo)</p>
+            <div class="space-y-2">
+              <button
+                v-for="demo in demoUsers"
+                :key="demo.email"
+                type="button"
+                class="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-start transition-colors hover:border-brand-300 hover:bg-brand-50"
+                @click="selectDemo(demo.role)"
+              >
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">{{ demo.name }}</p>
+                  <p class="font-mono-custom text-xs text-gray-500">{{ demo.email }}</p>
+                </div>
+                <span class="text-xs font-bold" :class="roleTag[demo.role]">{{ demo.role }}</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   </FullScreenLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import {
+  Zap as ZapIcon,
+  Mail as MailIcon,
+  Lock as LockIcon,
+  Eye as EyeIcon,
+  EyeOff as EyeOffIcon,
+  LogIn as LogInIcon,
+  RefreshCw as RefreshCwIcon,
+} from 'lucide-vue-next'
 import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
+import Alert from '@/components/ui/Alert.vue'
+import Button from '@/components/ui/Button.vue'
 import { useAuth, type UserRole } from '@/composables/useAuth'
 
 const router = useRouter()
-const { login, fillDemo } = useAuth()
+const { login, fillDemo, demoUsers } = useAuth()
+
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const loading = ref(false)
 const error = ref('')
-const demos: Array<{ role: UserRole; email: string }> = [
-  { role: 'Administrador', email: 'admin@plusultra.com' },
-  { role: 'Recepcionista', email: 'recepcion@plusultra.com' },
-  { role: 'Entrenador', email: 'entrenador@plusultra.com' },
-]
+
+const roleTag: Record<UserRole, string> = {
+  Administrador: 'text-orange-500',
+  Recepcionista: 'text-blue-light-500',
+  Entrenador: 'text-brand-500',
+}
+
 const selectDemo = (role: UserRole) => {
   const demo = fillDemo(role)
   email.value = demo.email
   password.value = demo.password
 }
-const submit = () => { error.value = login(email.value, password.value) ? '' : 'El email o la contraseña no son correctos.'; if (!error.value) router.push('/') }
+
+const submit = () => {
+  loading.value = true
+  error.value = ''
+  setTimeout(() => {
+    const ok = login(email.value, password.value)
+    if (ok) {
+      router.push('/')
+    } else {
+      error.value = 'Credenciales incorrectas. Revisá el email y contraseña.'
+      loading.value = false
+    }
+  }, 600)
+}
 </script>

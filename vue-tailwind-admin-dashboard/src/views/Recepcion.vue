@@ -24,12 +24,7 @@
                 <p class="text-sm text-gray-500">{{ selected.plan }} · {{ selected.status }}</p>
               </div>
             </div>
-            <button
-              class="mt-4 w-full rounded-lg bg-brand-500 py-2.5 text-sm font-medium text-white"
-              @click="checkIn"
-            >
-              Registrar Ingreso
-            </button>
+            <Button size="sm" class-name="mt-4 w-full justify-center" @click="checkIn">Registrar Ingreso</Button>
           </div>
           <div v-else-if="query" class="mt-3 space-y-2">
             <button
@@ -51,7 +46,7 @@
               <p class="text-sm text-gray-500">Presentes ahora</p>
               <p class="mt-1 text-4xl font-semibold text-gray-900">{{ presentMembers.length }}</p>
             </div>
-            <span class="rounded-full bg-success-50 px-3 py-1 text-sm font-medium text-success-600"
+            <span class="rounded-full bg-brand-50 px-3 py-1 text-sm font-medium text-brand-600"
               >En el gimnasio</span
             >
           </div>
@@ -62,7 +57,7 @@
               class="flex items-center gap-3 py-3"
             >
               <span
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-success-50 text-xs font-semibold text-success-600"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-600"
                 >{{ member.initials }}</span
               >
               <div>
@@ -79,6 +74,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Button from '@/components/ui/Button.vue'
 import { useGymData, type Member } from '@/composables/useGymData'
 const { members, presentMembers, registerAccess } = useGymData()
 const query = ref('')

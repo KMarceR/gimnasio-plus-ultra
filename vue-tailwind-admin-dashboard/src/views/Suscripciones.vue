@@ -6,18 +6,16 @@
           ← Volver a Suscripciones
         </button>
         <div class="flex gap-2">
-          <button
-            class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700"
-            @click="openEdit(selectedPlan)"
-          >
-            Editar plan</button
-          ><button
+          <Button size="sm" variant="outline" @click="openEdit(selectedPlan)">Editar plan</Button>
+          <Button
             v-if="!selectedPlan.isBase"
-            class="rounded-lg border border-error-200 px-3 py-2 text-sm font-medium text-error-600"
+            size="sm"
+            variant="outline"
+            class-name="!ring-error-200 !text-error-600 hover:!bg-error-50"
             @click="removePlan(selectedPlan)"
           >
             Eliminar
-          </button>
+          </Button>
         </div>
       </div>
       <section
@@ -37,7 +35,7 @@
                 class="text-sm font-semibold uppercase"
                 >{{ selectedPlan.duration }}</span
               ><span
-                class="rounded-full bg-success-50 px-2.5 py-1 text-xs font-medium text-success-600"
+                class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600"
                 >{{ membersForPlan(selectedPlan.name).length }} socios activos</span
               >
             </div>
@@ -91,17 +89,7 @@
             <p class="text-xs text-gray-500">{{ member.email }}</p>
           </div>
           <p class="hidden text-sm text-gray-500 sm:block">Vence {{ member.expiry }}</p>
-          <span
-            :class="
-              member.status === 'Vencido'
-                ? 'bg-error-50 text-error-600'
-                : member.status === 'Por vencer'
-                  ? 'bg-warning-50 text-warning-600'
-                  : 'bg-success-50 text-success-600'
-            "
-            class="rounded-full px-2.5 py-1 text-xs font-medium"
-            >{{ member.status }}</span
-          >
+          <Badge :color="memberStatusColor(member.status)">{{ member.status }}</Badge>
         </div>
         <p v-if="!planMembers.length" class="p-8 text-center text-sm text-gray-500">
           No hay socios asignados a este plan.
@@ -123,12 +111,7 @@
             v-model="search"
             class="h-11 rounded-lg border border-gray-200 px-4 text-sm"
             placeholder="Buscar plan..."
-          /><button
-            class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600"
-            @click="openCreate"
-          >
-            + Nuevo Plan
-          </button>
+          /><Button size="sm" @click="openCreate">+ Nuevo Plan</Button>
         </div>
       </header>
       <section class="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -147,14 +130,14 @@
           v-for="plan in filteredPlans"
           :key="plan.id"
           :class="planTheme(plan.color).border"
-          class="group cursor-pointer rounded-2xl border bg-white p-5 shadow-theme-xs transition hover:-translate-y-0.5 hover:shadow-theme-sm"
+          class="group cursor-pointer rounded-2xl border bg-white p-5 shadow-theme-xs transition duration-200 hover:-translate-y-1 hover:bg-gray-50/70 hover:shadow-theme-lg hover:ring-2 hover:ring-brand-500/10"
           @click="openDetail(plan)"
         >
           <div class="flex flex-col gap-4 md:flex-row md:items-center">
             <div class="flex min-w-55 items-center gap-4">
               <span
                 :class="planTheme(plan.color).soft"
-                class="flex h-11 w-11 items-center justify-center rounded-xl"
+                class="flex h-11 w-11 items-center justify-center rounded-xl transition duration-200 group-hover:scale-110"
                 ><CreditCard class="h-5 w-5" :stroke-width="1.8" /></span
               >
               <div>
@@ -205,7 +188,7 @@
               >
                 ✎</button
               ><button
-                class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50"
+                class="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-brand-600 opacity-70 transition hover:bg-brand-50 hover:text-brand-700 group-hover:opacity-100"
                 @click.stop="openDetail(plan)"
               >
                 Ver detalle ›
@@ -222,11 +205,9 @@
       </p>
     </div>
 
-    <div
-      v-if="modal"
-      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/50 p-4"
-      @click.self="closeModal"
-    >
+    <Modal v-if="modal" full-screen-backdrop @close="closeModal">
+      <template #body>
+      <div class="p-4">
       <form
         class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white shadow-theme-xl"
         @submit.prevent="savePlan"
@@ -298,7 +279,7 @@
                 @keyup.enter.prevent="addBenefit"
               /><button
                 type="button"
-                class="h-11 w-11 rounded-xl border border-success-200 bg-success-50 text-success-600"
+                class="h-11 w-11 rounded-xl border border-brand-200 bg-brand-50 text-brand-600"
                 @click="addBenefit"
               >
                 +
@@ -312,7 +293,7 @@
               :key="benefit"
               class="mt-2 flex items-center justify-between rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700"
             >
-              <span><span class="text-success-600">✓</span> {{ benefit }}</span
+              <span><span class="text-brand-600">✓</span> {{ benefit }}</span
               ><button type="button" class="text-gray-400" @click="removeBenefit(index)">×</button>
             </div>
           </div>
@@ -325,21 +306,20 @@
               ${{ Number(form.price || 0).toLocaleString('es-MX') }} / {{ form.duration }}
             </p>
           </div>
-          <p v-if="error" class="text-sm text-error-600">{{ error }}</p>
+          <Alert v-if="error" variant="error" title="No se pudo guardar" :message="error" />
         </div>
         <footer class="flex gap-3 border-t border-gray-100 p-6">
-          <button
-            type="button"
-            class="flex-1 rounded-lg border border-gray-200 py-2.5 text-sm font-medium text-gray-700"
-            @click="closeModal"
+          <Button type="button" variant="outline" class-name="flex-1 justify-center" @click="closeModal"
+            >Cancelar</Button
           >
-            Cancelar</button
-          ><button class="flex-1 rounded-lg bg-brand-500 py-2.5 text-sm font-medium text-white">
-            {{ editingPlan ? 'Guardar cambios' : 'Crear Plan' }}
-          </button>
+          <Button type="submit" class-name="flex-1 justify-center">{{
+            editingPlan ? 'Guardar cambios' : 'Crear Plan'
+          }}</Button>
         </footer>
       </form>
-    </div>
+      </div>
+      </template>
+    </Modal>
   </AdminLayout>
 </template>
 
@@ -347,7 +327,11 @@
 import { computed, reactive, ref } from 'vue'
 import { CreditCard } from 'lucide-vue-next'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
-import { useGymData, type GymPlan, type PlanColor } from '@/composables/useGymData'
+import Badge from '@/components/ui/Badge.vue'
+import Button from '@/components/ui/Button.vue'
+import Modal from '@/components/ui/Modal.vue'
+import Alert from '@/components/ui/Alert.vue'
+import { useGymData, type GymPlan, type PlanColor, type MemberStatus } from '@/composables/useGymData'
 
 const { plans, members, addPlan, updatePlan, deletePlan } = useGymData()
 const search = ref('')
@@ -401,6 +385,13 @@ const stats = computed(() => [
   },
 ])
 const membersForPlan = (name: string) => members.value.filter((member) => member.plan === name)
+const memberStatusColor = (status: MemberStatus) =>
+  ({
+    Activo: 'primary',
+    'Por vencer': 'warning',
+    Vencido: 'error',
+    Inactivo: 'light',
+  })[status] as 'primary' | 'warning' | 'error' | 'light'
 const planMembers = computed(() =>
   selectedPlan.value
     ? membersForPlan(selectedPlan.value.name).filter((member) =>
@@ -418,11 +409,11 @@ const planTheme = (color: PlanColor) =>
       bar: 'bg-blue-light-500',
     },
     lime: {
-      text: 'text-success-600',
-      border: 'border-success-200',
-      soft: 'bg-success-50 border-success-200',
-      selected: 'border-success-300 bg-success-50',
-      bar: 'bg-success-500',
+      text: 'text-brand-600',
+      border: 'border-brand-200',
+      soft: 'bg-brand-50 border-brand-200',
+      selected: 'border-brand-300 bg-brand-50',
+      bar: 'bg-brand-500',
     },
     orange: {
       text: 'text-orange-600',

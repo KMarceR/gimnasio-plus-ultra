@@ -27,6 +27,10 @@ export interface Member {
   trainer: string
   initials: string
   attendance: string[]
+  address: string
+  birthDate: string
+  notes: string
+  qrCode: string
 }
 
 export interface Trainer {
@@ -58,11 +62,11 @@ export interface GymSession {
 }
 
 const initialMembers: Member[] = [
-  { id: 'm1', name: 'Valentina Ríos', email: 'valentina@correo.com', phone: '555 010 2233', plan: 'Mensual Plus', startDate: '2026-05-14', expiry: '2026-07-20', status: 'Por vencer', trainer: 'Diego Ramírez', initials: 'VR', attendance: ['2026-07-01', '2026-07-03', '2026-07-07', '2026-07-10'] },
-  { id: 'm2', name: 'Mateo Fernández', email: 'mateo@correo.com', phone: '555 010 9912', plan: 'Mensual Básico', startDate: '2026-01-05', expiry: '2026-08-05', status: 'Activo', trainer: 'Sofía Luna', initials: 'MF', attendance: ['2026-07-02', '2026-07-04', '2026-07-08'] },
-  { id: 'm3', name: 'Camila Torres', email: 'camila@correo.com', phone: '555 010 3818', plan: 'Corporativo', startDate: '2026-06-01', expiry: '2026-07-01', status: 'Vencido', trainer: 'Diego Ramírez', initials: 'CT', attendance: ['2026-06-28', '2026-06-30'] },
-  { id: 'm4', name: 'Nicolás Herrera', email: 'nicolas@correo.com', phone: '555 010 4481', plan: 'Mensual Plus', startDate: '2026-04-22', expiry: '2026-07-22', status: 'Por vencer', trainer: 'Sofía Luna', initials: 'NH', attendance: ['2026-07-01', '2026-07-05', '2026-07-09'] },
-  { id: 'm5', name: 'Sofía Castillo', email: 'sofia@correo.com', phone: '555 010 7762', plan: 'Mensual Básico', startDate: '2026-07-02', expiry: '2026-08-02', status: 'Activo', trainer: 'Diego Ramírez', initials: 'SC', attendance: ['2026-07-02', '2026-07-06', '2026-07-11'] },
+  { id: 'm1', name: 'Valentina Ríos', email: 'valentina@correo.com', phone: '555 010 2233', plan: 'Mensual Plus', startDate: '2026-05-14', expiry: '2026-07-20', status: 'Por vencer', trainer: 'Diego Ramírez', initials: 'VR', attendance: ['2026-07-01', '2026-07-03', '2026-07-07', '2026-07-10'], address: 'Av. Central 123', birthDate: '1995-07-22', notes: 'Objetivo: ganar masa muscular.', qrCode: 'PU-M1-VR' },
+  { id: 'm2', name: 'Mateo Fernández', email: 'mateo@correo.com', phone: '555 010 9912', plan: 'Mensual Básico', startDate: '2026-01-05', expiry: '2026-08-05', status: 'Activo', trainer: 'Sofía Luna', initials: 'MF', attendance: ['2026-07-02', '2026-07-04', '2026-07-08'], address: 'Calle Norte 45', birthDate: '1991-02-18', notes: '', qrCode: 'PU-M2-MF' },
+  { id: 'm3', name: 'Camila Torres', email: 'camila@correo.com', phone: '555 010 3818', plan: 'Corporativo', startDate: '2026-06-01', expiry: '2026-07-01', status: 'Vencido', trainer: 'Diego Ramírez', initials: 'CT', attendance: ['2026-06-28', '2026-06-30'], address: 'Paseo Sur 82', birthDate: '1997-11-09', notes: 'Alergia a ibuprofeno.', qrCode: 'PU-M3-CT' },
+  { id: 'm4', name: 'Nicolás Herrera', email: 'nicolas@correo.com', phone: '555 010 4481', plan: 'Mensual Plus', startDate: '2026-04-22', expiry: '2026-07-22', status: 'Por vencer', trainer: 'Sofía Luna', initials: 'NH', attendance: ['2026-07-01', '2026-07-05', '2026-07-09'], address: 'Libertad 210', birthDate: '1993-08-12', notes: '', qrCode: 'PU-M4-NH' },
+  { id: 'm5', name: 'Sofía Castillo', email: 'sofia@correo.com', phone: '555 010 7762', plan: 'Mensual Básico', startDate: '2026-07-02', expiry: '2026-08-02', status: 'Activo', trainer: 'Diego Ramírez', initials: 'SC', attendance: ['2026-07-02', '2026-07-06', '2026-07-11'], address: 'Los Álamos 17', birthDate: '1999-03-27', notes: '', qrCode: 'PU-M5-SC' },
 ]
 
 const initialTrainers: Trainer[] = [
@@ -101,6 +105,18 @@ export function useGymData() {
   const trainerById = (id: string) => trainers.value.find((trainer) => trainer.id === id)
 
   const addMember = (member: Member) => members.value.unshift(member)
+  const updateMember = (id: string, changes: Partial<Member>) => {
+    const member = members.value.find((item) => item.id === id)
+    if (member) Object.assign(member, changes)
+  }
+  const changeMemberPlan = (id: string, plan: GymPlan) => {
+    const member = members.value.find((item) => item.id === id)
+    if (!member) return
+    member.plan = plan.name
+    member.startDate = new Date().toISOString().slice(0, 10)
+    member.expiry = plan.duration === '12 meses' ? `${new Date().getFullYear() + 1}-07-14` : '2026-08-14'
+    member.status = 'Activo'
+  }
   const addPlan = (plan: GymPlan) => plans.value.push(plan)
   const updatePlan = (id: string, changes: Omit<GymPlan, 'id' | 'isBase'>) => {
     const plan = plans.value.find((item) => item.id === id)
@@ -139,6 +155,8 @@ export function useGymData() {
     memberById,
     trainerById,
     addMember,
+    updateMember,
+    changeMemberPlan,
     addPlan,
     updatePlan,
     deletePlan,
