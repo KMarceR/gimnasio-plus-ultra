@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "entrenadores")
 @PrimaryKeyJoinColumn(name = "id_persona")
-public class Entrenador {
+public class Entrenador extends Persona{
 
     @Column(name = "id_entrenador")
     private int id_entrenador;
