@@ -16,23 +16,23 @@ public class Estado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_estado")
-    private int id_estado;
+    private int idEstado;
 
-    @Column(nullable = false, unique = true)
-    private String nombre_estado;
+    @Column(name = "nombre_estado", nullable = false, unique = true)
+    private String nombreEstado;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Estado() {}
 
     // Getters y Setters específicos de Estado
-    public int getIdEstado() { return id_estado; } 
-    public void setIdEstado(int id_estado) { this.id_estado = id_estado; } 
+    public int getIdEstado() { return idEstado; } 
+    public void setIdEstado(int idEstado) { this.idEstado = idEstado; } 
 
-    public String getNombreEstado() { return nombre_estado; }
-    public void setNombreEstado(String nombre_estado) { this.nombre_estado = nombre_estado; } 
+    public String getNombreEstado() { return nombreEstado; }
+    public void setNombreEstado(String nombreEstado) { this.nombreEstado = nombreEstado; } 
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

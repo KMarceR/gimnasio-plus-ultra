@@ -21,7 +21,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
-    private int id_usuario;
+    private int idUsuario;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
@@ -36,18 +36,18 @@ public class Usuario {
     private Estado estado;
 
     @Column(name = "nombre_usuario", nullable = false, unique = true)
-    private String nombre_usuario;
+    private String nombreUsuario;
 
     @Column(nullable = false)
     private String contrasena;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Usuario() {}
 
-    public int getIdUsuario() { return id_usuario; }
-    public void setIdUsuario(int id_usuario) { this.id_usuario = id_usuario; }
+    public int getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 
     public Persona getPersona() { return persona; }
     public void setPersona(Persona persona) { this.persona = persona; }
@@ -77,12 +77,12 @@ public class Usuario {
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }
 
-    public String getNombreUsuario() { return nombre_usuario; }
-    public void setNombreUsuario(String nombre_usuario) { this.nombre_usuario = nombre_usuario; }
+    public String getNombreUsuario() { return nombreUsuario; }
+    public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
 
     public String getContrasena() { return contrasena; }
     public void setContrasena(String contrasena) { this.contrasena = contrasena; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

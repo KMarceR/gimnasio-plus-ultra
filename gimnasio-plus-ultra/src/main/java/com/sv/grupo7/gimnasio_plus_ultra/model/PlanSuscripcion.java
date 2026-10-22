@@ -18,14 +18,14 @@ public class PlanSuscripcion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_plansuscripcion")
-    private int id_plansuscripcion;
+    private int idPlanSuscripcion;
 
     @ManyToOne
     @JoinColumn(name = "id_estado", nullable = false)
     private Estado estado; // Asociación orientada a objetos
 
     @Column(name = "nombre_suscripcion", nullable = false, unique = true, length = 100)
-    private String nombre_suscripcion;
+    private String nombreSuscripcion;
 
     @Column(columnDefinition = "TEXT")
     private String detalles;
@@ -34,19 +34,19 @@ public class PlanSuscripcion {
     private double precio; // Tipo primitivo double coincidente con tu diseño
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public PlanSuscripcion() {}
 
     // Getters y Setters
-    public int getIdPlanSuscripcion() { return id_plansuscripcion; }
-    public void setIdPlanSuscripcion(int id_plansuscripcion) { this.id_plansuscripcion = id_plansuscripcion; }
+    public int getIdPlanSuscripcion() { return idPlanSuscripcion; }
+    public void setIdPlanSuscripcion(int idPlanSuscripcion) { this.idPlanSuscripcion = idPlanSuscripcion; }
 
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }
 
-    public String getNombreSuscripcion() { return nombre_suscripcion; }
-    public void setNombreSuscripcion(String nombre_suscripcion) { this.nombre_suscripcion = nombre_suscripcion; }
+    public String getNombreSuscripcion() { return nombreSuscripcion; }
+    public void setNombreSuscripcion(String nombreSuscripcion) { this.nombreSuscripcion = nombreSuscripcion; }
 
     public String getDetalles() { return detalles; }
     public void setDetalles(String detalles) { this.detalles = detalles; }
@@ -54,7 +54,7 @@ public class PlanSuscripcion {
     public double getPrecio() { return precio; }
     public void setPrecio(double precio) { this.precio = precio; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }
 

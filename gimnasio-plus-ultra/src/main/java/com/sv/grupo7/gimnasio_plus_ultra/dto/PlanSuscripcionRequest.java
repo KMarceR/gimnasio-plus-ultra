@@ -2,7 +2,7 @@ package com.sv.grupo7.gimnasio_plus_ultra.dto;
 
 public class PlanSuscripcionRequest {
 
-    private int id_estado;
+    private Integer id_estado;
     private String nombre_suscripcion;
     private String detalles;
     private double precio;
@@ -10,18 +10,18 @@ public class PlanSuscripcionRequest {
     public PlanSuscripcionRequest() {
     }
 
-    public PlanSuscripcionRequest(int id_estado, String nombre_suscripcion, String detalles, double precio) {
+    public PlanSuscripcionRequest(Integer id_estado, String nombre_suscripcion, String detalles, double precio) {
         this.id_estado = id_estado;
         this.nombre_suscripcion = nombre_suscripcion;
         this.detalles = detalles;
         this.precio = precio;
     }
 
-    public int getIdEstado() {
+    public Integer getIdEstado() {
         return id_estado;
     }
 
-    public void setIdEstado(int id_estado) {
+    public void setIdEstado(Integer id_estado) {
         this.id_estado = id_estado;
     }
 

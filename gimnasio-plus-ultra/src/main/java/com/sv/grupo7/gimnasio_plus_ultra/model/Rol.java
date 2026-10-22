@@ -16,23 +16,23 @@ public class Rol {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_rol")
-    private int id_rol;
+    private int idRol;
 
-    @Column(nullable = false, unique = true)
-    private String nombre_rol;
+    @Column(name = "nombre_rol", nullable = false, unique = true)
+    private String nombreRol;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Rol() {}
 
     // Getters y Setters específicos de Rol
-    public int getIdRol() { return id_rol; }
-    public void setIdRol(int id_rol) { this.id_rol = id_rol; }
+    public int getIdRol() { return idRol; }
+    public void setIdRol(int idRol) { this.idRol = idRol; }
 
-    public String getNombreRol() { return nombre_rol; }
-    public void setNombreRol(String nombre_rol) { this.nombre_rol = nombre_rol; }
+    public String getNombreRol() { return nombreRol; }
+    public void setNombreRol(String nombreRol) { this.nombreRol = nombreRol; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

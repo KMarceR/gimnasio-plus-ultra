@@ -12,6 +12,6 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Usuario;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
-    @Query("SELECT u FROM Usuario u WHERE u.nombre_usuario = :nombreUsuario")
+    @Query("SELECT u FROM Usuario u WHERE u.nombreUsuario = :nombreUsuario")
     Optional<Usuario> buscarPorNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 }

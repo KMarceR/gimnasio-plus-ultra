@@ -12,6 +12,6 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 @Repository
 public interface EstadoRepository extends JpaRepository<Estado, Integer> {
 
-    @Query("SELECT e FROM Estado e WHERE e.nombre_estado = :nombre")
+    @Query("SELECT e FROM Estado e WHERE e.nombreEstado = :nombre")
     Optional<Estado> buscarPorNombre(@Param("nombre") String nombre);
 }

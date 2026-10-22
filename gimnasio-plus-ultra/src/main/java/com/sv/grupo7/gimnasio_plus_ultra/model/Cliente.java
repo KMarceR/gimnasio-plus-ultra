@@ -25,7 +25,7 @@ public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cliente")
-    private int id_cliente;
+    private int idCliente;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
@@ -46,12 +46,12 @@ public class Cliente {
     private List<Asistencia> asistencias = new ArrayList<>();
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Cliente() {}
 
-    public int getIdCliente() { return id_cliente; }
-    public void setIdCliente(int id_cliente) { this.id_cliente = id_cliente; }
+    public int getIdCliente() { return idCliente; }
+    public void setIdCliente(int idCliente) { this.idCliente = idCliente; }
 
     public Persona getPersona() { return persona; }
     public void setPersona(Persona persona) { this.persona = persona; }
@@ -87,6 +87,6 @@ public class Cliente {
     public List<Asistencia> getAsistencias() { return asistencias; }
     public void setAsistencias(List<Asistencia> asistencias) { this.asistencias = asistencias; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

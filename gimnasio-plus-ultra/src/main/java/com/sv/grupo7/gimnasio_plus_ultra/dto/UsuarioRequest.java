@@ -4,8 +4,8 @@ import java.time.LocalDate;
 
 public class UsuarioRequest extends PersonaRequest {
 
-    private int id_rol;
-    private int id_estado;
+    private Integer id_rol;
+    private Integer id_estado;
     private String contrasena;
 
     public UsuarioRequest() {
@@ -14,7 +14,7 @@ public class UsuarioRequest extends PersonaRequest {
 
     public UsuarioRequest(String nombres, String apellidos, String genero, LocalDate fechaNacimiento,
             String direccion, String email, String telefono, String dui,
-            int id_rol, int id_estado, String contrasena) {
+            Integer id_rol, Integer id_estado, String contrasena) {
         super(nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui);
         this.id_rol = id_rol;
         this.id_estado = id_estado;
@@ -22,19 +22,19 @@ public class UsuarioRequest extends PersonaRequest {
     }
 
     // Getters y Setters
-    public int getIdRol() {
+    public Integer getIdRol() {
         return id_rol;
     }
 
-    public void setIdRol(int id_rol) {
+    public void setIdRol(Integer id_rol) {
         this.id_rol = id_rol;
     }
 
-    public int getIdEstado() {
+    public Integer getIdEstado() {
         return id_estado;
     }
 
-    public void setIdEstado(int id_estado) {
+    public void setIdEstado(Integer id_estado) {
         this.id_estado = id_estado;
     }
 

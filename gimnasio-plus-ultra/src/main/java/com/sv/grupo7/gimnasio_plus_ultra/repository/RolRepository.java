@@ -12,6 +12,6 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Rol;
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Integer> {
 
-    @Query("SELECT r FROM Rol r WHERE r.nombre_rol = :nombre")
+    @Query("SELECT r FROM Rol r WHERE r.nombreRol = :nombre")
     Optional<Rol> buscarPorNombre(@Param("nombre") String nombre);
 }

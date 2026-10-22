@@ -20,7 +20,7 @@ public class Sesion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_sesion")
-    private int id_sesion;
+    private int idSesion;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
@@ -35,22 +35,22 @@ public class Sesion {
     private Estado estado;
 
     @Column(name = "fecha_sesion", nullable = false)
-    private LocalDate fecha_sesion;
+    private LocalDate fechaSesion;
 
     @Column(name = "hora_inicio", nullable = false)
-    private LocalTime hora_inicio;
+    private LocalTime horaInicio;
 
     @Column(name = "hora_fin", nullable = false)
-    private LocalTime hora_fin;
+    private LocalTime horaFin;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Sesion() {}
 
     // Getters y Setters
-    public int getIdSesion() { return id_sesion; }
-    public void setIdSesion(int id_sesion) { this.id_sesion = id_sesion; }
+    public int getIdSesion() { return idSesion; }
+    public void setIdSesion(int idSesion) { this.idSesion = idSesion; }
 
     public Cliente getCliente() { return cliente; }
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
@@ -61,15 +61,15 @@ public class Sesion {
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }
 
-    public LocalDate getFechaSesion() { return fecha_sesion; }
-    public void setFechaSesion(LocalDate fecha_sesion) { this.fecha_sesion = fecha_sesion; }
+    public LocalDate getFechaSesion() { return fechaSesion; }
+    public void setFechaSesion(LocalDate fechaSesion) { this.fechaSesion = fechaSesion; }
 
-    public LocalTime getHoraInicio() { return hora_inicio; }
-    public void setHoraInicio(LocalTime hora_inicio) { this.hora_inicio = hora_inicio; }
+    public LocalTime getHoraInicio() { return horaInicio; }
+    public void setHoraInicio(LocalTime horaInicio) { this.horaInicio = horaInicio; }
 
-    public LocalTime getHoraFin() { return hora_fin; }
-    public void setHoraFin(LocalTime hora_fin) { this.hora_fin = hora_fin; }
+    public LocalTime getHoraFin() { return horaFin; }
+    public void setHoraFin(LocalTime horaFin) { this.horaFin = horaFin; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

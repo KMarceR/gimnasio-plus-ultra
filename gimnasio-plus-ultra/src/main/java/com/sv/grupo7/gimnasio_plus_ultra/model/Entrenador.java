@@ -20,7 +20,7 @@ public class Entrenador {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_entrenador")
-    private int id_entrenador;
+    private int idEntrenador;
 
     @OneToOne
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
@@ -37,15 +37,15 @@ public class Entrenador {
     private String especialidad;
 
     @Column(name = "tarifa_por_sesion", nullable = false)
-    private double tarifa_por_sesion;
+    private double tarifaPorSesion;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Entrenador() {}
 
-    public int getIdEntrenador() { return id_entrenador; }
-    public void setIdEntrenador(int id_entrenador) { this.id_entrenador = id_entrenador; }
+    public int getIdEntrenador() { return idEntrenador; }
+    public void setIdEntrenador(int idEntrenador) { this.idEntrenador = idEntrenador; }
 
     public Persona getPersona() { return persona; }
     public void setPersona(Persona persona) { this.persona = persona; }
@@ -78,9 +78,9 @@ public class Entrenador {
     public String getEspecialidad() { return especialidad; }
     public void setEspecialidad(String especialidad) { this.especialidad = especialidad; }
 
-    public double getTarifaPorSesion() { return tarifa_por_sesion; }
-    public void setTarifaPorSesion(double tarifa_por_sesion) { this.tarifa_por_sesion = tarifa_por_sesion; }
+    public double getTarifaPorSesion() { return tarifaPorSesion; }
+    public void setTarifaPorSesion(double tarifaPorSesion) { this.tarifaPorSesion = tarifaPorSesion; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

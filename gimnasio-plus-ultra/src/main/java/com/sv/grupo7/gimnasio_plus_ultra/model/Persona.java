@@ -16,7 +16,7 @@ public class Persona {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_persona")
-    private int id_persona;
+    private int idPersona;
 
     @Column(nullable = false)
     private String nombres;
@@ -28,7 +28,7 @@ public class Persona {
     private String genero;
 
     @Column(name = "fecha_nacimiento", nullable = false)
-    private LocalDate fecha_nacimiento;
+    private LocalDate fechaNacimiento;
 
     private String direccion;
 
@@ -41,12 +41,12 @@ public class Persona {
     private String dui;
 
     @Column(name = "creado_en", insertable = false, updatable = false)
-    private LocalDateTime creado_en;
+    private LocalDateTime creadoEn;
 
     public Persona() {}
 
-    public int getIdPersona() { return id_persona; }
-    public void setIdPersona(int id_persona) { this.id_persona = id_persona; }
+    public int getIdPersona() { return idPersona; }
+    public void setIdPersona(int idPersona) { this.idPersona = idPersona; }
 
     public String getNombres() { return nombres; }
     public void setNombres(String nombres) { this.nombres = nombres; }
@@ -57,8 +57,8 @@ public class Persona {
     public String getGenero() { return genero; }
     public void setGenero(String genero) { this.genero = genero; }
 
-    public LocalDate getFechaNacimiento() { return fecha_nacimiento; }
-    public void setFechaNacimiento(LocalDate fecha_nacimiento) { this.fecha_nacimiento = fecha_nacimiento; }
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
     public String getDireccion() { return direccion; }
     public void setDireccion(String direccion) { this.direccion = direccion; }
@@ -72,6 +72,6 @@ public class Persona {
     public String getDui() { return dui; }
     public void setDui(String dui) { this.dui = dui; }
 
-    public LocalDateTime getCreadoEn() { return creado_en; }
-    public void setCreadoEn(LocalDateTime creado_en) { this.creado_en = creado_en; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
 }

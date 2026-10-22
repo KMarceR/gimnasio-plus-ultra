@@ -5,9 +5,9 @@ import java.time.LocalTime;
 
 public class SesionRequest {
 
-    private int id_cliente;
-    private int id_entrenador;
-    private int id_estado;
+    private Integer id_cliente;
+    private Integer id_entrenador;
+    private Integer id_estado;
     private LocalDate fecha_sesion;
     private LocalTime hora_inicio;
     private LocalTime hora_fin;
@@ -15,7 +15,7 @@ public class SesionRequest {
     public SesionRequest() {
     }
 
-    public SesionRequest(int id_cliente, int id_entrenador, int id_estado,
+    public SesionRequest(Integer id_cliente, Integer id_entrenador, Integer id_estado,
             LocalDate fecha_sesion, LocalTime hora_inicio, LocalTime hora_fin) {
         this.id_cliente = id_cliente;
         this.id_entrenador = id_entrenador;
@@ -25,27 +25,27 @@ public class SesionRequest {
         this.hora_fin = hora_fin;
     }
 
-    public int getIdCliente() {
+    public Integer getIdCliente() {
         return id_cliente;
     }
 
-    public void setIdCliente(int id_cliente) {
+    public void setIdCliente(Integer id_cliente) {
         this.id_cliente = id_cliente;
     }
 
-    public int getIdEntrenador() {
+    public Integer getIdEntrenador() {
         return id_entrenador;
     }
 
-    public void setIdEntrenador(int id_entrenador) {
+    public void setIdEntrenador(Integer id_entrenador) {
         this.id_entrenador = id_entrenador;
     }
 
-    public int getIdEstado() {
+    public Integer getIdEstado() {
         return id_estado;
     }
 
-    public void setIdEstado(int id_estado) {
+    public void setIdEstado(Integer id_estado) {
         this.id_estado = id_estado;
     }
 
