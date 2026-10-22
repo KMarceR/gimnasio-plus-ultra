@@ -13,6 +13,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Usuario;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.RolRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.UsuarioRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 
 @Service
 public class UsuarioService {
@@ -20,19 +21,29 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final EstadoRepository estadoRepository;
+    private final PersonaRepository personaRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository,
             RolRepository rolRepository,
             EstadoRepository estadoRepository,
+            PersonaRepository personaRepository,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.estadoRepository = estadoRepository;
+        this.personaRepository = personaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     public UsuarioResponse crear(UsuarioRequest request) {
+        if (personaRepository.existsByDui(request.getDui())) {
+            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
+        }
+        if (personaRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Ya existe una persona registrada con ese email");
+        }
+
         Usuario usuario = new Usuario();
 
         usuario.setNombres(request.getNombres());
@@ -43,7 +54,7 @@ public class UsuarioService {
         usuario.setGenero(request.getGenero());
         usuario.setDui(request.getDui());
         usuario.setFechaNacimiento(request.getFechaNacimiento());
-        usuario.setNombreUsuario(request.getNombreUsuario());
+        usuario.setNombreUsuario(request.getDui());
 
         String hashContrasena = passwordEncoder.encode(request.getContrasena());
         usuario.setContrasena(hashContrasena);
@@ -72,6 +83,13 @@ public class UsuarioService {
     }
 
     public UsuarioResponse actualizar(Integer id, UsuarioRequest request) {
+        if (personaRepository.existsByDui(request.getDui())) {
+            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
+        }
+        if (personaRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Ya existe una persona registrada con ese email");
+        }
+
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if (usuario == null) {
             return null;
@@ -85,7 +103,7 @@ public class UsuarioService {
         usuario.setGenero(request.getGenero());
         usuario.setDui(request.getDui());
         usuario.setFechaNacimiento(request.getFechaNacimiento());
-        usuario.setNombreUsuario(request.getNombreUsuario());
+        usuario.setNombreUsuario(request.getDui());
 
         if (request.getContrasena() != null && !request.getContrasena().isBlank()) {
             usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
@@ -137,5 +155,13 @@ public class UsuarioService {
         response.setCreadoEn(usuario.getCreadoEn());
 
         return response;
+    }
+
+    public UsuarioResponse login(String nombreUsuario, String contrasena) {
+        return usuarioRepository.buscarPorNombreUsuario(nombreUsuario)
+                .filter(usuario -> passwordEncoder.matches(contrasena, usuario.getContrasena()))
+                .filter(usuario -> "Activo".equals(usuario.getEstado().getNombreEstado()))
+                .map(this::convertirAResponse)
+                .orElse(null);
     }
 }

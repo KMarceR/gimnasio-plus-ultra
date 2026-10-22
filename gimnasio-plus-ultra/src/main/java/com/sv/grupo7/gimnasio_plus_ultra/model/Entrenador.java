@@ -3,7 +3,6 @@ package com.sv.grupo7.gimnasio_plus_ultra.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +22,7 @@ public class Entrenador {
     @Column(name = "id_entrenador")
     private int id_entrenador;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "id_persona", nullable = false, unique = true)
     private Persona persona = new Persona();
 

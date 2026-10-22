@@ -4,10 +4,10 @@ import java.time.LocalDate;
 
 public class EntrenadorRequest extends PersonaRequest {
 
-    private int id_usuario;
-    private int id_estado;
+    private Integer id_estado;
+    private String contrasena;
     private String especialidad;
-    private double tarifa_por_sesion;
+    private Double tarifa_por_sesion;
 
     public EntrenadorRequest() {
         super();
@@ -15,29 +15,28 @@ public class EntrenadorRequest extends PersonaRequest {
 
     public EntrenadorRequest(String nombres, String apellidos, String genero, LocalDate fechaNacimiento,
             String direccion, String email, String telefono, String dui,
-            int id_usuario, int id_estado, String especialidad, double tarifa_por_sesion) {
+            Integer id_estado, String contrasena, String especialidad, Double tarifa_por_sesion) {
         super(nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui);
-        this.id_usuario = id_usuario;
         this.id_estado = id_estado;
+        this.contrasena = contrasena;
         this.especialidad = especialidad;
         this.tarifa_por_sesion = tarifa_por_sesion;
     }
 
-    // Getters y Setters
-    public int getIdUsuario() {
-        return id_usuario;
-    }
-
-    public void setIdUsuario(int id_usuario) {
-        this.id_usuario = id_usuario;
-    }
-
-    public int getIdEstado() {
+    public Integer getIdEstado() {
         return id_estado;
     }
 
-    public void setIdEstado(int id_estado) {
+    public void setIdEstado(Integer id_estado) {
         this.id_estado = id_estado;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getEspecialidad() {
@@ -48,11 +47,11 @@ public class EntrenadorRequest extends PersonaRequest {
         this.especialidad = especialidad;
     }
 
-    public double getTarifaPorSesion() {
+    public Double getTarifaPorSesion() {
         return tarifa_por_sesion;
     }
 
-    public void setTarifaPorSesion(double tarifa_por_sesion) {
+    public void setTarifaPorSesion(Double tarifa_por_sesion) {
         this.tarifa_por_sesion = tarifa_por_sesion;
     }
 }
