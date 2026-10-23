@@ -48,45 +48,142 @@ public class Cliente {
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
 
-    public Cliente() {}
+    @Column(name = "codigo_qr", nullable = false, unique = true, length = 36)
+    private String codigoQr;
 
-    public int getIdCliente() { return idCliente; }
-    public void setIdCliente(int idCliente) { this.idCliente = idCliente; }
+    public Cliente() {
+    }
 
-    public Persona getPersona() { return persona; }
-    public void setPersona(Persona persona) { this.persona = persona; }
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public Persona getPersona() {
+        return persona;
+    }
+
+    public void setPersona(Persona persona) {
+        this.persona = persona;
+    }
 
     // Delegados hacia Persona (datos personales compartidos)
-    public int getIdPersona() { return persona.getIdPersona(); }
-    public String getNombres() { return persona.getNombres(); }
-    public void setNombres(String nombres) { persona.setNombres(nombres); }
-    public String getApellidos() { return persona.getApellidos(); }
-    public void setApellidos(String apellidos) { persona.setApellidos(apellidos); }
-    public String getGenero() { return persona.getGenero(); }
-    public void setGenero(String genero) { persona.setGenero(genero); }
-    public LocalDate getFechaNacimiento() { return persona.getFechaNacimiento(); }
-    public void setFechaNacimiento(LocalDate fechaNacimiento) { persona.setFechaNacimiento(fechaNacimiento); }
-    public String getDireccion() { return persona.getDireccion(); }
-    public void setDireccion(String direccion) { persona.setDireccion(direccion); }
-    public String getEmail() { return persona.getEmail(); }
-    public void setEmail(String email) { persona.setEmail(email); }
-    public String getTelefono() { return persona.getTelefono(); }
-    public void setTelefono(String telefono) { persona.setTelefono(telefono); }
-    public String getDui() { return persona.getDui(); }
-    public void setDui(String dui) { persona.setDui(dui); }
+    public int getIdPersona() {
+        return persona.getIdPersona();
+    }
 
-    public PlanSuscripcion getPlanSuscripcion() { return planSuscripcion; }
-    public void setPlanSuscripcion(PlanSuscripcion planSuscripcion) { this.planSuscripcion = planSuscripcion; }
+    public String getNombres() {
+        return persona.getNombres();
+    }
 
-    public Estado getEstado() { return estado; }
-    public void setEstado(Estado estado) { this.estado = estado; }
+    public void setNombres(String nombres) {
+        persona.setNombres(nombres);
+    }
 
-    public String getNotas() { return notas; }
-    public void setNotas(String notas) { this.notas = notas; }
+    public String getApellidos() {
+        return persona.getApellidos();
+    }
 
-    public List<Asistencia> getAsistencias() { return asistencias; }
-    public void setAsistencias(List<Asistencia> asistencias) { this.asistencias = asistencias; }
+    public void setApellidos(String apellidos) {
+        persona.setApellidos(apellidos);
+    }
 
-    public LocalDateTime getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
+    public String getGenero() {
+        return persona.getGenero();
+    }
+
+    public void setGenero(String genero) {
+        persona.setGenero(genero);
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return persona.getFechaNacimiento();
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        persona.setFechaNacimiento(fechaNacimiento);
+    }
+
+    public String getDireccion() {
+        return persona.getDireccion();
+    }
+
+    public void setDireccion(String direccion) {
+        persona.setDireccion(direccion);
+    }
+
+    public String getEmail() {
+        return persona.getEmail();
+    }
+
+    public void setEmail(String email) {
+        persona.setEmail(email);
+    }
+
+    public String getTelefono() {
+        return persona.getTelefono();
+    }
+
+    public void setTelefono(String telefono) {
+        persona.setTelefono(telefono);
+    }
+
+    public String getDui() {
+        return persona.getDui();
+    }
+
+    public void setDui(String dui) {
+        persona.setDui(dui);
+    }
+
+    public PlanSuscripcion getPlanSuscripcion() {
+        return planSuscripcion;
+    }
+
+    public void setPlanSuscripcion(PlanSuscripcion planSuscripcion) {
+        this.planSuscripcion = planSuscripcion;
+    }
+
+    public Estado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
+    public String getNotas() {
+        return notas;
+    }
+
+    public void setNotas(String notas) {
+        this.notas = notas;
+    }
+
+    public String getCodigoQr() {
+        return codigoQr;
+    }
+
+    public void setCodigoQr(String codigoQr) {
+        this.codigoQr = codigoQr;
+    }
+
+    public List<Asistencia> getAsistencias() {
+        return asistencias;
+    }
+
+    public void setAsistencias(List<Asistencia> asistencias) {
+        this.asistencias = asistencias;
+    }
+
+    public LocalDateTime getCreadoEn() {
+        return creadoEn;
+    }
+
+    public void setCreadoEn(LocalDateTime creadoEn) {
+        this.creadoEn = creadoEn;
+    }
 }

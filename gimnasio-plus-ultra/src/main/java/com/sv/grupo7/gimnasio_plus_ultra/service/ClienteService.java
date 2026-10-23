@@ -1,11 +1,14 @@
 package com.sv.grupo7.gimnasio_plus_ultra.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.ClienteRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.ClienteResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Cliente;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
@@ -16,23 +19,39 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
 @Service
 public class ClienteService {
 
+    private static final String ESTADO_ACTIVO = "Activo";
+
     private final ClienteRepository clienteRepository;
     private final PlanSuscripcionRepository planSuscripcionRepository;
     private final EstadoRepository estadoRepository;
+    private final SuscripcionService suscripcionService;
 
     public ClienteService(ClienteRepository clienteRepository,
             PlanSuscripcionRepository planSuscripcionRepository,
-            EstadoRepository estadoRepository) {
+            EstadoRepository estadoRepository,
+            SuscripcionService suscripcionService) {
         this.clienteRepository = clienteRepository;
         this.planSuscripcionRepository = planSuscripcionRepository;
         this.estadoRepository = estadoRepository;
+        this.suscripcionService = suscripcionService;
     }
 
+    @Transactional
     public ClienteResponse crear(ClienteRequest request) {
         Cliente cliente = new Cliente();
         aplicarDatos(cliente, request);
+        cliente.setCodigoQr(UUID.randomUUID().toString()); // carnet QR unico; se genera solo al crear
 
         Cliente nuevoCliente = clienteRepository.save(cliente);
+
+        // Si se registra activo y con plan, se le vende su primera suscripcion
+        boolean activo = ESTADO_ACTIVO.equals(nuevoCliente.getEstado().getNombreEstado());
+        if (activo && nuevoCliente.getPlanSuscripcion() != null) {
+            SuscripcionRequest venta = new SuscripcionRequest();
+            venta.setIdCliente(nuevoCliente.getIdCliente());
+            venta.setIdPlanSuscripcion(nuevoCliente.getPlanSuscripcion().getIdPlanSuscripcion());
+            suscripcionService.vender(venta);
+        }
         return convertirAResponse(nuevoCliente);
     }
 
@@ -52,7 +71,7 @@ public class ClienteService {
         if (cliente == null) {
             return null;
         }
-        aplicarDatos(cliente, request);
+        aplicarDatos(cliente, request); // el codigo QR no cambia al editar
         return convertirAResponse(clienteRepository.save(cliente));
     }
 
@@ -75,7 +94,7 @@ public class ClienteService {
         cliente.setFechaNacimiento(request.getFechaNacimiento());
         cliente.setNotas(request.getNotas());
 
-        if (request.getIdPlanSuscripcion() > 0) {
+        if (request.getIdPlanSuscripcion() != null && request.getIdPlanSuscripcion() > 0) {
             PlanSuscripcion plan = planSuscripcionRepository.findById(Integer.valueOf(request.getIdPlanSuscripcion()))
                     .orElse(null);
             cliente.setPlanSuscripcion(plan);
@@ -103,6 +122,7 @@ public class ClienteService {
 
         response.setIdCliente(cliente.getIdCliente());
         response.setNotas(cliente.getNotas());
+        response.setCodigoQr(cliente.getCodigoQr());
         response.setCreadoEn(cliente.getCreadoEn());
 
         if (cliente.getPlanSuscripcion() != null) {

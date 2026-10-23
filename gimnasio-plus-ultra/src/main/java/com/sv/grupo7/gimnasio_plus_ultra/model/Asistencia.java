@@ -36,6 +36,9 @@ public class Asistencia {
     @Column(name = "hora_sesion", nullable = false)
     private LocalTime horaSesion;
 
+    @Column(name = "hora_salida")
+    private LocalTime horaSalida;
+
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
 
@@ -56,6 +59,9 @@ public class Asistencia {
 
     public LocalTime getHoraSesion() { return horaSesion; }
     public void setHoraSesion(LocalTime horaSesion) { this.horaSesion = horaSesion; }
+
+    public LocalTime getHoraSalida() { return horaSalida; }
+    public void setHoraSalida(LocalTime horaSalida) { this.horaSalida = horaSalida; }
 
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }

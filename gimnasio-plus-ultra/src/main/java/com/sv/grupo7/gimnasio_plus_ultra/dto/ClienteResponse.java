@@ -9,6 +9,16 @@ public class ClienteResponse extends PersonaResponse {
     private String nombre_suscripcion;
     private String nombre_estado;
     private String notas;
+    private String codigoQr;
+
+    public String getCodigoQr() {
+        return codigoQr;
+    }
+
+    public void setCodigoQr(String codigoQr) {
+        this.codigoQr = codigoQr;
+    }
+
     private LocalDateTime creado_en;
 
     public ClienteResponse() {

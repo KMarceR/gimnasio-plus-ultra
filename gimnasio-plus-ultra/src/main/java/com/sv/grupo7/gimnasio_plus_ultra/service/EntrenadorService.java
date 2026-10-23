@@ -17,7 +17,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.RolRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.UsuarioRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EntrenadorService {

@@ -7,6 +7,8 @@ import java.time.LocalTime;
 public class AsistenciaResponse {
 
     private int id_asistencia;
+    private int idCliente;
+    private LocalTime horaSalida;
     private String nombre_cliente;
     private String nombre_estado;
     private LocalDate fecha_asistencia;
@@ -72,5 +74,21 @@ public class AsistenciaResponse {
 
     public void setCreadoEn(LocalDateTime creado_en) {
         this.creado_en = creado_en;
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public LocalTime getHoraSalida() {
+        return horaSalida;
+    }
+
+    public void setHoraSalida(LocalTime horaSalida) {
+        this.horaSalida = horaSalida;
     }
 }

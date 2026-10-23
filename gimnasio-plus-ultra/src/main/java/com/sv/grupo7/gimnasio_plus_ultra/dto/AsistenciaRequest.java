@@ -9,6 +9,7 @@ public class AsistenciaRequest {
     private Integer id_estado;
     private LocalDate fecha_asistencia;
     private LocalTime hora_sesion;
+    private LocalTime horaSalida;   // para que recepcion corrija una marcacion
 
     public AsistenciaRequest() {
     }
@@ -50,5 +51,13 @@ public class AsistenciaRequest {
 
     public void setHoraSesion(LocalTime hora_sesion) {
         this.hora_sesion = hora_sesion;
+    }
+
+    public LocalTime getHoraSalida() {
+        return horaSalida;
+    }
+
+    public void setHoraSalida(LocalTime horaSalida) {
+        this.horaSalida = horaSalida;
     }
 }

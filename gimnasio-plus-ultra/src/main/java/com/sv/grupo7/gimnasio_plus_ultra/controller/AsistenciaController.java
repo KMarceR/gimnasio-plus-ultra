@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sv.grupo7.gimnasio_plus_ultra.dto.AccesoQrRequest;
+import com.sv.grupo7.gimnasio_plus_ultra.dto.AccesoQrResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.AsistenciaRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.AsistenciaResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.service.AsistenciaService;
@@ -43,7 +45,8 @@ public class AsistenciaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AsistenciaResponse> actualizar(@PathVariable Integer id, @RequestBody AsistenciaRequest request) {
+    public ResponseEntity<AsistenciaResponse> actualizar(@PathVariable Integer id,
+            @RequestBody AsistenciaRequest request) {
         AsistenciaResponse response = asistenciaService.actualizar(id, request);
         return response != null ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
@@ -51,5 +54,20 @@ public class AsistenciaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         return asistenciaService.eliminar(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/qr")
+    public ResponseEntity<AccesoQrResponse> registrarAccesoQr(@RequestBody AccesoQrRequest request) {
+        return ResponseEntity.ok(asistenciaService.registrarAccesoQr(request.getCodigoQr()));
+    }
+
+    @GetMapping("/presentes")
+    public List<AsistenciaResponse> presentes() {
+        return asistenciaService.obtenerPresentes();
+    }
+
+    @GetMapping("/hoy")
+    public List<AsistenciaResponse> deHoy() {
+        return asistenciaService.obtenerDeHoy();
     }
 }
