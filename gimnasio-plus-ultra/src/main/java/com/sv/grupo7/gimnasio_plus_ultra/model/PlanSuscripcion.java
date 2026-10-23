@@ -22,7 +22,7 @@ public class PlanSuscripcion {
 
     @ManyToOne
     @JoinColumn(name = "id_estado", nullable = false)
-    private Estado estado; // Asociación orientada a objetos
+    private Estado estado;
 
     @Column(name = "nombre_suscripcion", nullable = false, unique = true, length = 100)
     private String nombreSuscripcion;
@@ -31,30 +31,71 @@ public class PlanSuscripcion {
     private String detalles;
 
     @Column(nullable = false)
-    private double precio; // Tipo primitivo double coincidente con tu diseño
+    private double precio;
+
+    @Column(name = "tipo_plan", nullable = false, length = 20)
+    private String tipoPlan = "MENSUAL";
 
     @Column(name = "creado_en", insertable = false, updatable = false)
     private LocalDateTime creadoEn;
 
-    public PlanSuscripcion() {}
+    public PlanSuscripcion() {
+    }
 
     // Getters y Setters
-    public int getIdPlanSuscripcion() { return idPlanSuscripcion; }
-    public void setIdPlanSuscripcion(int idPlanSuscripcion) { this.idPlanSuscripcion = idPlanSuscripcion; }
+    public int getIdPlanSuscripcion() {
+        return idPlanSuscripcion;
+    }
 
-    public Estado getEstado() { return estado; }
-    public void setEstado(Estado estado) { this.estado = estado; }
+    public void setIdPlanSuscripcion(int idPlanSuscripcion) {
+        this.idPlanSuscripcion = idPlanSuscripcion;
+    }
 
-    public String getNombreSuscripcion() { return nombreSuscripcion; }
-    public void setNombreSuscripcion(String nombreSuscripcion) { this.nombreSuscripcion = nombreSuscripcion; }
+    public Estado getEstado() {
+        return estado;
+    }
 
-    public String getDetalles() { return detalles; }
-    public void setDetalles(String detalles) { this.detalles = detalles; }
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public String getNombreSuscripcion() {
+        return nombreSuscripcion;
+    }
 
-    public LocalDateTime getCreadoEn() { return creadoEn; }
-    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
+    public void setNombreSuscripcion(String nombreSuscripcion) {
+        this.nombreSuscripcion = nombreSuscripcion;
+    }
+
+    public String getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(String detalles) {
+        this.detalles = detalles;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public String getTipoPlan() {
+        return tipoPlan;
+    }
+
+    public void setTipoPlan(String tipoPlan) {
+        this.tipoPlan = tipoPlan;
+    }
+
+    public LocalDateTime getCreadoEn() {
+        return creadoEn;
+    }
+
+    public void setCreadoEn(LocalDateTime creadoEn) {
+        this.creadoEn = creadoEn;
+    }
 }
-

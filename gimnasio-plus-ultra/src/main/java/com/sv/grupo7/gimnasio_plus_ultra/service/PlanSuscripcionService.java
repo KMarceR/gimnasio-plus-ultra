@@ -10,6 +10,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.model.TipoPlan;
 
 @Service
 public class PlanSuscripcionService {
@@ -17,7 +18,8 @@ public class PlanSuscripcionService {
     private final PlanSuscripcionRepository planSuscripcionRepository;
     private final EstadoRepository estadoRepository;
 
-    public PlanSuscripcionService(PlanSuscripcionRepository planSuscripcionRepository, EstadoRepository estadoRepository) {
+    public PlanSuscripcionService(PlanSuscripcionRepository planSuscripcionRepository,
+            EstadoRepository estadoRepository) {
         this.planSuscripcionRepository = planSuscripcionRepository;
         this.estadoRepository = estadoRepository;
     }
@@ -66,11 +68,23 @@ public class PlanSuscripcionService {
         Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
                 .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
         plan.setEstado(estado);
+
+        String tipo = (request.getTipoPlan() == null || request.getTipoPlan().isBlank())
+                ? TipoPlan.MENSUAL.name()
+                : request.getTipoPlan().trim().toUpperCase();
+        try {
+            TipoPlan.valueOf(tipo); // valida que sea MENSUAL o ANUAL
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("El tipo de plan debe ser MENSUAL o ANUAL");
+        }
+        plan.setTipoPlan(tipo);
     }
 
     private PlanSuscripcionResponse convertirAResponse(PlanSuscripcion plan) {
         PlanSuscripcionResponse response = new PlanSuscripcionResponse();
         response.setIdPlanSuscripcion(plan.getIdPlanSuscripcion());
+        response.setTipoPlan(plan.getTipoPlan());
+        response.setDuracionMeses(TipoPlan.valueOf(plan.getTipoPlan()).getMeses());
         response.setNombreSuscripcion(plan.getNombreSuscripcion());
         response.setDetalles(plan.getDetalles());
         response.setPrecio(plan.getPrecio());

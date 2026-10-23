@@ -6,6 +6,7 @@ public class PlanSuscripcionRequest {
     private String nombre_suscripcion;
     private String detalles;
     private double precio;
+    private String tipoPlan;
 
     public PlanSuscripcionRequest() {
     }
@@ -47,5 +48,13 @@ public class PlanSuscripcionRequest {
 
     public void setPrecio(double precio) {
         this.precio = precio;
+    }
+
+    public String getTipoPlan() {
+        return tipoPlan;
+    }
+
+    public void setTipoPlan(String tipoPlan) {
+        this.tipoPlan = tipoPlan;
     }
 }

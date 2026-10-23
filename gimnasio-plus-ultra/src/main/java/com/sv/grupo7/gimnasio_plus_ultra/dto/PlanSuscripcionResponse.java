@@ -9,6 +9,8 @@ public class PlanSuscripcionResponse {
     private String nombre_suscripcion;
     private String detalles;
     private double precio;
+    private String tipoPlan;
+    private int duracionMeses;
     private LocalDateTime creado_en;
 
     public PlanSuscripcionResponse() {
@@ -72,4 +74,19 @@ public class PlanSuscripcionResponse {
         this.creado_en = creado_en;
     }
 
+    public String getTipoPlan() {
+        return tipoPlan;
+    }
+
+    public void setTipoPlan(String tipoPlan) {
+        this.tipoPlan = tipoPlan;
+    }
+
+    public int getDuracionMeses() {
+        return duracionMeses;
+    }
+
+    public void setDuracionMeses(int duracionMeses) {
+        this.duracionMeses = duracionMeses;
+    }
 }
