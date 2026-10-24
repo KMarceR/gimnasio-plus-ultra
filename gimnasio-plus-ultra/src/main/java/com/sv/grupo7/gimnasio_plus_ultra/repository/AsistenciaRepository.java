@@ -13,16 +13,21 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Asistencia;
 @Repository
 public interface AsistenciaRepository extends JpaRepository<Asistencia, Integer> {
 
-    // Entrada "abierta" de un cliente: hoy, estado Activo y todavia sin salida
-    @Query("SELECT a FROM Asistencia a WHERE a.cliente.idCliente = :idCliente "
-            + "AND a.fechaAsistencia = :fecha AND a.horaSalida IS NULL AND a.estado.nombreEstado = 'Activo'")
-    List<Asistencia> buscarEntradasAbiertas(@Param("idCliente") int idCliente, @Param("fecha") LocalDate fecha);
+        // Entrada "abierta" de un cliente: hoy, estado Activo y todavia sin salida
+        @Query("SELECT a FROM Asistencia a WHERE a.cliente.idCliente = :idCliente "
+                        + "AND a.fechaAsistencia = :fecha AND a.horaSalida IS NULL AND a.estado.nombreEstado = 'Activo'")
+        List<Asistencia> buscarEntradasAbiertas(@Param("idCliente") int idCliente, @Param("fecha") LocalDate fecha);
 
-    // Todos los que estan dentro del gimnasio en este momento
-    @Query("SELECT a FROM Asistencia a WHERE a.fechaAsistencia = :fecha "
-            + "AND a.horaSalida IS NULL AND a.estado.nombreEstado = 'Activo' ORDER BY a.horaSesion")
-    List<Asistencia> buscarPresentes(@Param("fecha") LocalDate fecha);
+        // Todos los que estan dentro del gimnasio en este momento
+        @Query("SELECT a FROM Asistencia a WHERE a.fechaAsistencia = :fecha "
+                        + "AND a.horaSalida IS NULL AND a.estado.nombreEstado = 'Activo' ORDER BY a.horaSesion")
+        List<Asistencia> buscarPresentes(@Param("fecha") LocalDate fecha);
 
-    // Log del dia, del mas reciente al mas antiguo
-    List<Asistencia> findByFechaAsistenciaOrderByHoraSesionDesc(LocalDate fecha);
+        // Log del dia, del mas reciente al mas antiguo
+        List<Asistencia> findByFechaAsistenciaOrderByHoraSesionDesc(LocalDate fecha);
+
+        // Entradas de dias anteriores que nunca marcaron salida
+        @Query("SELECT a FROM Asistencia a WHERE a.fechaAsistencia < :hoy "
+                        + "AND a.horaSalida IS NULL AND a.estado.nombreEstado = 'Activo'")
+        List<Asistencia> buscarEntradasSinSalida(@Param("hoy") LocalDate hoy);
 }

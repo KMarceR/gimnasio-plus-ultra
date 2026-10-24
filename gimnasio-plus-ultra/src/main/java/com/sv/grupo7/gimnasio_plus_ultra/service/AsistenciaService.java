@@ -25,11 +25,11 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.SuscripcionRepository;
 public class AsistenciaService implements CrudService<AsistenciaRequest, AsistenciaResponse> {
 
     private static final String CLIENTE_ACTIVO = "Activo";
-    private static final String ESTADO_DENTRO = "Activo";        // entro y esta dentro
-    private static final String ESTADO_SALIO = "Completada";     // entro y ya salio
-    private static final String ESTADO_RECHAZADO = "Cancelada";  // no se le permitio entrar
+    private static final String ESTADO_DENTRO = "Activo"; // entro y esta dentro
+    private static final String ESTADO_SALIO = "Completada"; // entro y ya salio
+    private static final String ESTADO_RECHAZADO = "Cancelada"; // no se le permitio entrar
     private static final long MINUTOS_MINIMOS_ENTRE_MARCAS = 10;
-
+    private static final String ESTADO_SIN_SALIDA = "Salida no marcada";
     private final AsistenciaRepository asistenciaRepository;
     private final ClienteRepository clienteRepository;
     private final EstadoRepository estadoRepository;
@@ -43,8 +43,7 @@ public class AsistenciaService implements CrudService<AsistenciaRequest, Asisten
         this.suscripcionRepository = suscripcionRepository;
     }
 
-    // ===================== CRUD (registro y correccion manual) =====================
-
+    // CRUD (registro y correccion manual)
     @Override
     public AsistenciaResponse crear(AsistenciaRequest request) {
         Asistencia asistencia = new Asistencia();
@@ -96,8 +95,7 @@ public class AsistenciaService implements CrudService<AsistenciaRequest, Asisten
                 .map(this::convertirAResponse).toList();
     }
 
-    // ===================== ACCESO POR QR (entrada / salida) =====================
-
+    // ACCESO POR QR (entrada / salida)
     @Transactional
     public AccesoQrResponse registrarAccesoQr(String codigoQr) {
         if (codigoQr == null || codigoQr.isBlank()) {
@@ -163,8 +161,22 @@ public class AsistenciaService implements CrudService<AsistenciaRequest, Asisten
         return respuesta;
     }
 
-    // ===================== METODOS DE APOYO =====================
+    //TAREA PROGRAMADA
+    @Transactional
+    public int cerrarEntradasSinSalida() {
+        List<Asistencia> abiertas = asistenciaRepository.buscarEntradasSinSalida(LocalDate.now());
+        if (abiertas.isEmpty()) {
+            return 0;
+        }
+        Estado sinSalida = buscarEstado(ESTADO_SIN_SALIDA);
+        for (Asistencia asistencia : abiertas) {
+            asistencia.setEstado(sinSalida);
+        }
+        asistenciaRepository.saveAll(abiertas);
+        return abiertas.size();
+    }
 
+    // METODOS DE APOYO
     private Estado buscarEstado(String nombre) {
         return estadoRepository.buscarPorNombre(nombre)
                 .orElseThrow(() -> new RuntimeException("No existe el estado " + nombre));

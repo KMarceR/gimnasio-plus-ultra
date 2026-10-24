@@ -23,7 +23,7 @@ public class SuscripcionService {
 
     private static final String ESTADO_ACTIVO = "Activo";
     private static final String ESTADO_CANCELADA = "Cancelada";
-
+    private static final String ESTADO_VENCIDA = "Vencida";
     private final SuscripcionRepository suscripcionRepository;
     private final ClienteRepository clienteRepository;
     private final PlanSuscripcionRepository planSuscripcionRepository;
@@ -44,7 +44,7 @@ public class SuscripcionService {
         if (request.getIdCliente() == null || request.getIdPlanSuscripcion() == null) {
             throw new RuntimeException("Debe indicar el cliente y el plan");
         }
-        Cliente cliente = clienteRepository.findById(request.getIdCliente())
+        Cliente cliente = clienteRepository.buscarParaActualizar(request.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
         if (!ESTADO_ACTIVO.equals(cliente.getEstado().getNombreEstado())) {
             throw new RuntimeException("El cliente no está activo");
@@ -99,8 +99,22 @@ public class SuscripcionService {
         return convertirAResponse(suscripcionRepository.save(suscripcion));
     }
 
-    // Si el cliente aún tiene una suscripción activa, la nueva empieza al día
-    // siguiente de que termine (renovación)
+    @Transactional
+    public int marcarVencidas() {
+        List<Suscripcion> vencidas = suscripcionRepository.buscarVencidas(LocalDate.now());
+        if (vencidas.isEmpty()) {
+            return 0;
+        }
+        Estado vencida = estadoRepository.buscarPorNombre(ESTADO_VENCIDA)
+                .orElseThrow(() -> new RuntimeException("No existe el estado Vencida"));
+        for (Suscripcion suscripcion : vencidas) {
+            suscripcion.setEstado(vencida);
+        }
+        suscripcionRepository.saveAll(vencidas);
+        return vencidas.size();
+    }
+
+    // Si el cliente aún tiene una suscripción activa, la nueva empieza al díasiguiente de que termine (renovación)
     private LocalDate calcularFechaInicio(Cliente cliente, LocalDate fechaSolicitada) {
         LocalDate inicio = (fechaSolicitada != null) ? fechaSolicitada : LocalDate.now();
         LocalDate ultimoVencimiento = suscripcionRepository.ultimaFechaVencimiento(cliente.getIdCliente());
