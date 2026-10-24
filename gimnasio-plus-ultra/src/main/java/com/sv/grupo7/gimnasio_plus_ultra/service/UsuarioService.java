@@ -16,12 +16,11 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.UsuarioRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 
 @Service
-public class UsuarioService {
+public class UsuarioService extends PersonaServiceBase implements CrudService<UsuarioRequest, UsuarioResponse> {
 
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final EstadoRepository estadoRepository;
-    private final PersonaRepository personaRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository,
@@ -29,31 +28,20 @@ public class UsuarioService {
             EstadoRepository estadoRepository,
             PersonaRepository personaRepository,
             PasswordEncoder passwordEncoder) {
+        super(personaRepository);
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.estadoRepository = estadoRepository;
-        this.personaRepository = personaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
     public UsuarioResponse crear(UsuarioRequest request) {
-        if (personaRepository.existsByDui(request.getDui())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
-        }
-        if (personaRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese email");
-        }
+        validarPersonaNueva(request);
 
         Usuario usuario = new Usuario();
 
-        usuario.setNombres(request.getNombres());
-        usuario.setApellidos(request.getApellidos());
-        usuario.setEmail(request.getEmail());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setDireccion(request.getDireccion());
-        usuario.setGenero(request.getGenero());
-        usuario.setDui(request.getDui());
-        usuario.setFechaNacimiento(request.getFechaNacimiento());
+        copiarDatosPersona(usuario.getPersona(), request);
         usuario.setNombreUsuario(request.getDui());
 
         String hashContrasena = passwordEncoder.encode(request.getContrasena());
@@ -71,38 +59,27 @@ public class UsuarioService {
         return convertirAResponse(nuevoUsuario);
     }
 
+    @Override
     public List<UsuarioResponse> obtenerTodos() {
         return usuarioRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public UsuarioResponse obtenerPorId(Integer id) {
         return usuarioRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public UsuarioResponse actualizar(Integer id, UsuarioRequest request) {
-        if (personaRepository.existsByDui(request.getDui())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
-        }
-        if (personaRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese email");
-        }
-
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if (usuario == null) {
             return null;
         }
-
-        usuario.setNombres(request.getNombres());
-        usuario.setApellidos(request.getApellidos());
-        usuario.setEmail(request.getEmail());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setDireccion(request.getDireccion());
-        usuario.setGenero(request.getGenero());
-        usuario.setDui(request.getDui());
-        usuario.setFechaNacimiento(request.getFechaNacimiento());
+        validarPersonaEditada(usuario.getPersona(), request);
+        copiarDatosPersona(usuario.getPersona(), request);
         usuario.setNombreUsuario(request.getDui());
 
         if (request.getContrasena() != null && !request.getContrasena().isBlank()) {
@@ -120,6 +97,7 @@ public class UsuarioService {
         return convertirAResponse(usuarioRepository.save(usuario));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!usuarioRepository.existsById(id)) {
             return false;

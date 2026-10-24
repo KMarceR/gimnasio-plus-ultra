@@ -7,10 +7,6 @@ public class EstadoRequest {
     public EstadoRequest() {
     }
 
-    public EstadoRequest(String nombre_estado) {
-        this.nombre_estado = nombre_estado;
-    }
-
     public String getNombreEstado() {
         return nombre_estado;
     }

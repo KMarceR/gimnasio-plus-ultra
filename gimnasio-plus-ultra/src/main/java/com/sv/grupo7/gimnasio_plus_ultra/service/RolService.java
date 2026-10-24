@@ -10,7 +10,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Rol;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.RolRepository;
 
 @Service
-public class RolService {
+public class RolService implements CrudService<RolRequest, RolResponse> {
 
     private final RolRepository rolRepository;
 
@@ -18,6 +18,7 @@ public class RolService {
         this.rolRepository = rolRepository;
     }
 
+    @Override
     public RolResponse crear(RolRequest request) {
         Rol rol = new Rol();
         rol.setNombreRol(request.getNombreRol());
@@ -25,17 +26,20 @@ public class RolService {
         return convertirAResponse(nuevoRol);
     }
 
+    @Override
     public List<RolResponse> obtenerTodos() {
         return rolRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public RolResponse obtenerPorId(Integer id) {
         return rolRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public RolResponse actualizar(Integer id, RolRequest request) {
         Rol rol = rolRepository.findById(id).orElse(null);
         if (rol == null) {
@@ -45,6 +49,7 @@ public class RolService {
         return convertirAResponse(rolRepository.save(rol));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!rolRepository.existsById(id)) {
             return false;

@@ -16,7 +16,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.SesionRepository;
 
 @Service
-public class SesionService {
+public class SesionService implements CrudService<SesionRequest, SesionResponse> {
 
     private final SesionRepository sesionRepository;
     private final ClienteRepository clienteRepository;
@@ -31,6 +31,7 @@ public class SesionService {
         this.estadoRepository = estadoRepository;
     }
 
+    @Override
     public SesionResponse crear(SesionRequest request) {
         Sesion sesion = new Sesion();
         aplicarDatos(sesion, request);
@@ -39,17 +40,20 @@ public class SesionService {
         return convertirAResponse(nuevaSesion);
     }
 
+    @Override
     public List<SesionResponse> obtenerTodos() {
         return sesionRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public SesionResponse obtenerPorId(Integer id) {
         return sesionRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public SesionResponse actualizar(Integer id, SesionRequest request) {
         Sesion sesion = sesionRepository.findById(id).orElse(null);
         if (sesion == null) {
@@ -59,6 +63,7 @@ public class SesionService {
         return convertirAResponse(sesionRepository.save(sesion));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!sesionRepository.existsById(id)) {
             return false;

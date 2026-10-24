@@ -1,6 +1,5 @@
 package com.sv.grupo7.gimnasio_plus_ultra.dto;
 
-import java.time.LocalDate;
 
 public class EntrenadorRequest extends PersonaRequest {
 
@@ -11,16 +10,6 @@ public class EntrenadorRequest extends PersonaRequest {
 
     public EntrenadorRequest() {
         super();
-    }
-
-    public EntrenadorRequest(String nombres, String apellidos, String genero, LocalDate fechaNacimiento,
-            String direccion, String email, String telefono, String dui,
-            Integer id_estado, String contrasena, String especialidad, Double tarifa_por_sesion) {
-        super(nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui);
-        this.id_estado = id_estado;
-        this.contrasena = contrasena;
-        this.especialidad = especialidad;
-        this.tarifa_por_sesion = tarifa_por_sesion;
     }
 
     public Integer getIdEstado() {

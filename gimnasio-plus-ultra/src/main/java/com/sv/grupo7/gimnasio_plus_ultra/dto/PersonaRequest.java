@@ -15,18 +15,6 @@ public class PersonaRequest {
     public PersonaRequest() {
     }
 
-    public PersonaRequest(String nombres, String apellidos, String genero, LocalDate fechaNacimiento,
-            String direccion, String email, String telefono, String dui) {
-        this.nombres = nombres;
-        this.apellidos = apellidos;
-        this.genero = genero;
-        this.fechaNacimiento = fechaNacimiento;
-        this.direccion = direccion;
-        this.email = email;
-        this.telefono = telefono;
-        this.dui = dui;
-    }
-
     public String getNombres() {
         return nombres;
     }

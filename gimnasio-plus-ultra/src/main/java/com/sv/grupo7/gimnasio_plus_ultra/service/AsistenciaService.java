@@ -22,7 +22,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.SuscripcionRepository;
 
 @Service
-public class AsistenciaService {
+public class AsistenciaService implements CrudService<AsistenciaRequest, AsistenciaResponse> {
 
     private static final String CLIENTE_ACTIVO = "Activo";
     private static final String ESTADO_DENTRO = "Activo";        // entro y esta dentro
@@ -45,6 +45,7 @@ public class AsistenciaService {
 
     // ===================== CRUD (registro y correccion manual) =====================
 
+    @Override
     public AsistenciaResponse crear(AsistenciaRequest request) {
         Asistencia asistencia = new Asistencia();
         aplicarDatos(asistencia, request);
@@ -53,17 +54,20 @@ public class AsistenciaService {
         return convertirAResponse(nuevaAsistencia);
     }
 
+    @Override
     public List<AsistenciaResponse> obtenerTodos() {
         return asistenciaRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public AsistenciaResponse obtenerPorId(Integer id) {
         return asistenciaRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public AsistenciaResponse actualizar(Integer id, AsistenciaRequest request) {
         Asistencia asistencia = asistenciaRepository.findById(id).orElse(null);
         if (asistencia == null) {
@@ -73,6 +77,7 @@ public class AsistenciaService {
         return convertirAResponse(asistenciaRepository.save(asistencia));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!asistenciaRepository.existsById(id)) {
             return false;

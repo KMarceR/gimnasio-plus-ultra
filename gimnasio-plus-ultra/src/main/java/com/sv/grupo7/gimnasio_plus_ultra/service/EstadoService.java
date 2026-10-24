@@ -10,7 +10,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 
 @Service
-public class EstadoService {
+public class EstadoService implements CrudService<EstadoRequest, EstadoResponse> {
 
     private final EstadoRepository estadoRepository;
 
@@ -18,6 +18,7 @@ public class EstadoService {
         this.estadoRepository = estadoRepository;
     }
 
+    @Override
     public EstadoResponse crear(EstadoRequest request) {
         Estado estado = new Estado();
         estado.setNombreEstado(request.getNombreEstado());
@@ -25,17 +26,20 @@ public class EstadoService {
         return convertirAResponse(nuevoEstado);
     }
 
+    @Override
     public List<EstadoResponse> obtenerTodos() {
         return estadoRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public EstadoResponse obtenerPorId(Integer id) {
         return estadoRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public EstadoResponse actualizar(Integer id, EstadoRequest request) {
         Estado estado = estadoRepository.findById(id).orElse(null);
         if (estado == null) {
@@ -45,6 +49,7 @@ public class EstadoService {
         return convertirAResponse(estadoRepository.save(estado));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!estadoRepository.existsById(id)) {
             return false;

@@ -15,16 +15,6 @@ public class SesionRequest {
     public SesionRequest() {
     }
 
-    public SesionRequest(Integer id_cliente, Integer id_entrenador, Integer id_estado,
-            LocalDate fecha_sesion, LocalTime hora_inicio, LocalTime hora_fin) {
-        this.id_cliente = id_cliente;
-        this.id_entrenador = id_entrenador;
-        this.id_estado = id_estado;
-        this.fecha_sesion = fecha_sesion;
-        this.hora_inicio = hora_inicio;
-        this.hora_fin = hora_fin;
-    }
-
     public Integer getIdCliente() {
         return id_cliente;
     }

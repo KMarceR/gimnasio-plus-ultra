@@ -20,7 +20,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.UsuarioRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class EntrenadorService {
+public class EntrenadorService extends PersonaServiceBase implements CrudService<EntrenadorRequest, EntrenadorResponse> {
 
     private static final String ROL_ENTRENADOR = "Entrenador";
     private static final String ESTADO_ACTIVO = "Activo";
@@ -28,7 +28,6 @@ public class EntrenadorService {
 
     private final EntrenadorRepository entrenadorRepository;
     private final UsuarioRepository usuarioRepository;
-    private final PersonaRepository personaRepository;
     private final RolRepository rolRepository;
     private final EstadoRepository estadoRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,31 +38,26 @@ public class EntrenadorService {
             RolRepository rolRepository,
             EstadoRepository estadoRepository,
             PasswordEncoder passwordEncoder) {
+        super(personaRepository);
         this.entrenadorRepository = entrenadorRepository;
         this.usuarioRepository = usuarioRepository;
-        this.personaRepository = personaRepository;
         this.rolRepository = rolRepository;
         this.estadoRepository = estadoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
+    @Override
     public EntrenadorResponse crear(EntrenadorRequest request) {
         validarDatos(request, true);
-
-        if (personaRepository.existsByDui(request.getDui())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
-        }
-        if (personaRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese email");
-        }
+        validarPersonaNueva(request);
 
         Rol rolEntrenador = rolRepository.buscarPorNombre(ROL_ENTRENADOR)
                 .orElseThrow(() -> new RuntimeException("No existe el rol Entrenador"));
         Estado estado = obtenerEstado(request.getIdEstado());
 
         Usuario usuario = new Usuario();
-        copiarDatosPersona(usuario, request);
+        copiarDatosPersona(usuario.getPersona(), request);
         usuario.setNombreUsuario(request.getDui());
         usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
         usuario.setRol(rolEntrenador);
@@ -80,11 +74,13 @@ public class EntrenadorService {
         return convertirAResponse(entrenadorRepository.save(entrenador));
     }
 
+    @Override
     public List<EntrenadorResponse> obtenerTodos() {
         return entrenadorRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public EntrenadorResponse obtenerPorId(Integer id) {
         return entrenadorRepository.findById(id)
                 .map(this::convertirAResponse)
@@ -92,6 +88,7 @@ public class EntrenadorService {
     }
 
     @Transactional
+    @Override
     public EntrenadorResponse actualizar(Integer id, EntrenadorRequest request) {
         Entrenador entrenador = entrenadorRepository.findById(id).orElse(null);
         if (entrenador == null) {
@@ -100,15 +97,10 @@ public class EntrenadorService {
         validarDatos(request, false);
 
         Usuario usuario = entrenador.getUsuario();
-        if (!usuario.getDui().equals(request.getDui()) && personaRepository.existsByDui(request.getDui())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
-        }
-        if (!usuario.getEmail().equals(request.getEmail()) && personaRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese email");
-        }
+        validarPersonaEditada(usuario.getPersona(), request);
         Estado estado = obtenerEstado(request.getIdEstado());
 
-        copiarDatosPersona(usuario, request);
+        copiarDatosPersona(usuario.getPersona(), request);
         usuario.setNombreUsuario(request.getDui());
         if (!esVacio(request.getContrasena())) { // contraseña solo si viene una nueva
             usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
@@ -124,6 +116,7 @@ public class EntrenadorService {
     }
 
     @Transactional
+    @Override
     public boolean eliminar(Integer id) {
         Entrenador entrenador = entrenadorRepository.findById(id).orElse(null);
         if (entrenador == null) {
@@ -159,17 +152,6 @@ public class EntrenadorService {
         }
         return estadoRepository.findById(idEstado)
                 .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
-    }
-
-    private void copiarDatosPersona(Usuario usuario, EntrenadorRequest request) {
-        usuario.setNombres(request.getNombres());
-        usuario.setApellidos(request.getApellidos());
-        usuario.setGenero(request.getGenero());
-        usuario.setFechaNacimiento(request.getFechaNacimiento());
-        usuario.setDireccion(request.getDireccion());
-        usuario.setEmail(request.getEmail());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setDui(request.getDui());
     }
 
     private boolean esVacio(String valor) {

@@ -10,7 +10,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.Persona;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 
 @Service
-public class PersonaService {
+public class PersonaService implements CrudService<PersonaRequest, PersonaResponse> {
 
     private final PersonaRepository personaRepository;
 
@@ -18,6 +18,7 @@ public class PersonaService {
         this.personaRepository = personaRepository;
     }
 
+    @Override
     public PersonaResponse crear(PersonaRequest personaRequest) {
         Persona persona = new Persona();
 
@@ -34,17 +35,20 @@ public class PersonaService {
         return convertirAResponse(nuevaPersona);
     }
 
+    @Override
     public List<PersonaResponse> obtenerTodos() {
         return personaRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public PersonaResponse obtenerPorId(Integer id) {
         return personaRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public PersonaResponse actualizar(Integer id, PersonaRequest personaRequest) {
         Persona personaExistente = personaRepository.findById(id).orElse(null);
 
@@ -65,6 +69,7 @@ public class PersonaService {
         return convertirAResponse(personaActualizada);
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!personaRepository.existsById(id)) {
             return false;

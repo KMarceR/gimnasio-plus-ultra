@@ -14,13 +14,6 @@ public class AsistenciaRequest {
     public AsistenciaRequest() {
     }
 
-    public AsistenciaRequest(Integer id_cliente, Integer id_estado, LocalDate fecha_asistencia, LocalTime hora_sesion) {
-        this.id_cliente = id_cliente;
-        this.id_estado = id_estado;
-        this.fecha_asistencia = fecha_asistencia;
-        this.hora_sesion = hora_sesion;
-    }
-
     public Integer getIdCliente() {
         return id_cliente;
     }

@@ -1,6 +1,5 @@
 package com.sv.grupo7.gimnasio_plus_ultra.dto;
 
-import java.time.LocalDate;
 
 public class ClienteRequest extends PersonaRequest {
 
@@ -10,15 +9,6 @@ public class ClienteRequest extends PersonaRequest {
 
     public ClienteRequest() {
         super();
-    }
-
-    public ClienteRequest(String nombres, String apellidos, String genero, LocalDate fechaNacimiento,
-            String direccion, String email, String telefono, String dui,
-            Integer id_plansuscripcion, Integer id_estado, String notas) {
-        super(nombres, apellidos, genero, fechaNacimiento, direccion, email, telefono, dui); // Invoca al padre
-        this.id_plansuscripcion = id_plansuscripcion;
-        this.id_estado = id_estado;
-        this.notas = notas;
     }
 
     // Getters y Setters

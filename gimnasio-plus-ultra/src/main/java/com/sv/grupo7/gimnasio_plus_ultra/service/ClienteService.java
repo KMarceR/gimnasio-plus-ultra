@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.ClienteRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.ClienteResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionRequest;
@@ -17,7 +18,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
 
 @Service
-public class ClienteService {
+public class ClienteService extends PersonaServiceBase implements CrudService<ClienteRequest, ClienteResponse> {
 
     private static final String ESTADO_ACTIVO = "Activo";
 
@@ -29,15 +30,19 @@ public class ClienteService {
     public ClienteService(ClienteRepository clienteRepository,
             PlanSuscripcionRepository planSuscripcionRepository,
             EstadoRepository estadoRepository,
-            SuscripcionService suscripcionService) {
+            SuscripcionService suscripcionService,
+            PersonaRepository personaRepository) {
+        super(personaRepository);
         this.clienteRepository = clienteRepository;
         this.planSuscripcionRepository = planSuscripcionRepository;
         this.estadoRepository = estadoRepository;
         this.suscripcionService = suscripcionService;
     }
 
+    @Override
     @Transactional
     public ClienteResponse crear(ClienteRequest request) {
+        validarPersonaNueva(request);
         Cliente cliente = new Cliente();
         aplicarDatos(cliente, request);
         cliente.setCodigoQr(UUID.randomUUID().toString()); // carnet QR unico; se genera solo al crear
@@ -55,26 +60,31 @@ public class ClienteService {
         return convertirAResponse(nuevoCliente);
     }
 
+    @Override
     public List<ClienteResponse> obtenerTodos() {
         return clienteRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public ClienteResponse obtenerPorId(Integer id) {
         return clienteRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public ClienteResponse actualizar(Integer id, ClienteRequest request) {
         Cliente cliente = clienteRepository.findById(id).orElse(null);
         if (cliente == null) {
             return null;
         }
+        validarPersonaEditada(cliente.getPersona(), request);
         aplicarDatos(cliente, request); // el codigo QR no cambia al editar
         return convertirAResponse(clienteRepository.save(cliente));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!clienteRepository.existsById(id)) {
             return false;
@@ -84,14 +94,7 @@ public class ClienteService {
     }
 
     private void aplicarDatos(Cliente cliente, ClienteRequest request) {
-        cliente.setNombres(request.getNombres());
-        cliente.setApellidos(request.getApellidos());
-        cliente.setEmail(request.getEmail());
-        cliente.setTelefono(request.getTelefono());
-        cliente.setDireccion(request.getDireccion());
-        cliente.setGenero(request.getGenero());
-        cliente.setDui(request.getDui());
-        cliente.setFechaNacimiento(request.getFechaNacimiento());
+        copiarDatosPersona(cliente.getPersona(), request);
         cliente.setNotas(request.getNotas());
 
         if (request.getIdPlanSuscripcion() != null && request.getIdPlanSuscripcion() > 0) {

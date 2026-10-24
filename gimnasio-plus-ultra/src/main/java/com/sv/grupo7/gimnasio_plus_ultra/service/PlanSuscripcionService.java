@@ -13,7 +13,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.model.TipoPlan;
 
 @Service
-public class PlanSuscripcionService {
+public class PlanSuscripcionService implements CrudService<PlanSuscripcionRequest, PlanSuscripcionResponse> {
 
     private final PlanSuscripcionRepository planSuscripcionRepository;
     private final EstadoRepository estadoRepository;
@@ -24,6 +24,7 @@ public class PlanSuscripcionService {
         this.estadoRepository = estadoRepository;
     }
 
+    @Override
     public PlanSuscripcionResponse crear(PlanSuscripcionRequest request) {
         PlanSuscripcion plan = new PlanSuscripcion();
         aplicarDatos(plan, request);
@@ -32,17 +33,20 @@ public class PlanSuscripcionService {
         return convertirAResponse(nuevoPlan);
     }
 
+    @Override
     public List<PlanSuscripcionResponse> obtenerTodos() {
         return planSuscripcionRepository.findAll().stream()
                 .map(this::convertirAResponse).toList();
     }
 
+    @Override
     public PlanSuscripcionResponse obtenerPorId(Integer id) {
         return planSuscripcionRepository.findById(id)
                 .map(this::convertirAResponse)
                 .orElse(null);
     }
 
+    @Override
     public PlanSuscripcionResponse actualizar(Integer id, PlanSuscripcionRequest request) {
         PlanSuscripcion plan = planSuscripcionRepository.findById(id).orElse(null);
         if (plan == null) {
@@ -52,6 +56,7 @@ public class PlanSuscripcionService {
         return convertirAResponse(planSuscripcionRepository.save(plan));
     }
 
+    @Override
     public boolean eliminar(Integer id) {
         if (!planSuscripcionRepository.existsById(id)) {
             return false;
