@@ -1,13 +1,16 @@
 package com.sv.grupo7.gimnasio_plus_ultra.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sv.grupo7.gimnasio_plus_ultra.dto.CambioFechaSuscripcion;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.dto.VistaCancelacionResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.exception.DatosInvalidosException;
 import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.exception.ReglaNegocioException;
@@ -71,10 +74,9 @@ public class SuscripcionService {
         suscripcion.setFechaVencimiento(tipo.calcularVencimiento(inicio));
         suscripcion.setPrecioPagado(plan.getPrecio()); // precio al momento de la venta
 
-        cliente.setPlanSuscripcion(plan); // plan actual del cliente
-        clienteRepository.save(cliente);
-
-        return convertirAResponse(suscripcionRepository.save(suscripcion));
+        Suscripcion guardada = suscripcionRepository.save(suscripcion);
+        actualizarPlanActual(cliente);
+        return convertirAResponse(guardada);
     }
 
     public List<SuscripcionResponse> obtenerTodos() {
@@ -90,16 +92,81 @@ public class SuscripcionService {
                 .stream().map(this::convertirAResponse).toList();
     }
 
+    // Muestra que pasaria al cancelar, sin guardar nada
+    public VistaCancelacionResponse vistaCancelacion(Integer id) {
+        Suscripcion suscripcion = suscripcionRepository.findById(id).orElse(null);
+        if (suscripcion == null) {
+            return null;
+        }
+        validarCancelable(suscripcion);
+        List<Reprogramacion> reprogramaciones = calcularReprogramaciones(suscripcion);
+
+        List<CambioFechaSuscripcion> cambios = new ArrayList<>();
+        for (Reprogramacion r : reprogramaciones) {
+            CambioFechaSuscripcion cambio = new CambioFechaSuscripcion();
+            cambio.setIdSuscripcion(r.suscripcion().getIdSuscripcion());
+            cambio.setNombrePlan(r.suscripcion().getPlanSuscripcion().getNombreSuscripcion());
+            cambio.setFechaInicioActual(r.suscripcion().getFechaInicio());
+            cambio.setFechaVencimientoActual(r.suscripcion().getFechaVencimiento());
+            cambio.setNuevaFechaInicio(r.inicio());
+            cambio.setNuevaFechaVencimiento(r.vencimiento());
+            cambios.add(cambio);
+        }
+        VistaCancelacionResponse vista = new VistaCancelacionResponse();
+        vista.setCambios(cambios);
+        vista.setQuedaSinPlanVigente(suscripcion.estaVigente(LocalDate.now()) && cambios.isEmpty());
+        return vista;
+    }
+
+    // Cancela y adelanta las suscripciones activas que venian despues
     @Transactional
     public SuscripcionResponse cancelar(Integer id) {
         Suscripcion suscripcion = suscripcionRepository.findById(id).orElse(null);
         if (suscripcion == null) {
             return null;
         }
+        validarCancelable(suscripcion);
+        clienteRepository.buscarParaActualizar(suscripcion.getCliente().getIdCliente()); // bloqueo, igual que al vender
+
+        List<Reprogramacion> reprogramaciones = calcularReprogramaciones(suscripcion);
         Estado cancelada = estadoRepository.buscarPorNombre(ESTADO_CANCELADA)
                 .orElseThrow(() -> new RuntimeException("No existe el estado Cancelada"));
         suscripcion.setEstado(cancelada);
-        return convertirAResponse(suscripcionRepository.save(suscripcion));
+        Suscripcion guardada = suscripcionRepository.save(suscripcion);
+
+        for (Reprogramacion r : reprogramaciones) {
+            r.suscripcion().setFechaInicio(r.inicio());
+            r.suscripcion().setFechaVencimiento(r.vencimiento());
+            suscripcionRepository.save(r.suscripcion());
+        }
+        actualizarPlanActual(suscripcion.getCliente());
+        return convertirAResponse(guardada);
+    }
+
+    private void validarCancelable(Suscripcion suscripcion) {
+        if (!ESTADO_ACTIVO.equals(suscripcion.getEstado().getNombreEstado())) {
+            throw new ReglaNegocioException("Solo se pueden cancelar suscripciones activas");
+        }
+    }
+
+    private record Reprogramacion(Suscripcion suscripcion, LocalDate inicio, LocalDate vencimiento) {
+    }
+
+    // La siguiente empieza hoy si la cancelada ya estaba corriendo, o en la fecha en que iba a empezar la cancelada
+    private List<Reprogramacion> calcularReprogramaciones(Suscripcion cancelada) {
+        LocalDate hoy = LocalDate.now();
+        LocalDate inicio = cancelada.getFechaInicio().isAfter(hoy) ? cancelada.getFechaInicio() : hoy;
+        List<Suscripcion> siguientes = suscripcionRepository.buscarActivasPosteriores(
+                cancelada.getCliente().getIdCliente(), cancelada.getFechaInicio());
+
+        List<Reprogramacion> resultado = new ArrayList<>();
+        for (Suscripcion siguiente : siguientes) {
+            TipoPlan tipo = TipoPlan.valueOf(siguiente.getPlanSuscripcion().getTipoPlan());
+            LocalDate vencimiento = tipo.calcularVencimiento(inicio);
+            resultado.add(new Reprogramacion(siguiente, inicio, vencimiento));
+            inicio = vencimiento.plusDays(1);
+        }
+        return resultado;
     }
 
     @Transactional
@@ -114,7 +181,15 @@ public class SuscripcionService {
             suscripcion.setEstado(vencida);
         }
         suscripcionRepository.saveAll(vencidas);
+        vencidas.forEach(suscripcion -> actualizarPlanActual(suscripcion.getCliente()));
         return vencidas.size();
+    }
+
+    // El plan actual del cliente es el de su suscripcion vigente hoy; sin vigente, queda sin plan
+    private void actualizarPlanActual(Cliente cliente) {
+        List<Suscripcion> vigentes = suscripcionRepository.buscarVigentes(cliente.getIdCliente(), LocalDate.now());
+        cliente.setPlanSuscripcion(vigentes.isEmpty() ? null : vigentes.get(0).getPlanSuscripcion());
+        clienteRepository.save(cliente);
     }
 
     // Si el cliente aún tiene una suscripción activa, la nueva empieza al díasiguiente de que termine (renovación)

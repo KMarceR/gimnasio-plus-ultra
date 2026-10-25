@@ -131,6 +131,7 @@ public class ClienteService extends PersonaServiceBase implements CrudService<Cl
         response.setCreadoEn(cliente.getCreadoEn());
 
         if (cliente.getPlanSuscripcion() != null) {
+            response.setIdPlanSuscripcion(cliente.getPlanSuscripcion().getIdPlanSuscripcion());
             response.setNombreSuscripcion(cliente.getPlanSuscripcion().getNombreSuscripcion());
         } else {
             response.setNombreSuscripcion("Ninguno");

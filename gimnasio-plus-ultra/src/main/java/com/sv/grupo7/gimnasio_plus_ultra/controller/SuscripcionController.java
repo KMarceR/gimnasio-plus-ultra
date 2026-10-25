@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.dto.VistaCancelacionResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.service.SuscripcionService;
 
 @RestController
@@ -44,6 +45,12 @@ public class SuscripcionController {
     @PostMapping
     public ResponseEntity<SuscripcionResponse> vender(@RequestBody SuscripcionRequest request) {
         return ResponseEntity.ok(suscripcionService.vender(request));
+    }
+
+    @GetMapping("/{id}/cancelacion")
+    public ResponseEntity<VistaCancelacionResponse> vistaCancelacion(@PathVariable Integer id) {
+        VistaCancelacionResponse r = suscripcionService.vistaCancelacion(id);
+        return r != null ? ResponseEntity.ok(r) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}/cancelar")

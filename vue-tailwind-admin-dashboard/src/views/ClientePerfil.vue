@@ -21,6 +21,21 @@
             <p class="mt-1 text-sm text-gray-500">{{ member.email }}</p>
             <Badge class="mt-3" :color="statusColor(member.estado)">{{ member.estado }}</Badge>
           </div>
+          <button
+            v-if="imagenQr"
+            type="button"
+            class="flex flex-col items-center rounded-xl border border-gray-200 p-3 transition hover:border-brand-400"
+            title="Clic para copiar el código"
+            @click="copiarCodigo"
+          >
+            <img :src="imagenQr" alt="Código QR del cliente" class="h-32 w-32" />
+            <span class="mt-2 max-w-40 break-all font-mono text-[10px] text-gray-500">{{
+              member.codigoQr
+            }}</span>
+            <span class="mt-1 text-xs font-medium text-brand-600">{{
+              copiado ? '¡Código copiado!' : 'Clic para copiar'
+            }}</span>
+          </button>
         </div>
         <div class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
@@ -76,15 +91,25 @@
             }}<input
               v-model="editForm[field.key]"
               :type="field.type"
+              :pattern="field.pattern || undefined"
+              :maxlength="field.maxlength || undefined"
+              :title="field.title || undefined"
               class="mt-2 h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm" /></label
           ><textarea
             v-model="editForm.notas"
             class="sm:col-span-2 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm"
             placeholder="Notas internas"
           ></textarea>
+          <Alert
+            v-if="errorEdicion"
+            class="sm:col-span-2"
+            variant="error"
+            title="No se pudieron guardar los cambios"
+            :message="errorEdicion"
+          />
           <div class="flex gap-3 sm:col-span-2">
             <Button size="sm" variant="outline" @click="editing = false">Cancelar</Button
-            ><Button size="sm" @click="saveEditing">Guardar cambios</Button>
+            ><Button size="sm" :disabled="procesando" @click="saveEditing">Guardar cambios</Button>
           </div>
         </div>
         <div v-else class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -120,16 +145,90 @@
           </div>
         </div>
         <div class="rounded-2xl border border-gray-200 bg-white p-6">
-          <h2 class="font-semibold text-gray-900">Cambiar plan</h2>
-          <select
-            class="mt-4 h-11 w-full rounded-lg border border-gray-200 px-3 text-sm sm:max-w-md"
-            :value="member.planId"
-            @change="changePlan"
-          >
-            <option v-for="plan in plans" :key="plan.id" :value="plan.id">
-              {{ plan.nombre }} · ${{ plan.precio.toLocaleString('es-SV') }}
-            </option>
-          </select>
+          <h2 class="font-semibold text-gray-900">Vender o renovar suscripción</h2>
+          <p class="mt-1 text-sm text-gray-500">
+            Si el cliente tiene una suscripción vigente, la nueva empieza el día siguiente a su
+            vencimiento.
+          </p>
+          <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+            <select
+              v-model="planVenta"
+              class="h-11 w-full rounded-lg border border-gray-200 px-3 text-sm sm:max-w-md"
+            >
+              <option v-for="plan in planesActivos" :key="plan.id" :value="plan.id">
+                {{ plan.nombre }} · {{ plan.tipoPlan }} · ${{ plan.precio.toLocaleString('es-SV') }}
+              </option>
+            </select>
+            <Button size="sm" :disabled="procesando || !planVenta" @click="vender">Vender</Button>
+          </div>
+          <Alert
+            v-if="mensajeVenta"
+            class="mt-4"
+            variant="success"
+            title="Listo"
+            :message="mensajeVenta"
+          />
+          <Alert
+            v-if="errorVenta"
+            class="mt-4"
+            variant="error"
+            title="No se pudo completar"
+            :message="errorVenta"
+          />
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-6">
+          <h2 class="font-semibold text-gray-900">Historial de suscripciones</h2>
+          <table class="mt-4 min-w-full">
+            <thead>
+              <tr class="border-b border-gray-100 text-xs uppercase tracking-wider text-gray-400">
+                <th class="py-3 text-start">Plan</th>
+                <th class="py-3 text-start">Inicio</th>
+                <th class="py-3 text-start">Vence</th>
+                <th class="py-3 text-start">Pagado</th>
+                <th class="py-3 text-start">Estado</th>
+                <th class="py-3 text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="suscripcion in suscripciones"
+                :key="suscripcion.idSuscripcion"
+                class="border-b border-gray-100 last:border-0"
+              >
+                <td class="py-3 text-sm font-semibold text-gray-800">
+                  {{ suscripcion.nombrePlan }}
+                  <span class="block text-xs font-normal text-gray-500">{{
+                    suscripcion.tipoPlan
+                  }}</span>
+                </td>
+                <td class="py-3 font-mono text-sm text-gray-600">{{ suscripcion.fechaInicio }}</td>
+                <td class="py-3 font-mono text-sm text-gray-600">
+                  {{ suscripcion.fechaVencimiento }}
+                </td>
+                <td class="py-3 text-sm text-gray-800">
+                  ${{ suscripcion.precioPagado.toLocaleString('es-SV') }}
+                </td>
+                <td class="py-3">
+                  <Badge :color="suscripcion.vigente ? 'success' : estadoSuscripcionColor(suscripcion)">{{
+                    suscripcion.vigente ? 'Vigente' : suscripcion.nombreEstado
+                  }}</Badge>
+                </td>
+                <td class="py-3 text-end">
+                  <button
+                    v-if="suscripcion.nombreEstado === 'Activo'"
+                    class="rounded-lg px-3 py-2 text-sm font-medium text-error-600 hover:bg-error-50"
+                    :disabled="procesando"
+                    @click="cancelar(suscripcion)"
+                  >
+                    Cancelar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-if="!suscripciones.length" class="py-6 text-center text-sm text-gray-500">
+            Este cliente no tiene suscripciones registradas.
+          </p>
         </div>
       </section>
       <section
@@ -200,14 +299,67 @@
       </section>
     </div>
     <div v-else class="rounded-2xl bg-white p-8 text-center text-gray-500">
-      Cliente no encontrado.
+      {{ members.length ? 'Cliente no encontrado.' : 'Cargando...' }}
     </div>
+    <Modal v-if="porCancelar" full-screen-backdrop @close="porCancelar = null">
+      <template #body>
+        <div class="p-4">
+          <div class="w-full max-w-xl rounded-2xl bg-white shadow-theme-xl">
+            <header class="border-b border-gray-200 p-6">
+              <h2 class="text-xl font-semibold text-gray-900">
+                Cancelar {{ porCancelar.suscripcion.nombrePlan }}
+              </h2>
+            </header>
+            <div class="space-y-4 p-6 text-sm text-gray-600">
+              <template v-if="porCancelar.vista.cambios.length">
+                <p>Al cancelar, estos planes se adelantarán:</p>
+                <div
+                  v-for="cambio in porCancelar.vista.cambios"
+                  :key="cambio.idSuscripcion"
+                  class="rounded-xl border border-gray-200 p-4"
+                >
+                  <p class="font-semibold text-gray-900">{{ cambio.nombrePlan }}</p>
+                  <p class="mt-1 text-gray-500 line-through">
+                    {{ cambio.fechaInicioActual }} → {{ cambio.fechaVencimientoActual }}
+                  </p>
+                  <p class="font-medium text-brand-600">
+                    {{ cambio.nuevaFechaInicio }} → {{ cambio.nuevaFechaVencimiento }}
+                  </p>
+                </div>
+              </template>
+              <Alert
+                v-else-if="porCancelar.vista.quedaSinPlanVigente"
+                variant="warning"
+                title="El cliente quedará sin plan vigente"
+                message="Su código QR será rechazado en la entrada hasta que compre un nuevo plan."
+              />
+              <p v-else>Ningún otro plan cambia de fecha.</p>
+            </div>
+            <footer class="flex gap-3 border-t border-gray-100 p-6">
+              <Button
+                variant="outline"
+                class-name="flex-1 justify-center"
+                @click="porCancelar = null"
+                >Volver</Button
+              >
+              <Button
+                class-name="flex-1 justify-center"
+                :disabled="procesando"
+                @click="confirmarCancelacion"
+                >Confirmar cancelación</Button
+              >
+            </footer>
+          </div>
+        </div>
+      </template>
+    </Modal>
   </AdminLayout>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import QRCode from 'qrcode'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import {
   useGymData,
@@ -215,50 +367,75 @@ import {
   iniciales,
   type EstadoGeneral,
   type SessionStatus,
+  type Suscripcion,
+  type VistaCancelacion,
 } from '@/composables/useGymData'
 import InfoField from '@/components/common/InfoField.vue'
+import Alert from '@/components/ui/Alert.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
+import Modal from '@/components/ui/Modal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const {
+  members,
   memberById,
   updateMember,
   plans,
-  changeMemberPlan,
   trainerById,
   sessions,
   attendanceByMember,
+  suscripcionesDeCliente,
+  venderSuscripcion,
+  vistaCancelacion,
+  cancelarSuscripcion,
 } = useGymData()
-const member = memberById(String(route.params.id))
+const member = computed(() => memberById(String(route.params.id)))
 const tab = ref('Perfil')
 const editing = ref(false)
-const notas = ref(member?.notas || '')
+const procesando = ref(false)
+const errorEdicion = ref('')
+const notas = ref('')
 const tabs = ['Perfil', 'Suscripción', 'Asistencia', 'Sesiones' /*'Notas'*/]
 const editForm = reactive({
-  nombres: member?.nombres || '',
-  apellidos: member?.apellidos || '',
-  email: member?.email || '',
-  telefono: member?.telefono || '',
-  dui: member?.dui || '',
-  fechaNacimiento: member?.fechaNacimiento || '',
-  direccion: member?.direccion || '',
-  notas: member?.notas || '',
+  nombres: '',
+  apellidos: '',
+  email: '',
+  telefono: '',
+  dui: '',
+  fechaNacimiento: '',
+  direccion: '',
+  notas: '',
 })
 const editableFields = [
   { key: 'nombres', label: 'Nombres', type: 'text' },
   { key: 'apellidos', label: 'Apellidos', type: 'text' },
   { key: 'email', label: 'Email', type: 'email' },
-  { key: 'telefono', label: 'Teléfono', type: 'text' },
-  { key: 'dui', label: 'DUI', type: 'text' },
+  {
+    key: 'telefono',
+    label: 'Teléfono',
+    type: 'text',
+    pattern: '\\d{4}-\\d{4}',
+    maxlength: 9,
+    title: 'Formato 0000-0000',
+  },
+  { key: 'dui', label: 'DUI', type: 'text', pattern: '\\d{8}-\\d', maxlength: 10, title: 'Formato 00000000-0' },
   { key: 'fechaNacimiento', label: 'Fecha de nacimiento', type: 'date' },
   { key: 'direccion', label: 'Dirección', type: 'text' },
-] as const
-const currentPlan = computed(() => plans.value.find((plan) => plan.id === member?.planId))
-const misAsistencias = computed(() => (member ? attendanceByMember(member.id) : []))
+] as {
+  key: keyof typeof editForm
+  label: string
+  type: string
+  pattern?: string
+  maxlength?: number
+  title?: string
+}[]
+const planesActivos = computed(() => plans.value.filter((plan) => plan.estado === 'Activo'))
+const currentPlan = computed(() => plans.value.find((plan) => plan.id === member.value?.planId))
+const misAsistencias = computed(() => (member.value ? attendanceByMember(member.value.id) : []))
 const misSesiones = computed(() =>
-  sessions.value.filter((session) => session.clienteId === member?.id),
+  sessions.value.filter((session) => session.clienteId === member.value?.id),
 )
 const statusColor = (estado: EstadoGeneral) =>
   ({ Activo: 'primary', Inactivo: 'light' })[estado] as 'primary' | 'light'
@@ -266,18 +443,122 @@ const sessionColor = (estado: SessionStatus) =>
   ({ Programada: 'info', Confirmada: 'primary', Completada: 'success', Cancelada: 'light' })[
     estado
   ] as 'info' | 'primary' | 'success' | 'light'
+const estadoSuscripcionColor = (suscripcion: Suscripcion) =>
+  suscripcion.nombreEstado === 'Activo'
+    ? 'info'
+    : suscripcion.nombreEstado === 'Vencida'
+      ? 'warning'
+      : 'light'
+const mensajeError = (e: unknown) => (e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
+
+const imagenQr = ref('')
+const copiado = ref(false)
+watch(
+  () => member.value?.codigoQr,
+  async (codigo) => {
+    imagenQr.value = codigo ? await QRCode.toDataURL(codigo, { width: 256, margin: 1 }) : ''
+  },
+  { immediate: true },
+)
+const copiarCodigo = async () => {
+  if (!member.value) return
+  await navigator.clipboard.writeText(member.value.codigoQr)
+  copiado.value = true
+  setTimeout(() => (copiado.value = false), 2000)
+}
+
+const suscripciones = ref<Suscripcion[]>([])
+const planVenta = ref('')
+const mensajeVenta = ref('')
+const errorVenta = ref('')
+const cargarSuscripciones = async () => {
+  if (!member.value) return
+  try {
+    suscripciones.value = await suscripcionesDeCliente(member.value.id)
+  } catch (e) {
+    errorVenta.value = mensajeError(e)
+  }
+}
+watch(
+  () => member.value?.id,
+  () => {
+    notas.value = member.value?.notas ?? ''
+    planVenta.value = member.value?.planId ?? planesActivos.value[0]?.id ?? ''
+    cargarSuscripciones()
+  },
+  { immediate: true },
+)
+const vender = async () => {
+  if (!member.value) return
+  procesando.value = true
+  mensajeVenta.value = ''
+  errorVenta.value = ''
+  try {
+    await venderSuscripcion(member.value.id, planVenta.value)
+    await cargarSuscripciones()
+    mensajeVenta.value = 'Suscripción registrada.'
+  } catch (e) {
+    errorVenta.value = mensajeError(e)
+  } finally {
+    procesando.value = false
+  }
+}
+// Primero se muestra el aviso con lo que calculo el backend; se cancela al confirmar
+const porCancelar = ref<{ suscripcion: Suscripcion; vista: VistaCancelacion } | null>(null)
+const cancelar = async (suscripcion: Suscripcion) => {
+  mensajeVenta.value = ''
+  errorVenta.value = ''
+  try {
+    porCancelar.value = { suscripcion, vista: await vistaCancelacion(suscripcion.idSuscripcion) }
+  } catch (e) {
+    errorVenta.value = mensajeError(e)
+  }
+}
+const confirmarCancelacion = async () => {
+  if (!porCancelar.value) return
+  procesando.value = true
+  try {
+    await cancelarSuscripcion(porCancelar.value.suscripcion.idSuscripcion)
+    await cargarSuscripciones()
+    mensajeVenta.value = 'Suscripción cancelada.'
+  } catch (e) {
+    errorVenta.value = mensajeError(e)
+  } finally {
+    procesando.value = false
+    porCancelar.value = null
+  }
+}
+
 const startEditing = () => {
+  if (!member.value) return
+  const { nombres, apellidos, email, telefono, dui, fechaNacimiento, direccion } = member.value
+  Object.assign(editForm, {
+    nombres,
+    apellidos,
+    email,
+    telefono,
+    dui,
+    fechaNacimiento,
+    direccion,
+    notas: member.value.notas,
+  })
+  errorEdicion.value = ''
   editing.value = true
 }
-const saveEditing = () => {
-  if (member) updateMember(member.id, { ...editForm })
-  editing.value = false
+const saveEditing = async () => {
+  if (!member.value) return
+  procesando.value = true
+  errorEdicion.value = ''
+  try {
+    await updateMember(member.value.id, { ...editForm })
+    editing.value = false
+  } catch (e) {
+    errorEdicion.value = mensajeError(e)
+  } finally {
+    procesando.value = false
+  }
 }
-const saveNotas = () => {
-  if (member) updateMember(member.id, { notas: notas.value })
-}
-const changePlan = (event: Event) => {
-  const planId = (event.target as HTMLSelectElement).value
-  if (member) changeMemberPlan(member.id, planId)
+const saveNotas = async () => {
+  if (member.value) await updateMember(member.value.id, { notas: notas.value })
 }
 </script>

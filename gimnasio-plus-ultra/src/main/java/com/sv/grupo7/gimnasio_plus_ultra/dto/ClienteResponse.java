@@ -7,6 +7,7 @@ public class ClienteResponse extends PersonaResponse {
 
     private int id_cliente;
     private String nombre_suscripcion;
+    private Integer idPlanSuscripcion;
     private String nombre_estado;
     private String notas;
     private String codigoQr;
@@ -42,6 +43,14 @@ public class ClienteResponse extends PersonaResponse {
 
     public void setIdCliente(int id_cliente) {
         this.id_cliente = id_cliente;
+    }
+
+    public Integer getIdPlanSuscripcion() {
+        return idPlanSuscripcion;
+    }
+
+    public void setIdPlanSuscripcion(Integer idPlanSuscripcion) {
+        this.idPlanSuscripcion = idPlanSuscripcion;
     }
 
     public String getNombreSuscripcion() {

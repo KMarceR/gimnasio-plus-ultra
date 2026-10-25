@@ -26,7 +26,12 @@ public interface SuscripcionRepository extends JpaRepository<Suscripcion, Intege
                         + "WHERE s.cliente.idCliente = :idCliente AND s.estado.nombreEstado = 'Activo'")
         LocalDate ultimaFechaVencimiento(@Param("idCliente") int idCliente);
 
-        // Suscripciones activas cuya fecha de vencimiento ya paso
+        // Suscripciones activas del cliente que empiezan despues de la fecha indicada
+    @Query("SELECT s FROM Suscripcion s WHERE s.cliente.idCliente = :idCliente "
+            + "AND s.estado.nombreEstado = 'Activo' AND s.fechaInicio > :fecha ORDER BY s.fechaInicio")
+    List<Suscripcion> buscarActivasPosteriores(@Param("idCliente") int idCliente, @Param("fecha") LocalDate fecha);
+
+    // Suscripciones activas cuya fecha de vencimiento ya paso
         @Query("SELECT s FROM Suscripcion s WHERE s.estado.nombreEstado = 'Activo' AND s.fechaVencimiento < :hoy")
         List<Suscripcion> buscarVencidas(@Param("hoy") LocalDate hoy);
 }

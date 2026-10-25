@@ -13,14 +13,6 @@
         </button>
         <div class="flex gap-2">
           <Button size="sm" variant="outline" @click="openEdit(selectedPlan)">Editar plan</Button>
-          <Button
-            size="sm"
-            variant="outline"
-            class-name="!ring-error-200 !text-error-600 hover:!bg-error-50"
-            @click="removePlan(selectedPlan)"
-          >
-            Eliminar
-          </Button>
         </div>
       </div>
       <section class="rounded-2xl border border-brand-200 bg-white p-6 shadow-theme-xs sm:p-8">
@@ -36,6 +28,9 @@
               <span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600"
                 >{{ membersForPlan(selectedPlan.id).length }} socios</span
               >
+              <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">{{
+                duracionTexto(selectedPlan)
+              }}</span>
             </div>
             <h1 class="mt-2 text-3xl font-semibold text-gray-900">{{ selectedPlan.nombre }}</h1>
             <p class="mt-3 max-w-xl text-sm text-gray-600">{{ selectedPlan.detalles }}</p>
@@ -117,6 +112,7 @@
           <thead>
             <tr class="border-b border-gray-100 text-xs uppercase tracking-wider text-gray-400">
               <th class="py-3 text-start">Plan</th>
+              <th class="py-3 text-start">Tipo</th>
               <th class="py-3 text-start">Precio</th>
               <th class="py-3 text-start">Socios</th>
               <th class="py-3 text-start">Estado</th>
@@ -142,6 +138,7 @@
                   </div>
                 </div>
               </td>
+              <td class="py-4 text-sm text-gray-600">{{ duracionTexto(plan) }}</td>
               <td class="py-4 text-sm font-semibold text-brand-600">
                 ${{ plan.precio.toLocaleString('es-SV') }}
               </td>
@@ -207,6 +204,15 @@
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
               /></label>
               <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
+                >Tipo de plan<select
+                  v-model="form.tipoPlan"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+                >
+                  <option value="MENSUAL">Mensual (1 mes)</option>
+                  <option value="ANUAL">Anual (12 meses)</option>
+                </select></label
+              >
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Detalles<textarea
                   v-model="form.detalles"
                   rows="3"
@@ -235,7 +241,7 @@
                 @click="closeModal"
                 >Cancelar</Button
               >
-              <Button type="submit" class-name="flex-1 justify-center">{{
+              <Button type="submit" :disabled="guardando" class-name="flex-1 justify-center">{{
                 editingPlan ? 'Guardar cambios' : 'Crear Plan'
               }}</Button>
             </footer>
@@ -254,16 +260,31 @@ import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
 import Alert from '@/components/ui/Alert.vue'
-import { useGymData, nombreCompleto, iniciales, type GymPlan } from '@/composables/useGymData'
+import {
+  useGymData,
+  nombreCompleto,
+  iniciales,
+  type GymPlan,
+  type TipoPlan,
+} from '@/composables/useGymData'
 
-const { plans, members, addPlan, updatePlan, deletePlan } = useGymData()
+const { plans, members, addPlan, updatePlan } = useGymData()
 const search = ref('')
 const selectedPlan = ref<GymPlan | null>(null)
 const memberSearch = ref('')
 const modal = ref(false)
 const editingPlan = ref<GymPlan | null>(null)
 const error = ref('')
-const form = reactive({ nombre: '', precio: 0, detalles: '', activo: true })
+const guardando = ref(false)
+const form = reactive({
+  nombre: '',
+  precio: 0,
+  detalles: '',
+  tipoPlan: 'MENSUAL' as TipoPlan,
+  activo: true,
+})
+const duracionTexto = (plan: GymPlan) =>
+  `${plan.tipoPlan === 'ANUAL' ? 'Anual' : 'Mensual'} · ${plan.duracionMeses} ${plan.duracionMeses === 1 ? 'mes' : 'meses'}`
 const filteredPlans = computed(() =>
   plans.value.filter((plan) =>
     `${plan.nombre} ${plan.detalles}`.toLowerCase().includes(search.value.toLowerCase()),
@@ -303,6 +324,7 @@ const resetForm = () => {
   form.nombre = ''
   form.precio = 0
   form.detalles = ''
+  form.tipoPlan = 'MENSUAL'
   form.activo = true
   error.value = ''
 }
@@ -316,6 +338,7 @@ const openEdit = (plan: GymPlan) => {
   form.nombre = plan.nombre
   form.precio = plan.precio
   form.detalles = plan.detalles
+  form.tipoPlan = plan.tipoPlan
   form.activo = plan.estado === 'Activo'
   error.value = ''
   modal.value = true
@@ -324,23 +347,32 @@ const closeModal = () => {
   modal.value = false
   editingPlan.value = null
 }
-const savePlan = () => {
+const savePlan = async () => {
   const data = {
     nombre: form.nombre.trim(),
     precio: Number(form.precio),
     detalles: form.detalles.trim(),
+    tipoPlan: form.tipoPlan,
     estado: form.activo ? ('Activo' as const) : ('Inactivo' as const),
   }
-  if (editingPlan.value) updatePlan(editingPlan.value.id, data)
-  else addPlan({ ...data, id: `${Date.now()}` })
-  closeModal()
+  guardando.value = true
+  error.value = ''
+  try {
+    if (editingPlan.value) await updatePlan(editingPlan.value.id, data)
+    else await addPlan(data)
+    // El detalle abierto muestra la version recien guardada
+    if (selectedPlan.value) {
+      selectedPlan.value = plans.value.find((plan) => plan.id === selectedPlan.value?.id) ?? null
+    }
+    closeModal()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'No se pudo guardar el plan.'
+  } finally {
+    guardando.value = false
+  }
 }
 const openDetail = (plan: GymPlan) => {
   selectedPlan.value = plan
   memberSearch.value = ''
-}
-const removePlan = (plan: GymPlan) => {
-  deletePlan(plan.id)
-  selectedPlan.value = null
 }
 </script>

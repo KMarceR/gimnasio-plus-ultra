@@ -124,6 +124,9 @@
                 >DUI<input
                   v-model="form.dui"
                   required
+                  pattern="\d{8}-\d"
+                  maxlength="10"
+                  title="Formato 00000000-0"
                   placeholder="02564718-9"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -137,6 +140,9 @@
                 >Teléfono<input
                   v-model="form.telefono"
                   required
+                  pattern="\d{4}-\d{4}"
+                  maxlength="9"
+                  title="Formato 0000-0000"
                   placeholder="6102-3344"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -155,10 +161,10 @@
                 class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
                 >Plan de suscripción<select
                   v-model="form.planId"
-                  required
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
                 >
-                  <option v-for="plan in plans" :key="plan.id" :value="plan.id">
+                  <option value="">Sin plan</option>
+                  <option v-for="plan in planesActivos" :key="plan.id" :value="plan.id">
                     {{ plan.nombre }} · ${{ plan.precio.toLocaleString('es-SV') }}
                   </option>
                 </select></label
@@ -172,6 +178,9 @@
                 ></textarea>
               </label>
             </div>
+            <div v-if="error" class="px-6 pb-2">
+              <Alert variant="error" title="No se pudo registrar" :message="error" />
+            </div>
             <footer class="flex gap-3 border-t border-gray-100 p-6">
               <Button
                 type="button"
@@ -180,7 +189,9 @@
                 @click="closeModal"
                 >Cancelar</Button
               >
-              <Button type="submit" class-name="flex-1 justify-center">Registrar cliente</Button>
+              <Button type="submit" :disabled="guardando" class-name="flex-1 justify-center">{{
+                guardando ? 'Guardando...' : 'Registrar cliente'
+              }}</Button>
             </footer>
           </form>
         </div>
@@ -196,6 +207,7 @@ import AdminLayout from '@/components/layout/AdminLayout.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
+import Alert from '@/components/ui/Alert.vue'
 import { useAuth } from '@/composables/useAuth'
 import {
   useGymData,
@@ -211,6 +223,8 @@ const { members, plans, planById, attendanceByMember, addMember } = useGymData()
 const search = ref('')
 const filter = ref('Todos')
 const modal = ref(false)
+const error = ref('')
+const guardando = ref(false)
 const statuses = ['Todos', 'Activo', 'Inactivo']
 const canCreate = computed(() => currentUser.value?.role !== 'Entrenador')
 const form = reactive({
@@ -222,9 +236,10 @@ const form = reactive({
   telefono: '',
   fechaNacimiento: '',
   direccion: '',
-  planId: plans.value[0]?.id || '',
+  planId: '',
   notas: '',
 })
+const planesActivos = computed(() => plans.value.filter((plan) => plan.estado === 'Activo'))
 const filteredMembers = computed(() =>
   members.value.filter(
     (member) =>
@@ -240,28 +255,47 @@ const statusColor = (estado: EstadoGeneral) =>
     Inactivo: 'light',
   })[estado] as 'primary' | 'light'
 const openCreate = () => {
-  form.planId = plans.value[0]?.id || ''
+  Object.assign(form, {
+    nombres: '',
+    apellidos: '',
+    genero: 'Masculino',
+    dui: '',
+    email: '',
+    telefono: '',
+    fechaNacimiento: '',
+    direccion: '',
+    planId: planesActivos.value[0]?.id || '',
+    notas: '',
+  })
+  error.value = ''
   modal.value = true
 }
 const closeModal = () => {
   modal.value = false
 }
-const createMember = () => {
-  addMember({
-    id: `${Date.now()}`,
-    nombres: form.nombres,
-    apellidos: form.apellidos,
-    genero: form.genero,
-    fechaNacimiento: form.fechaNacimiento,
-    direccion: form.direccion,
-    email: form.email,
-    telefono: form.telefono,
-    dui: form.dui,
-    planId: form.planId || null,
-    estado: 'Activo',
-    notas: form.notas,
-    creadoEn: new Date().toISOString().slice(0, 10),
-  })
-  closeModal()
+// Si se registra activo y con plan, el backend le vende su primera suscripcion y genera su QR
+const createMember = async () => {
+  guardando.value = true
+  error.value = ''
+  try {
+    await addMember({
+      nombres: form.nombres,
+      apellidos: form.apellidos,
+      genero: form.genero,
+      fechaNacimiento: form.fechaNacimiento,
+      direccion: form.direccion,
+      email: form.email,
+      telefono: form.telefono,
+      dui: form.dui,
+      planId: form.planId || null,
+      estado: 'Activo',
+      notas: form.notas,
+    })
+    closeModal()
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'No se pudo registrar el cliente.'
+  } finally {
+    guardando.value = false
+  }
 }
 </script>

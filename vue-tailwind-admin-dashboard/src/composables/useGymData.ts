@@ -1,8 +1,10 @@
 import { computed, ref } from 'vue'
+import { api } from '@/services/api'
 
 export type EstadoGeneral = 'Activo' | 'Inactivo'
 export type SessionStatus = 'Programada' | 'Confirmada' | 'Completada' | 'Cancelada'
 export type Genero = 'Masculino' | 'Femenino'
+export type TipoPlan = 'MENSUAL' | 'ANUAL'
 
 // Datos de persona (tabla `persona`)
 export interface Member {
@@ -18,6 +20,7 @@ export interface Member {
   planId: string | null
   estado: EstadoGeneral
   notas: string
+  codigoQr: string
   creadoEn: string
 }
 
@@ -26,7 +29,37 @@ export interface GymPlan {
   nombre: string
   detalles: string
   precio: number
+  tipoPlan: TipoPlan
+  duracionMeses: number
   estado: EstadoGeneral
+}
+
+export type DatosCliente = Omit<Member, 'id' | 'codigoQr' | 'creadoEn'>
+export type DatosPlan = Omit<GymPlan, 'id' | 'duracionMeses'>
+
+export interface CambioFechaSuscripcion {
+  idSuscripcion: number
+  nombrePlan: string
+  fechaInicioActual: string
+  fechaVencimientoActual: string
+  nuevaFechaInicio: string
+  nuevaFechaVencimiento: string
+}
+
+export interface VistaCancelacion {
+  cambios: CambioFechaSuscripcion[]
+  quedaSinPlanVigente: boolean
+}
+
+export interface Suscripcion {
+  idSuscripcion: number
+  nombrePlan: string
+  tipoPlan: TipoPlan
+  fechaInicio: string
+  fechaVencimiento: string
+  precioPagado: number
+  nombreEstado: string
+  vigente: boolean
 }
 
 export interface Trainer {
@@ -69,39 +102,6 @@ export const nombreCompleto = (persona: { nombres: string; apellidos: string }) 
 export const iniciales = (persona: { nombres: string; apellidos: string }) =>
   `${persona.nombres.charAt(0)}${persona.apellidos.charAt(0)}`.toUpperCase()
 
-const initialMembers: Member[] = [
-  {
-    id: '1',
-    nombres: 'Roberto Antonio',
-    apellidos: 'Zelaya Flores',
-    genero: 'Masculino',
-    fechaNacimiento: '1998-07-19',
-    direccion: 'Colonia Utila, Santa Tecla, La Libertad',
-    email: 'roberto.zelaya@outlook.com',
-    telefono: '6102-3344',
-    dui: '02564718-9',
-    planId: '1',
-    estado: 'Activo',
-    notas: 'Lesión crónica de meniscos en rodilla izquierda. Evitar prensa inclinada pesada.',
-    creadoEn: '2026-09-26',
-  },
-  {
-    id: '2',
-    nombres: 'Sofía Alejandra',
-    apellidos: 'Quintanilla Cruz',
-    genero: 'Femenino',
-    fechaNacimiento: '2001-04-11',
-    direccion: 'Residencial Villa Lourdes, Colón, La Libertad',
-    email: 'sofia.quinta@yahoo.com',
-    telefono: '7988-1122',
-    dui: '05987412-3',
-    planId: '2',
-    estado: 'Activo',
-    notas: 'Meta: Resistencia aeróbica y pérdida de grasa. Preparación para media maratón.',
-    creadoEn: '2026-09-26',
-  },
-]
-
 const initialTrainers: Trainer[] = [
   {
     id: '1',
@@ -116,24 +116,6 @@ const initialTrainers: Trainer[] = [
     nombreUsuario: 'nelson_coach',
     especialidad: 'Culturismo, HIIT y Nutrición Funcional',
     tarifaPorSesion: 15,
-    estado: 'Activo',
-  },
-]
-
-const initialPlans: GymPlan[] = [
-  {
-    id: '1',
-    nombre: 'Membresía Plus Ultra Black',
-    detalles:
-      'Acceso completo ilimitado a zona de pesas, cardio, spinning y evaluaciones mensuales.',
-    precio: 45,
-    estado: 'Activo',
-  },
-  {
-    id: '2',
-    nombre: 'Membresía Smart Fit Estudiante',
-    detalles: 'Acceso al área de musculación de lunes a viernes en horario matutino.',
-    precio: 25,
     estado: 'Activo',
   },
 ]
@@ -165,9 +147,73 @@ const initialAsistencia: AsistenciaRecord[] = [
   { id: '3', clienteId: '1', estado: 'Activo', fecha: '2026-09-25', hora: '06:00' },
 ]
 
-const members = ref<Member[]>(initialMembers)
+interface ClienteApi {
+  idCliente: number
+  nombres: string
+  apellidos: string
+  genero: Genero
+  fechaNacimiento: string
+  direccion: string | null
+  email: string
+  telefono: string
+  dui: string
+  idPlanSuscripcion: number | null
+  nombreEstado: string
+  notas: string | null
+  codigoQr: string
+  creadoEn: string | null
+}
+
+interface PlanApi {
+  idPlanSuscripcion: number
+  nombreSuscripcion: string
+  detalles: string | null
+  precio: number
+  tipoPlan: TipoPlan
+  duracionMeses: number
+  nombreEstado: string
+}
+
+interface EstadoApi {
+  idEstado: number
+  nombreEstado: string
+}
+
+const aEstadoGeneral = (nombre: string): EstadoGeneral => (nombre === 'Activo' ? 'Activo' : 'Inactivo')
+
+const aMember = (c: ClienteApi): Member => ({
+  id: String(c.idCliente),
+  nombres: c.nombres,
+  apellidos: c.apellidos,
+  genero: c.genero,
+  fechaNacimiento: c.fechaNacimiento,
+  direccion: c.direccion ?? '',
+  email: c.email,
+  telefono: c.telefono,
+  dui: c.dui,
+  planId: c.idPlanSuscripcion == null ? null : String(c.idPlanSuscripcion),
+  estado: aEstadoGeneral(c.nombreEstado),
+  notas: c.notas ?? '',
+  codigoQr: c.codigoQr,
+  creadoEn: (c.creadoEn ?? '').slice(0, 10),
+})
+
+const aPlan = (p: PlanApi): GymPlan => ({
+  id: String(p.idPlanSuscripcion),
+  nombre: p.nombreSuscripcion,
+  detalles: p.detalles ?? '',
+  precio: p.precio,
+  tipoPlan: p.tipoPlan,
+  duracionMeses: p.duracionMeses,
+  estado: aEstadoGeneral(p.nombreEstado),
+})
+
+const members = ref<Member[]>([])
 const trainers = ref<Trainer[]>(initialTrainers)
-const plans = ref<GymPlan[]>(initialPlans)
+const plans = ref<GymPlan[]>([])
+const estados = ref<EstadoApi[]>([])
+const errorCarga = ref('')
+let datosCargados = false
 const sessions = ref<GymSession[]>(initialSessions)
 const asistencia = ref<AsistenciaRecord[]>(initialAsistencia)
 const presentMembers = ref<Member[]>([])
@@ -187,23 +233,90 @@ export function useGymData() {
   const attendanceByMember = (id: string) =>
     asistencia.value.filter((record) => record.clienteId === id)
 
-  const addMember = (member: Member) => members.value.unshift(member)
-  const updateMember = (id: string, changes: Partial<Member>) => {
-    const member = members.value.find((item) => item.id === id)
-    if (member) Object.assign(member, changes)
-  }
-  const changeMemberPlan = (id: string, planId: string) => {
-    const member = members.value.find((item) => item.id === id)
-    if (member) member.planId = planId
+  const idEstado = (nombre: string) => {
+    const estado = estados.value.find((item) => item.nombreEstado === nombre)
+    if (!estado) throw new Error(`No existe el estado ${nombre}`)
+    return estado.idEstado
   }
 
-  const addPlan = (plan: GymPlan) => plans.value.push(plan)
-  const updatePlan = (id: string, changes: Omit<GymPlan, 'id'>) => {
-    const plan = plans.value.find((item) => item.id === id)
-    if (plan) Object.assign(plan, changes)
+  const cargarClientes = async () => {
+    members.value = (await api.get<ClienteApi[]>('/clientes')).map(aMember)
   }
-  const deletePlan = (id: string) => {
-    plans.value = plans.value.filter((item) => item.id !== id)
+  const cargarPlanes = async () => {
+    plans.value = (await api.get<PlanApi[]>('/planes-suscripcion')).map(aPlan)
+  }
+  // Se carga una sola vez al entrar; las altas y cambios recargan solo su lista
+  const cargarDatos = async () => {
+    if (datosCargados) return
+    try {
+      const [listaEstados] = await Promise.all([
+        api.get<EstadoApi[]>('/estados'),
+        cargarClientes(),
+        cargarPlanes(),
+      ])
+      estados.value = listaEstados
+      datosCargados = true
+      errorCarga.value = ''
+    } catch (e) {
+      errorCarga.value = e instanceof Error ? e.message : 'No se pudieron cargar los datos'
+    }
+  }
+
+  const clienteRequest = (datos: DatosCliente) => ({
+    nombres: datos.nombres,
+    apellidos: datos.apellidos,
+    genero: datos.genero,
+    fechaNacimiento: datos.fechaNacimiento,
+    direccion: datos.direccion,
+    email: datos.email,
+    telefono: datos.telefono,
+    dui: datos.dui,
+    idPlanSuscripcion: datos.planId ? Number(datos.planId) : null,
+    idEstado: idEstado(datos.estado),
+    notas: datos.notas,
+  })
+  const addMember = async (datos: DatosCliente) => {
+    await api.post('/clientes', clienteRequest(datos))
+    await cargarClientes()
+  }
+  const updateMember = async (id: string, cambios: Partial<DatosCliente>) => {
+    const actual = memberById(id)
+    if (!actual) return
+    await api.put(`/clientes/${id}`, clienteRequest({ ...actual, ...cambios }))
+    await cargarClientes()
+  }
+
+  const planRequest = (datos: DatosPlan) => ({
+    nombreSuscripcion: datos.nombre,
+    detalles: datos.detalles,
+    precio: datos.precio,
+    tipoPlan: datos.tipoPlan,
+    idEstado: idEstado(datos.estado),
+  })
+  const addPlan = async (datos: DatosPlan) => {
+    await api.post('/planes-suscripcion', planRequest(datos))
+    await cargarPlanes()
+  }
+  const updatePlan = async (id: string, datos: DatosPlan) => {
+    await api.put(`/planes-suscripcion/${id}`, planRequest(datos))
+    await cargarPlanes()
+  }
+
+  const suscripcionesDeCliente = (idCliente: string) =>
+    api.get<Suscripcion[]>(`/suscripciones/cliente/${idCliente}`)
+  // El backend recalcula el plan actual del cliente al vender o cancelar
+  const venderSuscripcion = async (idCliente: string, planId: string) => {
+    await api.post('/suscripciones', {
+      idCliente: Number(idCliente),
+      idPlanSuscripcion: Number(planId),
+    })
+    await cargarClientes()
+  }
+  const vistaCancelacion = (idSuscripcion: number) =>
+    api.get<VistaCancelacion>(`/suscripciones/${idSuscripcion}/cancelacion`)
+  const cancelarSuscripcion = async (idSuscripcion: number) => {
+    await api.put(`/suscripciones/${idSuscripcion}/cancelar`)
+    await cargarClientes()
   }
 
   const addTrainer = (trainer: Trainer) => trainers.value.unshift(trainer)
@@ -248,12 +361,16 @@ export function useGymData() {
     trainerById,
     planById,
     attendanceByMember,
+    errorCarga,
+    cargarDatos,
     addMember,
     updateMember,
-    changeMemberPlan,
     addPlan,
     updatePlan,
-    deletePlan,
+    vistaCancelacion,
+    suscripcionesDeCliente,
+    venderSuscripcion,
+    cancelarSuscripcion,
     addTrainer,
     updateTrainer,
     addSession,
