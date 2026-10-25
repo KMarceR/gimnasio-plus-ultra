@@ -31,7 +31,7 @@
             <div>
               <label
                 class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500"
-                >Usuario</label
+                >Usuario (DUI)</label
               >
               <div class="relative">
                 <UserIcon
@@ -42,7 +42,7 @@
                   v-model="nombreUsuario"
                   type="text"
                   required
-                  placeholder="nombre_usuario"
+                  placeholder="00000000-0"
                   class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 ps-10 pe-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-400 focus:outline-none"
                 />
               </div>
@@ -106,6 +106,7 @@ import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
 import Alert from '@/components/ui/Alert.vue'
 import Button from '@/components/ui/Button.vue'
 import { useAuth } from '@/composables/useAuth'
+import { ApiError } from '@/services/api'
 
 const router = useRouter()
 const { login } = useAuth()
@@ -116,17 +117,16 @@ const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
 
-const submit = () => {
+const submit = async () => {
   loading.value = true
   error.value = ''
-  setTimeout(() => {
-    const ok = login(nombreUsuario.value, password.value)
-    if (ok) {
-      router.push('/')
-    } else {
-      error.value = 'Credenciales incorrectas. Revisá el usuario y contraseña.'
-      loading.value = false
-    }
-  }, 600)
+  try {
+    await login(nombreUsuario.value.trim(), password.value)
+    router.push('/')
+  } catch (e) {
+    error.value = e instanceof ApiError ? e.message : 'No se pudo iniciar sesión.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>

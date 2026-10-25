@@ -192,7 +192,7 @@ import Modal from '@/components/ui/Modal.vue'
 import { useAuth, type UserRole, type SessionUser } from '@/composables/useAuth'
 import type { Genero } from '@/composables/useGymData'
 const { demoUsers } = useAuth()
-const users = ref<SessionUser[]>(demoUsers.map(({ password: _password, ...user }) => user))
+const users = ref<SessionUser[]>([...demoUsers])
 const search = ref('')
 const filteredUsers = computed(() =>
   users.value.filter((user) =>

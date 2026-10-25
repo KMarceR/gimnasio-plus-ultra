@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import type { Genero } from './useGymData'
+import { api } from '@/services/api'
 
 export type UserRole = 'Administrador' | 'Gerente' | 'Recepcionista' | 'Entrenador'
 
@@ -20,7 +21,22 @@ export interface SessionUser {
   initials: string
 }
 
-const demoUsers: Array<SessionUser & { password: string }> = [
+interface UsuarioResponse {
+  idUsuario: number
+  nombreUsuario: string
+  nombreRol: string
+  nombres: string
+  apellidos: string
+  genero: Genero
+  fechaNacimiento: string
+  direccion: string
+  email: string
+  telefono: string
+  dui: string
+}
+
+// Temporal: la pantalla Usuarios los muestra hasta conectarla con la API
+const demoUsers: SessionUser[] = [
   {
     id: '1',
     nombreUsuario: 'daniel_admin',
@@ -32,7 +48,6 @@ const demoUsers: Array<SessionUser & { password: string }> = [
     email: 'daniel.guevara@plusultra.com',
     telefono: '2257-8888',
     dui: '01234567-9',
-    password: 'plusultra123',
     role: 'Administrador',
     initials: 'DG',
   },
@@ -47,7 +62,6 @@ const demoUsers: Array<SessionUser & { password: string }> = [
     email: 'karla.bonilla@plusultra.com',
     telefono: '7512-3456',
     dui: '06010191-2',
-    password: 'plusultra123',
     role: 'Gerente',
     initials: 'KB',
   },
@@ -62,7 +76,6 @@ const demoUsers: Array<SessionUser & { password: string }> = [
     email: 'nelson.trainer@gmail.com',
     telefono: '7745-9988',
     dui: '04891234-5',
-    password: 'plusultra123',
     role: 'Entrenador',
     initials: 'NP',
   },
@@ -74,15 +87,25 @@ const currentUser = ref<SessionUser | null>(storedUser ? JSON.parse(storedUser) 
 export function useAuth() {
   const isAuthenticated = computed(() => currentUser.value !== null)
 
-  const login = (nombreUsuario: string, password: string) => {
-    const user = demoUsers.find(
-      (item) => item.nombreUsuario === nombreUsuario && item.password === password,
-    )
-    if (!user) return false
-    const { password: _password, ...sessionUser } = user
+  // Lanza ApiError si el usuario o la contrasena no son validos
+  const login = async (nombreUsuario: string, contrasena: string) => {
+    const usuario = await api.post<UsuarioResponse>('/auth/login', { nombreUsuario, contrasena })
+    const sessionUser: SessionUser = {
+      id: String(usuario.idUsuario),
+      nombreUsuario: usuario.nombreUsuario,
+      nombres: usuario.nombres,
+      apellidos: usuario.apellidos,
+      genero: usuario.genero,
+      fechaNacimiento: usuario.fechaNacimiento,
+      direccion: usuario.direccion,
+      email: usuario.email,
+      telefono: usuario.telefono,
+      dui: usuario.dui,
+      role: usuario.nombreRol as UserRole,
+      initials: `${usuario.nombres.charAt(0)}${usuario.apellidos.charAt(0)}`.toUpperCase(),
+    }
     currentUser.value = sessionUser
     localStorage.setItem('plus-ultra-user', JSON.stringify(sessionUser))
-    return true
   }
 
   const logout = () => {
@@ -90,12 +113,5 @@ export function useAuth() {
     localStorage.removeItem('plus-ultra-user')
   }
 
-  const fillDemo = (role: UserRole) => {
-    const user = demoUsers.find((item) => item.role === role)
-    return user
-      ? { nombreUsuario: user.nombreUsuario, password: user.password }
-      : { nombreUsuario: '', password: '' }
-  }
-
-  return { currentUser, isAuthenticated, login, logout, fillDemo, demoUsers }
+  return { currentUser, isAuthenticated, login, logout, demoUsers }
 }
