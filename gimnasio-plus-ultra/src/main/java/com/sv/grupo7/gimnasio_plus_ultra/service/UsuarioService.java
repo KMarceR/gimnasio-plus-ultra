@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.UsuarioRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.UsuarioResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Rol;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Usuario;
@@ -48,11 +49,11 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
         usuario.setContrasena(hashContrasena);
 
         Rol rol = rolRepository.findById(request.getIdRol())
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
         usuario.setRol(rol);
 
         Estado estado = estadoRepository.findById(request.getIdEstado())
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         usuario.setEstado(estado);
 
         Usuario nuevoUsuario = usuarioRepository.save(usuario);
@@ -87,11 +88,11 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
         }
 
         Rol rol = rolRepository.findById(request.getIdRol())
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
         usuario.setRol(rol);
 
         Estado estado = estadoRepository.findById(request.getIdEstado())
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         usuario.setEstado(estado);
 
         return convertirAResponse(usuarioRepository.save(usuario));

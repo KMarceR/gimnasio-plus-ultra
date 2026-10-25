@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.DatosInvalidosException;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.ReglaNegocioException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Cliente;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
@@ -42,17 +45,17 @@ public class SuscripcionService {
     @Transactional
     public SuscripcionResponse vender(SuscripcionRequest request) {
         if (request.getIdCliente() == null || request.getIdPlanSuscripcion() == null) {
-            throw new RuntimeException("Debe indicar el cliente y el plan");
+            throw new DatosInvalidosException("Debe indicar el cliente y el plan");
         }
         Cliente cliente = clienteRepository.buscarParaActualizar(request.getIdCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado"));
         if (!ESTADO_ACTIVO.equals(cliente.getEstado().getNombreEstado())) {
-            throw new RuntimeException("El cliente no está activo");
+            throw new ReglaNegocioException("El cliente no está activo");
         }
         PlanSuscripcion plan = planSuscripcionRepository.findById(request.getIdPlanSuscripcion())
-                .orElseThrow(() -> new RuntimeException("Plan no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Plan no encontrado"));
         if (!ESTADO_ACTIVO.equals(plan.getEstado().getNombreEstado())) {
-            throw new RuntimeException("El plan no está disponible para la venta");
+            throw new ReglaNegocioException("El plan no está disponible para la venta");
         }
         Estado activo = estadoRepository.buscarPorNombre(ESTADO_ACTIVO)
                 .orElseThrow(() -> new RuntimeException("No existe el estado Activo"));

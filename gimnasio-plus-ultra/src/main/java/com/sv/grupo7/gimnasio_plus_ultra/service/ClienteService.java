@@ -10,6 +10,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.ClienteRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.ClienteResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SuscripcionRequest;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Cliente;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
@@ -106,7 +107,7 @@ public class ClienteService extends PersonaServiceBase implements CrudService<Cl
         }
 
         Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         cliente.setEstado(estado);
     }
 

@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.PlanSuscripcionRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.PlanSuscripcionResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.DatosInvalidosException;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
+import com.sv.grupo7.gimnasio_plus_ultra.model.TipoPlan;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
-import com.sv.grupo7.gimnasio_plus_ultra.model.TipoPlan;
 
 @Service
 public class PlanSuscripcionService implements CrudService<PlanSuscripcionRequest, PlanSuscripcionResponse> {
@@ -71,7 +73,7 @@ public class PlanSuscripcionService implements CrudService<PlanSuscripcionReques
         plan.setPrecio(request.getPrecio());
 
         Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         plan.setEstado(estado);
 
         String tipo = (request.getTipoPlan() == null || request.getTipoPlan().isBlank())
@@ -80,7 +82,7 @@ public class PlanSuscripcionService implements CrudService<PlanSuscripcionReques
         try {
             TipoPlan.valueOf(tipo); // valida que sea MENSUAL o ANUAL
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("El tipo de plan debe ser MENSUAL o ANUAL");
+            throw new DatosInvalidosException("El tipo de plan debe ser MENSUAL o ANUAL");
         }
         plan.setTipoPlan(tipo);
     }

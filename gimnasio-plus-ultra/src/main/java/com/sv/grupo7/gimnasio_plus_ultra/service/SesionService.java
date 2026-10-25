@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SesionRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.SesionResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Cliente;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Entrenador;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
@@ -78,15 +79,15 @@ public class SesionService implements CrudService<SesionRequest, SesionResponse>
         sesion.setHoraFin(request.getHoraFin());
 
         Cliente cliente = clienteRepository.findById(Integer.valueOf(request.getIdCliente()))
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado"));
         sesion.setCliente(cliente);
 
         Entrenador entrenador = entrenadorRepository.findById(Integer.valueOf(request.getIdEntrenador()))
-                .orElseThrow(() -> new RuntimeException("Entrenador no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Entrenador no encontrado"));
         sesion.setEntrenador(entrenador);
 
         Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         sesion.setEstado(estado);
     }
 

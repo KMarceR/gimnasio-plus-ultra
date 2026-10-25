@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.EntrenadorRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.EntrenadorResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.DatosInvalidosException;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Entrenador;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Rol;
@@ -132,16 +134,16 @@ public class EntrenadorService extends PersonaServiceBase implements CrudService
     private void validarDatos(EntrenadorRequest request, boolean esNuevo) {
         if (esVacio(request.getNombres()) || esVacio(request.getApellidos()) || esVacio(request.getGenero())
                 || esVacio(request.getDui()) || esVacio(request.getEmail()) || request.getFechaNacimiento() == null) {
-            throw new RuntimeException("Faltan datos obligatorios del entrenador");
+            throw new DatosInvalidosException("Faltan datos obligatorios del entrenador");
         }
         if (!request.getDui().matches(FORMATO_DUI)) {
-            throw new RuntimeException("El DUI debe tener el formato 00000000-0");
+            throw new DatosInvalidosException("El DUI debe tener el formato 00000000-0");
         }
         if (esNuevo && esVacio(request.getContrasena())) {
-            throw new RuntimeException("La contraseña es obligatoria");
+            throw new DatosInvalidosException("La contraseña es obligatoria");
         }
         if (request.getTarifaPorSesion() == null || request.getTarifaPorSesion() < 0) {
-            throw new RuntimeException("La tarifa por sesión es obligatoria y no puede ser negativa");
+            throw new DatosInvalidosException("La tarifa por sesión es obligatoria y no puede ser negativa");
         }
     }
 
@@ -151,7 +153,7 @@ public class EntrenadorService extends PersonaServiceBase implements CrudService
                     .orElseThrow(() -> new RuntimeException("No existe el estado Activo"));
         }
         return estadoRepository.findById(idEstado)
-                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
     }
 
     private boolean esVacio(String valor) {

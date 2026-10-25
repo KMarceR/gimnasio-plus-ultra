@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.AccesoQrResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.AsistenciaRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.AsistenciaResponse;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.DatosInvalidosException;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Asistencia;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Cliente;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
@@ -99,10 +101,10 @@ public class AsistenciaService implements CrudService<AsistenciaRequest, Asisten
     @Transactional
     public AccesoQrResponse registrarAccesoQr(String codigoQr) {
         if (codigoQr == null || codigoQr.isBlank()) {
-            throw new RuntimeException("Debe enviar el código QR");
+            throw new DatosInvalidosException("Debe enviar el código QR");
         }
         Cliente cliente = clienteRepository.findByCodigoQr(codigoQr.trim())
-                .orElseThrow(() -> new RuntimeException("Código QR no válido"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Código QR no válido"));
 
         LocalDate hoy = LocalDate.now();
         LocalTime ahora = LocalTime.now().withNano(0);
@@ -202,11 +204,11 @@ public class AsistenciaService implements CrudService<AsistenciaRequest, Asisten
         asistencia.setHoraSalida(request.getHoraSalida());
 
         Cliente cliente = clienteRepository.findById(Integer.valueOf(request.getIdCliente()))
-                .orElseThrow(() -> new RuntimeException("Cliente no registrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no registrado"));
         asistencia.setCliente(cliente);
 
         Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
-                .orElseThrow(() -> new RuntimeException("Estado inválido"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estado inválido"));
         asistencia.setEstado(estado);
     }
 

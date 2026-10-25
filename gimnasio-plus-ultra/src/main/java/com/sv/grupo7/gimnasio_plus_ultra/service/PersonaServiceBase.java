@@ -3,6 +3,7 @@ package com.sv.grupo7.gimnasio_plus_ultra.service;
 import java.util.Objects;
 
 import com.sv.grupo7.gimnasio_plus_ultra.dto.PersonaRequest;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoDuplicadoException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Persona;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
 
@@ -27,10 +28,10 @@ public abstract class PersonaServiceBase {
 
     protected void validarPersonaNueva(PersonaRequest request) {
         if (personaRepository.existsByDui(request.getDui())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
+            throw new RecursoDuplicadoException("Ya existe una persona registrada con ese DUI");
         }
         if (personaRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese email");
+            throw new RecursoDuplicadoException("Ya existe una persona registrada con ese email");
         }
     }
 
@@ -38,10 +39,10 @@ public abstract class PersonaServiceBase {
         boolean cambioDui = !Objects.equals(actual.getDui(), request.getDui());
         boolean cambioEmail = !Objects.equals(actual.getEmail(), request.getEmail());
         if (cambioDui && personaRepository.existsByDui(request.getDui())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese DUI");
+            throw new RecursoDuplicadoException("Ya existe una persona registrada con ese DUI");
         }
         if (cambioEmail && personaRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe una persona registrada con ese email");
+            throw new RecursoDuplicadoException("Ya existe una persona registrada con ese email");
         }
     }
 }
