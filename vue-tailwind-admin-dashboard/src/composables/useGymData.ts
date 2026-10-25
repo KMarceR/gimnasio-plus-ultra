@@ -35,6 +35,8 @@ export interface GymPlan {
 }
 
 export type DatosCliente = Omit<Member, 'id' | 'codigoQr' | 'creadoEn'>
+export type DatosEntrenador = Omit<Trainer, 'id' | 'nombreUsuario'> & { contrasena: string }
+export type DatosSesion = Pick<GymSession, 'clienteId' | 'entrenadorId' | 'fecha' | 'horaInicio' | 'horaFin'>
 export type DatosPlan = Omit<GymPlan, 'id' | 'duracionMeses'>
 
 export interface CambioFechaSuscripcion {
@@ -117,50 +119,16 @@ export const esIngreso = (record: AsistenciaRecord) => record.estado !== 'Cancel
 export const etiquetaAsistencia = (estado: string) =>
   ({ Activo: 'Dentro', Completada: 'Salió', Cancelada: 'Rechazado' })[estado] ?? estado
 
+// Fecha de hoy en hora local (toISOString usa UTC y de noche daria el dia siguiente)
+export const fechaHoy = (fecha = new Date()) =>
+  `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`
+
 export const nombreCompleto = (persona: { nombres: string; apellidos: string }) =>
   `${persona.nombres} ${persona.apellidos}`
 
 export const iniciales = (persona: { nombres: string; apellidos: string }) =>
   `${persona.nombres.charAt(0)}${persona.apellidos.charAt(0)}`.toUpperCase()
 
-const initialTrainers: Trainer[] = [
-  {
-    id: '1',
-    nombres: 'Nelson Eduardo',
-    apellidos: 'Palacios Henríquez',
-    genero: 'Masculino',
-    fechaNacimiento: '1991-02-03',
-    direccion: 'Urbanización Prados de Venecia, Soyapango',
-    email: 'nelson.trainer@gmail.com',
-    telefono: '7745-9988',
-    dui: '04891234-5',
-    nombreUsuario: 'nelson_coach',
-    especialidad: 'Culturismo, HIIT y Nutrición Funcional',
-    tarifaPorSesion: 15,
-    estado: 'Activo',
-  },
-]
-
-const initialSessions: GymSession[] = [
-  {
-    id: '1',
-    clienteId: '1',
-    entrenadorId: '1',
-    fecha: '2026-09-23',
-    horaInicio: '08:00',
-    horaFin: '09:00',
-    estado: 'Completada',
-  },
-  {
-    id: '2',
-    clienteId: '2',
-    entrenadorId: '1',
-    fecha: '2026-09-26',
-    horaInicio: '16:00',
-    horaFin: '17:00',
-    estado: 'Programada',
-  },
-]
 
 
 interface ClienteApi {
@@ -210,6 +178,58 @@ const aAsistencia = (a: AsistenciaApi): AsistenciaRecord => ({
   horaSalida: a.horaSalida ? a.horaSalida.slice(0, 5) : '',
 })
 
+interface EntrenadorApi {
+  idEntrenador: number
+  nombres: string
+  apellidos: string
+  genero: Genero
+  fechaNacimiento: string
+  direccion: string | null
+  email: string
+  telefono: string
+  dui: string
+  nombreUsuario: string
+  nombreEstado: string
+  especialidad: string
+  tarifaPorSesion: number
+}
+
+const aTrainer = (e: EntrenadorApi): Trainer => ({
+  id: String(e.idEntrenador),
+  nombres: e.nombres,
+  apellidos: e.apellidos,
+  genero: e.genero,
+  fechaNacimiento: e.fechaNacimiento,
+  direccion: e.direccion ?? '',
+  email: e.email,
+  telefono: e.telefono,
+  dui: e.dui,
+  nombreUsuario: e.nombreUsuario,
+  especialidad: e.especialidad,
+  tarifaPorSesion: e.tarifaPorSesion,
+  estado: aEstadoGeneral(e.nombreEstado),
+})
+
+interface SesionApi {
+  idSesion: number
+  idCliente: number
+  idEntrenador: number
+  nombreEstado: SessionStatus
+  fechaSesion: string
+  horaInicio: string
+  horaFin: string
+}
+
+const aSesion = (s: SesionApi): GymSession => ({
+  id: String(s.idSesion),
+  clienteId: String(s.idCliente),
+  entrenadorId: String(s.idEntrenador),
+  fecha: s.fechaSesion,
+  horaInicio: s.horaInicio.slice(0, 5),
+  horaFin: s.horaFin.slice(0, 5),
+  estado: s.nombreEstado,
+})
+
 interface EstadoApi {
   idEstado: number
   nombreEstado: string
@@ -245,21 +265,23 @@ const aPlan = (p: PlanApi): GymPlan => ({
 })
 
 const members = ref<Member[]>([])
-const trainers = ref<Trainer[]>(initialTrainers)
+const trainers = ref<Trainer[]>([])
 const plans = ref<GymPlan[]>([])
 const estados = ref<EstadoApi[]>([])
 const errorCarga = ref('')
 let datosCargados = false
-const sessions = ref<GymSession[]>(initialSessions)
+const sessions = ref<GymSession[]>([])
 const asistencia = ref<AsistenciaRecord[]>([])
 
 export function useGymData() {
   const activeMembers = computed(
     () => members.value.filter((member) => member.estado === 'Activo').length,
   )
-  const today = computed(() => sessions.value[sessions.value.length - 1]?.fecha || '')
   const todaySessions = computed(
-    () => sessions.value.filter((session) => session.fecha === today.value).length,
+    () =>
+      sessions.value.filter(
+        (session) => session.fecha === fechaHoy() && session.estado !== 'Cancelada',
+      ).length,
   )
 
   const memberById = (id: string) => members.value.find((member) => member.id === id)
@@ -284,6 +306,12 @@ export function useGymData() {
       .map(aAsistencia)
       .sort((a, b) => `${b.fecha} ${b.hora}`.localeCompare(`${a.fecha} ${a.hora}`))
   }
+  const cargarEntrenadores = async () => {
+    trainers.value = (await api.get<EntrenadorApi[]>('/entrenadores')).map(aTrainer)
+  }
+  const cargarSesiones = async () => {
+    sessions.value = (await api.get<SesionApi[]>('/sesiones')).map(aSesion)
+  }
   const cargarPlanes = async () => {
     plans.value = (await api.get<PlanApi[]>('/planes-suscripcion')).map(aPlan)
   }
@@ -296,6 +324,8 @@ export function useGymData() {
         cargarClientes(),
         cargarPlanes(),
         cargarAsistencias(),
+        cargarEntrenadores(),
+        cargarSesiones(),
       ])
       estados.value = listaEstados
       datosCargados = true
@@ -362,19 +392,48 @@ export function useGymData() {
     await cargarClientes()
   }
 
-  const addTrainer = (trainer: Trainer) => trainers.value.unshift(trainer)
-  const updateTrainer = (id: string, changes: Partial<Trainer>) => {
-    const trainer = trainers.value.find((item) => item.id === id)
-    if (trainer) Object.assign(trainer, changes)
+  // El usuario del entrenador es su DUI y lo crea el backend; contrasena vacia = no cambiarla
+  const entrenadorRequest = (datos: DatosEntrenador) => ({
+    nombres: datos.nombres,
+    apellidos: datos.apellidos,
+    genero: datos.genero,
+    fechaNacimiento: datos.fechaNacimiento,
+    direccion: datos.direccion,
+    email: datos.email,
+    telefono: datos.telefono,
+    dui: datos.dui,
+    idEstado: idEstado(datos.estado),
+    contrasena: datos.contrasena,
+    especialidad: datos.especialidad,
+    tarifaPorSesion: datos.tarifaPorSesion,
+  })
+  const addTrainer = async (datos: DatosEntrenador) => {
+    await api.post('/entrenadores', entrenadorRequest(datos))
+    await cargarEntrenadores()
+  }
+  const updateTrainer = async (id: string, datos: DatosEntrenador) => {
+    await api.put(`/entrenadores/${id}`, entrenadorRequest(datos))
+    await cargarEntrenadores()
   }
 
-  const addSession = (session: GymSession) => sessions.value.push(session)
-  const updateSessionStatus = (id: string, estado: SessionStatus) => {
-    const session = sessions.value.find((item) => item.id === id)
-    if (session) session.estado = estado
+  const sesionRequest = (datos: DatosSesion, estado?: SessionStatus) => ({
+    idCliente: Number(datos.clienteId),
+    idEntrenador: Number(datos.entrenadorId),
+    fechaSesion: datos.fecha,
+    horaInicio: datos.horaInicio,
+    horaFin: datos.horaFin,
+    idEstado: estado ? idEstado(estado) : null,
+  })
+  // El backend la crea como Programada y valida horario y choques
+  const addSession = async (datos: DatosSesion) => {
+    await api.post('/sesiones', sesionRequest(datos))
+    await cargarSesiones()
   }
-  const deleteSession = (id: string) => {
-    sessions.value = sessions.value.filter((session) => session.id !== id)
+  const updateSessionStatus = async (id: string, estado: SessionStatus) => {
+    const sesion = sessions.value.find((item) => item.id === id)
+    if (!sesion) return
+    await api.put(`/sesiones/${id}`, sesionRequest(sesion, estado))
+    await cargarSesiones()
   }
 
   // El backend decide si es entrada, salida, duplicado o rechazado
@@ -415,7 +474,6 @@ export function useGymData() {
     updateTrainer,
     addSession,
     updateSessionStatus,
-    deleteSession,
     registrarAccesoQr,
     asistenciasDeHoy,
     presentesAhora,

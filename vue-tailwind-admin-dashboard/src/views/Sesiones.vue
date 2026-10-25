@@ -271,6 +271,7 @@
                   v-model="form.fecha"
                   required
                   type="date"
+                  :min="fechaHoy()"
                   class="mt-2 h-11 w-full rounded-lg border border-gray-200 px-3 text-sm"
               /></label>
               <div class="grid grid-cols-2 gap-4">
@@ -290,6 +291,13 @@
                 /></label>
               </div>
             </div>
+            <Alert
+              v-if="error"
+              class="mt-5"
+              variant="error"
+              title="No se pudo agendar"
+              :message="error"
+            />
             <div class="mt-6 flex gap-3">
               <Button
                 type="button"
@@ -298,7 +306,9 @@
                 @click="closeModal"
                 >Cancelar</Button
               >
-              <Button type="submit" class-name="flex-1 justify-center">Agendar Sesión</Button>
+              <Button type="submit" :disabled="guardando" class-name="flex-1 justify-center">{{
+                guardando ? 'Agendando...' : 'Agendar Sesión'
+              }}</Button>
             </div>
           </form>
         </div>
@@ -361,18 +371,14 @@
                     :key="action.label"
                     :class="action.class"
                     class="flex-1 rounded-lg py-2.5 text-sm font-medium"
+                    :disabled="guardando"
                     @click="runAction(action.estado)"
                   >
                     {{ action.label }}
                   </button>
                 </div>
               </div>
-              <button
-                class="w-full border-t border-gray-100 pt-5 text-sm font-medium text-error-600"
-                @click="removeSelected"
-              >
-                Eliminar sesión
-              </button>
+              <Alert v-if="error" variant="error" title="No se pudo actualizar" :message="error" />
             </div>
           </section>
         </div>
@@ -387,9 +393,11 @@ import AdminLayout from '@/components/layout/AdminLayout.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
+import Alert from '@/components/ui/Alert.vue'
 import {
   useGymData,
   nombreCompleto,
+  fechaHoy,
   type GymSession,
   type SessionStatus,
 } from '@/composables/useGymData'
@@ -402,8 +410,9 @@ const {
   trainerById,
   addSession,
   updateSessionStatus,
-  deleteSession,
 } = useGymData()
+const error = ref('')
+const guardando = ref(false)
 const viewMode = ref<'agenda' | 'week'>('agenda')
 const search = ref('')
 const statusFilter = ref('Todas')
@@ -414,7 +423,7 @@ const statuses = ['Todas', 'Programada', 'Confirmada', 'Completada', 'Cancelada'
 const form = reactive({
   clienteId: '',
   entrenadorId: '',
-  fecha: '2026-09-26',
+  fecha: fechaHoy(),
   horaInicio: '09:00',
   horaFin: '10:00',
 })
@@ -518,14 +527,15 @@ const nextActions = computed(() =>
 )
 const weekDays = computed(() =>
   Array.from({ length: 7 }, (_, index) => {
-    const date = new Date('2026-09-22T12:00:00')
-    date.setDate(date.getDate() + index)
-    const iso = date.toISOString().slice(0, 10)
+    // Semana actual, de lunes a domingo
+    const date = new Date()
+    date.setDate(date.getDate() - ((date.getDay() + 6) % 7) + index)
+    const iso = fechaHoy(date)
     return {
       date: iso,
       number: date.getDate(),
       label: date.toLocaleDateString('es-SV', { weekday: 'short' }),
-      isToday: iso === '2026-09-26',
+      isToday: iso === fechaHoy(),
     }
   }),
 )
@@ -563,10 +573,13 @@ const detailHeader = (estado: SessionStatus) =>
     Completada: 'bg-teal-50/70',
     Cancelada: 'bg-gray-50',
   })[estado]
+const mensajeError = (e: unknown) => (e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
 const openCreateModal = () => {
+  error.value = ''
   modal.value = 'create'
 }
 const openDetail = (session: GymSession) => {
+  error.value = ''
   selectedSession.value = session
   modal.value = 'detail'
 }
@@ -574,28 +587,31 @@ const closeModal = () => {
   modal.value = null
   selectedSession.value = null
 }
-const createSession = () => {
-  addSession({
-    id: `${Date.now()}`,
-    clienteId: form.clienteId,
-    entrenadorId: form.entrenadorId,
-    fecha: form.fecha,
-    horaInicio: form.horaInicio,
-    horaFin: form.horaFin,
-    estado: 'Programada',
-  })
-  closeModal()
-}
-const runAction = (estado: SessionStatus) => {
-  if (selectedSession.value) {
-    updateSessionStatus(selectedSession.value.id, estado)
-    selectedSession.value.estado = estado
+// Las reglas (horario, choques, activos) las valida el backend
+const createSession = async () => {
+  guardando.value = true
+  error.value = ''
+  try {
+    await addSession({ ...form })
+    closeModal()
+  } catch (e) {
+    error.value = mensajeError(e)
+  } finally {
+    guardando.value = false
   }
 }
-const removeSelected = () => {
-  if (selectedSession.value) {
-    deleteSession(selectedSession.value.id)
-    closeModal()
+const runAction = async (estado: SessionStatus) => {
+  if (!selectedSession.value) return
+  guardando.value = true
+  error.value = ''
+  try {
+    const id = selectedSession.value.id
+    await updateSessionStatus(id, estado)
+    selectedSession.value = sessions.value.find((session) => session.id === id) ?? null
+  } catch (e) {
+    error.value = mensajeError(e)
+  } finally {
+    guardando.value = false
   }
 }
 </script>

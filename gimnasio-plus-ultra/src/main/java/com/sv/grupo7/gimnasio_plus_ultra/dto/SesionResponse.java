@@ -7,6 +7,8 @@ import java.time.LocalTime;
 public class SesionResponse {
 
     private int id_sesion;
+    private Integer idCliente;
+    private Integer idEntrenador;
     private String nombre_cliente;
     private String nombre_entrenador;
     private String nombre_estado;
@@ -16,6 +18,22 @@ public class SesionResponse {
     private LocalDateTime creado_en;
 
     public SesionResponse() {
+    }
+
+    public Integer getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public Integer getIdEntrenador() {
+        return idEntrenador;
+    }
+
+    public void setIdEntrenador(Integer idEntrenador) {
+        this.idEntrenador = idEntrenador;
     }
 
     public SesionResponse(int id_sesion, String nombre_cliente, String nombre_entrenador, String nombre_estado,

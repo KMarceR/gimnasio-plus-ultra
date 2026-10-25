@@ -22,6 +22,9 @@
           <h1 class="mt-1 text-3xl font-semibold text-gray-900">{{ nombreCompleto(trainer) }}</h1>
           <p class="mt-1 text-brand-600">{{ trainer.especialidad }}</p>
         </div>
+        <Button v-if="puedeEditar" size="sm" variant="outline" @click="editando = true"
+          >Editar</Button
+        >
         <Badge :color="trainer.estado === 'Activo' ? 'primary' : 'light'">{{
           trainer.estado
         }}</Badge>
@@ -116,21 +119,39 @@
         </p>
       </section>
     </div>
-    <div v-else class="p-8 text-center text-gray-500">Entrenador no encontrado.</div></AdminLayout
+    <div v-else class="p-8 text-center text-gray-500">
+      {{ trainers.length ? 'Entrenador no encontrado.' : 'Cargando...' }}
+    </div>
+    <FormularioEntrenador
+      v-if="editando && trainer"
+      :entrenador="trainer"
+      @close="editando = false"
+      @guardado="editando = false"
+    /></AdminLayout
   >
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import Badge from '@/components/ui/Badge.vue'
+import Button from '@/components/ui/Button.vue'
+import FormularioEntrenador from '@/components/entrenadores/FormularioEntrenador.vue'
+import { useAuth } from '@/composables/useAuth'
 import { useGymData, nombreCompleto, iniciales, type SessionStatus } from '@/composables/useGymData'
 const route = useRoute()
 const router = useRouter()
-const { trainerById, memberById, sessions } = useGymData()
-const trainer = trainerById(String(route.params.id))
+const { trainers, trainerById, memberById, sessions } = useGymData()
+const { currentUser } = useAuth()
+const trainer = computed(() => trainerById(String(route.params.id)))
+const editando = ref(false)
+const puedeEditar = computed(
+  () => currentUser.value?.role === 'Administrador' || currentUser.value?.role === 'Gerente',
+)
 const misSesiones = computed(() =>
-  sessions.value.filter((session) => session.entrenadorId === trainer?.id),
+  sessions.value
+    .filter((session) => session.entrenadorId === trainer.value?.id)
+    .sort((a, b) => `${b.fecha}${b.horaInicio}`.localeCompare(`${a.fecha}${a.horaInicio}`)),
 )
 const completadas = computed(() =>
   misSesiones.value.filter((session) => session.estado === 'Completada'),
