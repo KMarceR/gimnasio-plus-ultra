@@ -15,6 +15,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.RolRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.UsuarioRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PersonaRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.util.Validaciones;
 
 @Service
 public class UsuarioService extends PersonaServiceBase implements CrudService<UsuarioRequest, UsuarioResponse> {
@@ -48,11 +49,11 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
         String hashContrasena = passwordEncoder.encode(request.getContrasena());
         usuario.setContrasena(hashContrasena);
 
-        Rol rol = rolRepository.findById(request.getIdRol())
+        Rol rol = rolRepository.findById(Validaciones.idObligatorio(request.getIdRol(), "idRol"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
         usuario.setRol(rol);
 
-        Estado estado = estadoRepository.findById(request.getIdEstado())
+        Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         usuario.setEstado(estado);
 
@@ -87,11 +88,11 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
             usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
         }
 
-        Rol rol = rolRepository.findById(request.getIdRol())
+        Rol rol = rolRepository.findById(Validaciones.idObligatorio(request.getIdRol(), "idRol"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
         usuario.setRol(rol);
 
-        Estado estado = estadoRepository.findById(request.getIdEstado())
+        Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         usuario.setEstado(estado);
 

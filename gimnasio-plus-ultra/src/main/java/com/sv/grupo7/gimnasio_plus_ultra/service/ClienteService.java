@@ -17,6 +17,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.ClienteRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.util.Validaciones;
 
 @Service
 public class ClienteService extends PersonaServiceBase implements CrudService<ClienteRequest, ClienteResponse> {
@@ -46,7 +47,7 @@ public class ClienteService extends PersonaServiceBase implements CrudService<Cl
         validarPersonaNueva(request);
         Cliente cliente = new Cliente();
         aplicarDatos(cliente, request);
-        cliente.setCodigoQr(UUID.randomUUID().toString()); // carnet QR unico; se genera solo al crear
+        cliente.setCodigoQr(UUID.randomUUID().toString()); //QR unico; se genera solo al crear
 
         Cliente nuevoCliente = clienteRepository.save(cliente);
 
@@ -106,7 +107,7 @@ public class ClienteService extends PersonaServiceBase implements CrudService<Cl
             cliente.setPlanSuscripcion(null);
         }
 
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+        Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         cliente.setEstado(estado);
     }

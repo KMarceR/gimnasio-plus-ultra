@@ -15,6 +15,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.ClienteRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EntrenadorRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.SesionRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.util.Validaciones;
 
 @Service
 public class SesionService implements CrudService<SesionRequest, SesionResponse> {
@@ -78,15 +79,15 @@ public class SesionService implements CrudService<SesionRequest, SesionResponse>
         sesion.setHoraInicio(request.getHoraInicio());
         sesion.setHoraFin(request.getHoraFin());
 
-        Cliente cliente = clienteRepository.findById(Integer.valueOf(request.getIdCliente()))
+        Cliente cliente = clienteRepository.findById(Validaciones.idObligatorio(request.getIdCliente(), "idCliente"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado"));
         sesion.setCliente(cliente);
 
-        Entrenador entrenador = entrenadorRepository.findById(Integer.valueOf(request.getIdEntrenador()))
+        Entrenador entrenador = entrenadorRepository.findById(Validaciones.idObligatorio(request.getIdEntrenador(), "idEntrenador"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Entrenador no encontrado"));
         sesion.setEntrenador(entrenador);
 
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+        Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         sesion.setEstado(estado);
     }

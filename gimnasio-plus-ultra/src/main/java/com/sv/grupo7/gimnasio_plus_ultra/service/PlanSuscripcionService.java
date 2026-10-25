@@ -13,6 +13,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.model.PlanSuscripcion;
 import com.sv.grupo7.gimnasio_plus_ultra.model.TipoPlan;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.PlanSuscripcionRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.util.Validaciones;
 
 @Service
 public class PlanSuscripcionService implements CrudService<PlanSuscripcionRequest, PlanSuscripcionResponse> {
@@ -72,7 +73,7 @@ public class PlanSuscripcionService implements CrudService<PlanSuscripcionReques
         plan.setDetalles(request.getDetalles());
         plan.setPrecio(request.getPrecio());
 
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+        Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estado no encontrado"));
         plan.setEstado(estado);
 

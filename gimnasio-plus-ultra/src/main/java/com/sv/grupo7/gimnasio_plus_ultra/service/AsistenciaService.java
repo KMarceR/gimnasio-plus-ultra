@@ -22,6 +22,7 @@ import com.sv.grupo7.gimnasio_plus_ultra.repository.AsistenciaRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.ClienteRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.EstadoRepository;
 import com.sv.grupo7.gimnasio_plus_ultra.repository.SuscripcionRepository;
+import com.sv.grupo7.gimnasio_plus_ultra.util.Validaciones;
 
 @Service
 public class AsistenciaService implements CrudService<AsistenciaRequest, AsistenciaResponse> {
@@ -203,11 +204,11 @@ public class AsistenciaService implements CrudService<AsistenciaRequest, Asisten
         asistencia.setHoraSesion(request.getHoraSesion());
         asistencia.setHoraSalida(request.getHoraSalida());
 
-        Cliente cliente = clienteRepository.findById(Integer.valueOf(request.getIdCliente()))
+        Cliente cliente = clienteRepository.findById(Validaciones.idObligatorio(request.getIdCliente(), "idCliente"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no registrado"));
         asistencia.setCliente(cliente);
 
-        Estado estado = estadoRepository.findById(Integer.valueOf(request.getIdEstado()))
+        Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estado inválido"));
         asistencia.setEstado(estado);
     }
