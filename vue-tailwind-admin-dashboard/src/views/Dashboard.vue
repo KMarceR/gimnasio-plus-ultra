@@ -3,7 +3,7 @@
     <div class="space-y-6">
       <header class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p class="text-sm font-medium text-brand-600">Lunes, 14 de julio de 2026</p>
+          <p class="text-sm font-medium text-brand-600 first-letter:uppercase">{{ fechaTexto }}</p>
           <h1 class="font-body mt-1 text-3xl font-bold text-gray-900">Dashboard</h1>
         </div>
       </header>
@@ -73,13 +73,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
-import { useGymData, esIngreso, etiquetaAsistencia } from '@/composables/useGymData'
-const { members, activeMembers, todaySessions, asistencia, planById } = useGymData()
+import { useGymData, esIngreso, etiquetaAsistencia, fechaHoy } from '@/composables/useGymData'
+const { activeMembers, todaySessions, asistencia, ingresosDelMes } = useGymData()
+const fechaTexto = new Date().toLocaleDateString('es-SV', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
 const ultimosAccesos = computed(() => asistencia.value.slice(0, 8))
-const ingresosDelMes = computed(() =>
-  members.value
-    .filter((member) => member.estado === 'Activo')
-    .reduce((total, member) => total + (planById(member.planId)?.precio || 0), 0),
+const asistenciasHoy = computed(
+  () => asistencia.value.filter((record) => record.fecha === fechaHoy() && esIngreso(record)).length,
 )
 const metrics = computed(() => [
   {
@@ -90,18 +94,18 @@ const metrics = computed(() => [
   },
   {
     label: 'Ingresos del mes',
-    value: `$${ingresosDelMes.value.toLocaleString('es-SV')}`,
+    value: `$${ingresosDelMes.value.toLocaleString('es-SV', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     icon: '$',
     class: 'bg-blue-light-50 text-blue-light-600',
   },
   {
-    label: 'Asistencias registradas',
-    value: asistencia.value.filter(esIngreso).length,
+    label: 'Asistencias de hoy',
+    value: asistenciasHoy.value,
     icon: '↗',
     class: 'bg-orange-50 text-orange-600',
   },
   {
-    label: 'Sesiones programadas',
+    label: 'Sesiones de hoy',
     value: todaySessions.value,
     icon: '◷',
     class: 'bg-brand-50 text-brand-600',

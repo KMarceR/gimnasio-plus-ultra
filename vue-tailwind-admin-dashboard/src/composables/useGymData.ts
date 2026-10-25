@@ -62,6 +62,7 @@ export interface Suscripcion {
   precioPagado: number
   nombreEstado: string
   vigente: boolean
+  creadoEn: string | null
 }
 
 export interface Trainer {
@@ -272,6 +273,7 @@ const errorCarga = ref('')
 let datosCargados = false
 const sessions = ref<GymSession[]>([])
 const asistencia = ref<AsistenciaRecord[]>([])
+const suscripciones = ref<Suscripcion[]>([])
 
 export function useGymData() {
   const activeMembers = computed(
@@ -282,6 +284,17 @@ export function useGymData() {
       sessions.value.filter(
         (session) => session.fecha === fechaHoy() && session.estado !== 'Cancelada',
       ).length,
+  )
+
+  // Lo vendido este mes (por fecha de venta), sin contar las canceladas
+  const ingresosDelMes = computed(() =>
+    suscripciones.value
+      .filter(
+        (s) =>
+          s.nombreEstado !== 'Cancelada' &&
+          (s.creadoEn ?? s.fechaInicio).slice(0, 7) === fechaHoy().slice(0, 7),
+      )
+      .reduce((total, s) => total + s.precioPagado, 0),
   )
 
   const memberById = (id: string) => members.value.find((member) => member.id === id)
@@ -312,6 +325,9 @@ export function useGymData() {
   const cargarSesiones = async () => {
     sessions.value = (await api.get<SesionApi[]>('/sesiones')).map(aSesion)
   }
+  const cargarSuscripciones = async () => {
+    suscripciones.value = await api.get<Suscripcion[]>('/suscripciones')
+  }
   const cargarPlanes = async () => {
     plans.value = (await api.get<PlanApi[]>('/planes-suscripcion')).map(aPlan)
   }
@@ -326,6 +342,7 @@ export function useGymData() {
         cargarAsistencias(),
         cargarEntrenadores(),
         cargarSesiones(),
+        cargarSuscripciones(),
       ])
       estados.value = listaEstados
       datosCargados = true
@@ -383,13 +400,13 @@ export function useGymData() {
       idCliente: Number(idCliente),
       idPlanSuscripcion: Number(planId),
     })
-    await cargarClientes()
+    await Promise.all([cargarClientes(), cargarSuscripciones()])
   }
   const vistaCancelacion = (idSuscripcion: number) =>
     api.get<VistaCancelacion>(`/suscripciones/${idSuscripcion}/cancelacion`)
   const cancelarSuscripcion = async (idSuscripcion: number) => {
     await api.put(`/suscripciones/${idSuscripcion}/cancelar`)
-    await cargarClientes()
+    await Promise.all([cargarClientes(), cargarSuscripciones()])
   }
 
   // El usuario del entrenador es su DUI y lo crea el backend; contrasena vacia = no cambiarla
@@ -455,6 +472,8 @@ export function useGymData() {
     asistencia,
     activeMembers,
     todaySessions,
+    ingresosDelMes,
+    idEstado,
     memberById,
     trainerById,
     planById,

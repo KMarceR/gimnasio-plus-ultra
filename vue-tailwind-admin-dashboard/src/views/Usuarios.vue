@@ -15,6 +15,7 @@
           /><Button size="sm" @click="openCreate">+ Nuevo Usuario</Button>
         </div>
       </header>
+      <Alert v-if="errorCarga" variant="error" title="No se pudieron cargar los usuarios" :message="errorCarga" />
       <section
         class="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6"
       >
@@ -50,10 +51,17 @@
                 <Badge :color="roleColor(user.role)">{{ user.role }}</Badge>
               </td>
               <td class="py-4">
-                <Badge color="primary">Activo</Badge>
+                <Badge :color="user.estado === 'Activo' ? 'primary' : 'light'">{{ user.estado }}</Badge>
               </td>
               <td class="py-4 text-end">
+                <RouterLink
+                  v-if="user.role === 'Entrenador'"
+                  to="/entrenadores"
+                  class="rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-50"
+                  >Ver en Entrenadores</RouterLink
+                >
                 <button
+                  v-else
                   class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 hover:text-brand-700"
                   @click="openEdit(user)"
                 >
@@ -73,7 +81,7 @@
         <div class="p-4">
           <form
             class="max-h-[90vh] w-full max-w-140 overflow-y-auto rounded-2xl bg-white shadow-theme-xl"
-            @submit.prevent="createUser"
+            @submit.prevent="guardar"
           >
             <header class="flex items-center justify-between border-b border-gray-200 p-6">
               <h2 class="text-xl font-semibold text-gray-900">
@@ -110,6 +118,9 @@
                 >DUI<input
                   v-model="form.dui"
                   required
+                  pattern="\d{8}-\d"
+                  maxlength="10"
+                  title="Formato 00000000-0"
                   placeholder="01234567-9"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -123,6 +134,9 @@
                 >Teléfono<input
                   v-model="form.telefono"
                   required
+                  pattern="\d{4}-\d{4}"
+                  maxlength="9"
+                  title="Formato 0000-0000"
                   placeholder="2257-8888"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -137,24 +151,34 @@
                   v-model="form.direccion"
                   placeholder="Colonia San Benito, San Salvador"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
-              ><label
-                class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
+              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >Rol<select
-                  v-model="form.role"
+                  v-model="form.idRol"
                   required
-                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+                  :disabled="esUsuarioConectado"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm disabled:opacity-60"
                 >
-                  <option value="Administrador">Administrador</option>
-                  <option value="Gerente">Gerente</option>
-                  <option value="Recepcionista">Recepcionista</option>
-                  <option value="Entrenador">Entrenador</option>
+                  <option v-for="rol in rolesDisponibles" :key="rol.idRol" :value="rol.idRol">
+                    {{ rol.nombreRol }}
+                  </option>
                 </select></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
-                >Nombre de usuario<input
-                  v-model="form.nombreUsuario"
-                  required
-                  placeholder="daniel_admin"
-                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
+                >Estado<select
+                  v-model="form.estado"
+                  :disabled="esUsuarioConectado"
+                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm disabled:opacity-60"
+                >
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select></label
+              ><p v-if="esUsuarioConectado" class="text-xs text-gray-500 sm:col-span-2">
+                No puedes cambiar tu propio rol ni desactivarte; si lo hicieras, ya no podrías entrar
+                al sistema.
+              </p
+              ><p class="text-xs text-gray-500 sm:col-span-2">
+                El nombre de usuario es el DUI. Los entrenadores se registran en la pantalla
+                Entrenadores.
+              </p
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
                 >{{ editingUser ? 'Nueva contraseña (opcional)' : 'Contraseña'
                 }}<input
@@ -165,6 +189,9 @@
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
               /></label>
             </div>
+            <div v-if="error" class="px-6 pb-2">
+              <Alert variant="error" title="No se pudo guardar" :message="error" />
+            </div>
             <footer class="flex gap-3 border-t border-gray-100 p-6">
               <Button
                 type="button"
@@ -173,8 +200,8 @@
                 @click="closeModal"
                 >Cancelar</Button
               >
-              <Button type="submit" class-name="flex-1 justify-center">{{
-                editingUser ? 'Guardar cambios' : 'Registrar usuario'
+              <Button type="submit" :disabled="guardando" class-name="flex-1 justify-center">{{
+                guardando ? 'Guardando...' : editingUser ? 'Guardar cambios' : 'Registrar usuario'
               }}</Button>
             </footer>
           </form>
@@ -184,15 +211,35 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import Alert from '@/components/ui/Alert.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
 import Modal from '@/components/ui/Modal.vue'
-import { useAuth, type UserRole, type SessionUser } from '@/composables/useAuth'
-import type { Genero } from '@/composables/useGymData'
-const { demoUsers } = useAuth()
-const users = ref<SessionUser[]>([...demoUsers])
+import {
+  useAuth,
+  aSessionUser,
+  type UserRole,
+  type SessionUser,
+  type UsuarioApi,
+} from '@/composables/useAuth'
+import { useGymData, type EstadoGeneral, type Genero } from '@/composables/useGymData'
+import { api } from '@/services/api'
+
+interface Usuario extends SessionUser {
+  estado: EstadoGeneral
+}
+interface RolApi {
+  idRol: number
+  nombreRol: UserRole
+}
+
+const { currentUser, guardarSesion } = useAuth()
+const { idEstado } = useGymData()
+const users = ref<Usuario[]>([])
+const roles = ref<RolApi[]>([])
+const errorCarga = ref('')
 const search = ref('')
 const filteredUsers = computed(() =>
   users.value.filter((user) =>
@@ -201,8 +248,12 @@ const filteredUsers = computed(() =>
       .includes(search.value.toLowerCase()),
   ),
 )
+const rolesDisponibles = computed(() => roles.value.filter((rol) => rol.nombreRol !== 'Entrenador'))
 const modal = ref(false)
-const editingUser = ref<SessionUser | null>(null)
+const editingUser = ref<Usuario | null>(null)
+const esUsuarioConectado = computed(() => editingUser.value?.id === currentUser.value?.id)
+const error = ref('')
+const guardando = ref(false)
 const form = reactive({
   nombres: '',
   apellidos: '',
@@ -212,9 +263,9 @@ const form = reactive({
   telefono: '',
   fechaNacimiento: '',
   direccion: '',
-  nombreUsuario: '',
   contrasena: '',
-  role: 'Recepcionista' as UserRole,
+  idRol: 0,
+  estado: 'Activo' as EstadoGeneral,
 })
 const roleColor = (role: UserRole) =>
   ({
@@ -223,6 +274,23 @@ const roleColor = (role: UserRole) =>
     Recepcionista: 'info',
     Entrenador: 'primary',
   })[role] as 'warning' | 'purple' | 'info' | 'primary'
+const aUsuario = (usuario: UsuarioApi): Usuario => ({
+  ...aSessionUser(usuario),
+  estado: usuario.nombreEstado === 'Activo' ? 'Activo' : 'Inactivo',
+})
+const cargarUsuarios = async () => {
+  users.value = (await api.get<UsuarioApi[]>('/usuarios')).map(aUsuario)
+}
+onMounted(async () => {
+  try {
+    const [listaRoles] = await Promise.all([api.get<RolApi[]>('/roles'), cargarUsuarios()])
+    roles.value = listaRoles
+  } catch (err) {
+    errorCarga.value = err instanceof Error ? err.message : 'Error al cargar'
+  }
+})
+const idRolPorNombre = (nombre: UserRole) =>
+  roles.value.find((rol) => rol.nombreRol === nombre)?.idRol ?? 0
 const resetForm = () => {
   form.nombres = ''
   form.apellidos = ''
@@ -232,16 +300,17 @@ const resetForm = () => {
   form.telefono = ''
   form.fechaNacimiento = ''
   form.direccion = ''
-  form.nombreUsuario = ''
   form.contrasena = ''
-  form.role = 'Recepcionista'
+  form.idRol = idRolPorNombre('Recepcionista')
+  form.estado = 'Activo'
+  error.value = ''
 }
 const openCreate = () => {
   editingUser.value = null
   resetForm()
   modal.value = true
 }
-const openEdit = (user: SessionUser) => {
+const openEdit = (user: Usuario) => {
   editingUser.value = user
   form.nombres = user.nombres
   form.apellidos = user.apellidos
@@ -251,18 +320,21 @@ const openEdit = (user: SessionUser) => {
   form.telefono = user.telefono
   form.fechaNacimiento = user.fechaNacimiento
   form.direccion = user.direccion
-  form.nombreUsuario = user.nombreUsuario
   form.contrasena = ''
-  form.role = user.role
+  form.idRol = idRolPorNombre(user.role)
+  form.estado = user.estado
+  error.value = ''
   modal.value = true
 }
 const closeModal = () => {
   modal.value = false
   editingUser.value = null
 }
-const createUser = () => {
-  const data = {
-    nombreUsuario: form.nombreUsuario,
+// El backend usa el DUI como nombre de usuario; contrasena vacia al editar = no cambiarla
+const guardar = async () => {
+  guardando.value = true
+  error.value = ''
+  const datos = {
     nombres: form.nombres,
     apellidos: form.apellidos,
     genero: form.genero,
@@ -271,14 +343,23 @@ const createUser = () => {
     email: form.email,
     telefono: form.telefono,
     dui: form.dui,
-    role: form.role,
-    initials: `${form.nombres.charAt(0)}${form.apellidos.charAt(0)}`.toUpperCase(),
+    contrasena: form.contrasena,
+    idRol: form.idRol,
+    idEstado: idEstado(form.estado),
   }
-  if (editingUser.value) {
-    Object.assign(editingUser.value, data)
-  } else {
-    users.value.unshift({ id: `${Date.now()}`, ...data })
+  try {
+    if (editingUser.value) {
+      const actualizado = await api.put<UsuarioApi>(`/usuarios/${editingUser.value.id}`, datos)
+      if (esUsuarioConectado.value) guardarSesion(aSessionUser(actualizado))
+    } else {
+      await api.post('/usuarios', datos)
+    }
+    await cargarUsuarios()
+    closeModal()
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'No se pudo guardar el usuario.'
+  } finally {
+    guardando.value = false
   }
-  closeModal()
 }
 </script>

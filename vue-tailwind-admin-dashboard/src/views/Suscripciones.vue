@@ -268,7 +268,7 @@ import {
   type TipoPlan,
 } from '@/composables/useGymData'
 
-const { plans, members, addPlan, updatePlan } = useGymData()
+const { plans, members, addPlan, updatePlan, ingresosDelMes } = useGymData()
 const search = ref('')
 const selectedPlan = ref<GymPlan | null>(null)
 const memberSearch = ref('')
@@ -295,9 +295,9 @@ const activeMembers = computed(
 )
 const stats = computed(() => [
   {
-    label: 'Ingresos estimados',
-    value: `$${plans.value.reduce((total, plan) => total + membersForPlan(plan.id).length * plan.precio, 0).toLocaleString('es-SV')}`,
-    caption: 'por periodo',
+    label: 'Ingresos del mes',
+    value: `$${ingresosDelMes.value.toLocaleString('es-SV', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    caption: 'vendido este mes, sin canceladas',
   },
   {
     label: 'Socios activos',

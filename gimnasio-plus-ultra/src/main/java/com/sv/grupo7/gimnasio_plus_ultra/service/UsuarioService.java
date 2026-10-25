@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.UsuarioRequest;
 import com.sv.grupo7.gimnasio_plus_ultra.dto.UsuarioResponse;
 import com.sv.grupo7.gimnasio_plus_ultra.exception.RecursoNoEncontradoException;
+import com.sv.grupo7.gimnasio_plus_ultra.exception.ReglaNegocioException;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Estado;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Rol;
 import com.sv.grupo7.gimnasio_plus_ultra.model.Usuario;
@@ -19,6 +20,11 @@ import com.sv.grupo7.gimnasio_plus_ultra.util.Validaciones;
 
 @Service
 public class UsuarioService extends PersonaServiceBase implements CrudService<UsuarioRequest, UsuarioResponse> {
+
+    // Un entrenador necesita especialidad y tarifa: solo se crea y cambia desde EntrenadorService
+    private static final String ROL_ENTRENADOR = "Entrenador";
+    private static final String MENSAJE_ENTRENADOR =
+            "Los entrenadores se registran y modifican desde la pantalla Entrenadores";
 
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
@@ -40,6 +46,10 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
     @Override
     public UsuarioResponse crear(UsuarioRequest request) {
         validarPersonaNueva(request);
+        Rol rol = buscarRol(request.getIdRol());
+        if (ROL_ENTRENADOR.equals(rol.getNombreRol())) {
+            throw new ReglaNegocioException(MENSAJE_ENTRENADOR);
+        }
 
         Usuario usuario = new Usuario();
 
@@ -48,9 +58,6 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
 
         String hashContrasena = passwordEncoder.encode(request.getContrasena());
         usuario.setContrasena(hashContrasena);
-
-        Rol rol = rolRepository.findById(Validaciones.idObligatorio(request.getIdRol(), "idRol"))
-                .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
         usuario.setRol(rol);
 
         Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
@@ -81,15 +88,18 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
             return null;
         }
         validarPersonaEditada(usuario.getPersona(), request);
+        Rol rol = buscarRol(request.getIdRol());
+        boolean eraEntrenador = ROL_ENTRENADOR.equals(usuario.getRol().getNombreRol());
+        boolean seraEntrenador = ROL_ENTRENADOR.equals(rol.getNombreRol());
+        if (eraEntrenador != seraEntrenador) {
+            throw new ReglaNegocioException(MENSAJE_ENTRENADOR);
+        }
         copiarDatosPersona(usuario.getPersona(), request);
         usuario.setNombreUsuario(request.getDui());
 
         if (request.getContrasena() != null && !request.getContrasena().isBlank()) {
             usuario.setContrasena(passwordEncoder.encode(request.getContrasena()));
         }
-
-        Rol rol = rolRepository.findById(Validaciones.idObligatorio(request.getIdRol(), "idRol"))
-                .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
         usuario.setRol(rol);
 
         Estado estado = estadoRepository.findById(Validaciones.idObligatorio(request.getIdEstado(), "idEstado"))
@@ -135,6 +145,11 @@ public class UsuarioService extends PersonaServiceBase implements CrudService<Us
         response.setCreadoEn(usuario.getCreadoEn());
 
         return response;
+    }
+
+    private Rol buscarRol(Integer idRol) {
+        return rolRepository.findById(Validaciones.idObligatorio(idRol, "idRol"))
+                .orElseThrow(() -> new RecursoNoEncontradoException("Rol no encontrado"));
     }
 
     public UsuarioResponse login(String nombreUsuario, String contrasena) {
