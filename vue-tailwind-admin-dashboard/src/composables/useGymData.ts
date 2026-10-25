@@ -91,10 +91,31 @@ export interface GymSession {
 export interface AsistenciaRecord {
   id: string
   clienteId: string
+  nombreCliente: string
   estado: string
   fecha: string
   hora: string
+  horaSalida: string
 }
+
+export type TipoMovimiento = 'ENTRADA' | 'SALIDA' | 'RECHAZADO' | 'DUPLICADO'
+
+export interface AccesoQr {
+  tipoMovimiento: TipoMovimiento
+  permitido: boolean
+  mensaje: string
+  nombreCliente: string
+  nombrePlan: string | null
+  fechaVencimiento: string | null
+  horaEntrada: string | null
+  horaSalida: string | null
+}
+
+// Un intento rechazado se guarda con estado "Cancelada" y no cuenta como asistencia
+export const esIngreso = (record: AsistenciaRecord) => record.estado !== 'Cancelada'
+
+export const etiquetaAsistencia = (estado: string) =>
+  ({ Activo: 'Dentro', Completada: 'Salió', Cancelada: 'Rechazado' })[estado] ?? estado
 
 export const nombreCompleto = (persona: { nombres: string; apellidos: string }) =>
   `${persona.nombres} ${persona.apellidos}`
@@ -141,11 +162,6 @@ const initialSessions: GymSession[] = [
   },
 ]
 
-const initialAsistencia: AsistenciaRecord[] = [
-  { id: '1', clienteId: '1', estado: 'Completada', fecha: '2026-09-24', hora: '06:15' },
-  { id: '2', clienteId: '2', estado: 'Completada', fecha: '2026-09-24', hora: '18:30' },
-  { id: '3', clienteId: '1', estado: 'Activo', fecha: '2026-09-25', hora: '06:00' },
-]
 
 interface ClienteApi {
   idCliente: number
@@ -173,6 +189,26 @@ interface PlanApi {
   duracionMeses: number
   nombreEstado: string
 }
+
+interface AsistenciaApi {
+  idAsistencia: number
+  idCliente: number
+  nombreCliente: string
+  nombreEstado: string
+  fechaAsistencia: string
+  horaSesion: string
+  horaSalida: string | null
+}
+
+const aAsistencia = (a: AsistenciaApi): AsistenciaRecord => ({
+  id: String(a.idAsistencia),
+  clienteId: String(a.idCliente),
+  nombreCliente: a.nombreCliente,
+  estado: a.nombreEstado,
+  fecha: a.fechaAsistencia,
+  hora: a.horaSesion.slice(0, 5),
+  horaSalida: a.horaSalida ? a.horaSalida.slice(0, 5) : '',
+})
 
 interface EstadoApi {
   idEstado: number
@@ -215,8 +251,7 @@ const estados = ref<EstadoApi[]>([])
 const errorCarga = ref('')
 let datosCargados = false
 const sessions = ref<GymSession[]>(initialSessions)
-const asistencia = ref<AsistenciaRecord[]>(initialAsistencia)
-const presentMembers = ref<Member[]>([])
+const asistencia = ref<AsistenciaRecord[]>([])
 
 export function useGymData() {
   const activeMembers = computed(
@@ -232,6 +267,7 @@ export function useGymData() {
   const planById = (id: string | null) => plans.value.find((plan) => plan.id === id)
   const attendanceByMember = (id: string) =>
     asistencia.value.filter((record) => record.clienteId === id)
+  const ingresosDeCliente = (id: string) => attendanceByMember(id).filter(esIngreso).length
 
   const idEstado = (nombre: string) => {
     const estado = estados.value.find((item) => item.nombreEstado === nombre)
@@ -241,6 +277,12 @@ export function useGymData() {
 
   const cargarClientes = async () => {
     members.value = (await api.get<ClienteApi[]>('/clientes')).map(aMember)
+  }
+  // Del mas reciente al mas antiguo
+  const cargarAsistencias = async () => {
+    asistencia.value = (await api.get<AsistenciaApi[]>('/asistencias'))
+      .map(aAsistencia)
+      .sort((a, b) => `${b.fecha} ${b.hora}`.localeCompare(`${a.fecha} ${a.hora}`))
   }
   const cargarPlanes = async () => {
     plans.value = (await api.get<PlanApi[]>('/planes-suscripcion')).map(aPlan)
@@ -253,6 +295,7 @@ export function useGymData() {
         api.get<EstadoApi[]>('/estados'),
         cargarClientes(),
         cargarPlanes(),
+        cargarAsistencias(),
       ])
       estados.value = listaEstados
       datosCargados = true
@@ -334,19 +377,16 @@ export function useGymData() {
     sessions.value = sessions.value.filter((session) => session.id !== id)
   }
 
-  const registerAccess = (member: Member) => {
-    const estado = member.estado === 'Activo' ? 'Activo' : 'Cancelada'
-    asistencia.value.unshift({
-      id: `${Date.now()}`,
-      clienteId: member.id,
-      estado,
-      fecha: new Date().toISOString().slice(0, 10),
-      hora: new Date().toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' }),
-    })
-    if (member.estado === 'Activo' && !presentMembers.value.some((item) => item.id === member.id)) {
-      presentMembers.value.push(member)
-    }
+  // El backend decide si es entrada, salida, duplicado o rechazado
+  const registrarAccesoQr = async (codigoQr: string) => {
+    const resultado = await api.post<AccesoQr>('/asistencias/qr', { codigoQr })
+    await cargarAsistencias()
+    return resultado
   }
+  const asistenciasDeHoy = async () =>
+    (await api.get<AsistenciaApi[]>('/asistencias/hoy')).map(aAsistencia)
+  const presentesAhora = async () =>
+    (await api.get<AsistenciaApi[]>('/asistencias/presentes')).map(aAsistencia)
 
   return {
     members,
@@ -354,13 +394,13 @@ export function useGymData() {
     plans,
     sessions,
     asistencia,
-    presentMembers,
     activeMembers,
     todaySessions,
     memberById,
     trainerById,
     planById,
     attendanceByMember,
+    ingresosDeCliente,
     errorCarga,
     cargarDatos,
     addMember,
@@ -376,6 +416,8 @@ export function useGymData() {
     addSession,
     updateSessionStatus,
     deleteSession,
-    registerAccess,
+    registrarAccesoQr,
+    asistenciasDeHoy,
+    presentesAhora,
   }
 }

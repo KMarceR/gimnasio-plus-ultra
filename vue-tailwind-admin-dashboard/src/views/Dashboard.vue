@@ -34,36 +34,30 @@
         <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs sm:p-6">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-gray-900">Últimos accesos</h2>
-            <RouterLink to="/qr" class="text-sm font-medium text-brand-600"
-              >Ver control QR</RouterLink
+            <RouterLink to="/recepcion" class="text-sm font-medium text-brand-600"
+              >Ver recepción</RouterLink
             >
           </div>
           <div class="mt-5 divide-y divide-gray-100">
             <div
-              v-for="record in asistencia"
+              v-for="record in ultimosAccesos"
               :key="record.id"
               class="flex items-center gap-3 py-3 first:pt-0"
             >
               <span
                 :class="
-                  record.estado === 'Activo' || record.estado === 'Completada'
-                    ? 'bg-brand-50 text-brand-600'
-                    : 'bg-error-50 text-error-600'
+                  esIngreso(record) ? 'bg-brand-50 text-brand-600' : 'bg-error-50 text-error-600'
                 "
                 class="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold"
-                >{{
-                  record.estado === 'Activo' || record.estado === 'Completada' ? 'OK' : 'X'
-                }}</span
+                >{{ esIngreso(record) ? 'OK' : 'X' }}</span
               >
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-gray-800">
-                  {{
-                    memberById(record.clienteId)
-                      ? nombreCompleto(memberById(record.clienteId)!)
-                      : 'Cliente eliminado'
-                  }}
+                  {{ record.nombreCliente }}
                 </p>
-                <p class="text-xs text-gray-500">{{ record.fecha }} · {{ record.hora }}</p>
+                <p class="text-xs text-gray-500">
+                  {{ record.fecha }} · {{ record.hora }} · {{ etiquetaAsistencia(record.estado) }}
+                </p>
               </div>
             </div>
             <p v-if="!asistencia.length" class="py-6 text-center text-sm text-gray-500">
@@ -79,8 +73,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
-import { useGymData, nombreCompleto } from '@/composables/useGymData'
-const { members, activeMembers, todaySessions, asistencia, memberById, planById } = useGymData()
+import { useGymData, esIngreso, etiquetaAsistencia } from '@/composables/useGymData'
+const { members, activeMembers, todaySessions, asistencia, planById } = useGymData()
+const ultimosAccesos = computed(() => asistencia.value.slice(0, 8))
 const ingresosDelMes = computed(() =>
   members.value
     .filter((member) => member.estado === 'Activo')
@@ -101,7 +96,7 @@ const metrics = computed(() => [
   },
   {
     label: 'Asistencias registradas',
-    value: asistencia.value.length,
+    value: asistencia.value.filter(esIngreso).length,
     icon: '↗',
     class: 'bg-orange-50 text-orange-600',
   },

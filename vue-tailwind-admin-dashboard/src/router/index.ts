@@ -44,15 +44,7 @@ const router = createRouter({
         roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[],
       },
     },
-    {
-      path: '/qr',
-      name: 'Control QR',
-      component: () => import('@/views/ControlQR.vue'),
-      meta: {
-        title: 'Control QR',
-        roles: ['Administrador', 'Gerente', 'Recepcionista'] as UserRole[],
-      },
-    },
+    { path: '/qr', redirect: '/recepcion' },
     {
       path: '/recepcion',
       name: 'Recepción',

@@ -41,7 +41,7 @@
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <p class="text-xs text-gray-500">Asistencias</p>
             <p class="mt-1 font-mono text-lg font-semibold text-gray-900">
-              {{ misAsistencias.length }}
+              {{ member ? ingresosDeCliente(member.id) : 0 }}
             </p>
           </div>
           <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
@@ -244,14 +244,13 @@
           >
             <div>
               <p class="text-sm font-semibold text-gray-800">{{ record.fecha }}</p>
-              <p class="text-xs text-gray-500">{{ record.hora }}</p>
+              <p class="text-xs text-gray-500">
+                {{ record.hora }}{{ record.horaSalida ? ` → ${record.horaSalida}` : '' }}
+              </p>
             </div>
-            <Badge
-              :color="
-                record.estado === 'Activo' || record.estado === 'Completada' ? 'primary' : 'light'
-              "
-              >{{ record.estado }}</Badge
-            >
+            <Badge :color="esIngreso(record) ? 'primary' : 'error'">{{
+              etiquetaAsistencia(record.estado)
+            }}</Badge>
           </div>
         </div>
         <p v-if="!misAsistencias.length" class="py-6 text-center text-sm text-gray-500">
@@ -365,6 +364,8 @@ import {
   useGymData,
   nombreCompleto,
   iniciales,
+  esIngreso,
+  etiquetaAsistencia,
   type EstadoGeneral,
   type SessionStatus,
   type Suscripcion,
@@ -386,6 +387,7 @@ const {
   trainerById,
   sessions,
   attendanceByMember,
+  ingresosDeCliente,
   suscripcionesDeCliente,
   venderSuscripcion,
   vistaCancelacion,

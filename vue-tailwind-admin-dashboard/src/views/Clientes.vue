@@ -66,7 +66,7 @@
                   <Badge color="info">{{ planById(member.planId)?.nombre || 'Sin plan' }}</Badge>
                 </td>
                 <td class="py-4 text-sm font-semibold text-gray-800">
-                  {{ attendanceByMember(member.id).length }}
+                  {{ ingresosDeCliente(member.id) }}
                 </td>
                 <td class="py-4">
                   <Badge :color="statusColor(member.estado)">{{ member.estado }}</Badge>
@@ -219,7 +219,7 @@ import {
 
 const router = useRouter()
 const { currentUser } = useAuth()
-const { members, plans, planById, attendanceByMember, addMember } = useGymData()
+const { members, plans, planById, ingresosDeCliente, addMember } = useGymData()
 const search = ref('')
 const filter = ref('Todos')
 const modal = ref(false)
