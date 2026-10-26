@@ -54,16 +54,9 @@
                 <Badge :color="user.estado === 'Activo' ? 'primary' : 'light'">{{ user.estado }}</Badge>
               </td>
               <td class="py-4 text-end">
-                <RouterLink
-                  v-if="user.role === 'Entrenador'"
-                  to="/entrenadores"
-                  class="rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition hover:bg-gray-50"
-                  >Ver en Entrenadores</RouterLink
-                >
                 <button
-                  v-else
                   class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 hover:text-brand-700"
-                  @click="openEdit(user)"
+                  @click="editar(user)"
                 >
                   Editar
                 </button>
@@ -128,6 +121,7 @@
                   v-model="form.email"
                   required
                   type="email"
+                  autocomplete="off"
                   placeholder="daniel.guevara@plusultra.com"
                   class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm" /></label
               ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
@@ -179,14 +173,13 @@
                 El nombre de usuario es el DUI. Los entrenadores se registran en la pantalla
                 Entrenadores.
               </p
-              ><label class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+              ><label
+                class="text-xs font-semibold uppercase tracking-wider text-gray-500 sm:col-span-2"
                 >{{ editingUser ? 'Nueva contraseña (opcional)' : 'Contraseña'
-                }}<input
+                }}<CampoContrasena
                   v-model="form.contrasena"
                   :required="!editingUser"
-                  type="password"
-                  :placeholder="editingUser ? 'Dejar en blanco para no cambiarla' : ''"
-                  class="mt-2 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm"
+                  :placeholder="editingUser ? 'Déjala vacía para no cambiarla' : ''"
               /></label>
             </div>
             <div v-if="error" class="px-6 pb-2">
@@ -212,10 +205,12 @@
 </template>
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import Alert from '@/components/ui/Alert.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Button from '@/components/ui/Button.vue'
+import CampoContrasena from '@/components/ui/CampoContrasena.vue'
 import Modal from '@/components/ui/Modal.vue'
 import {
   useAuth,
@@ -236,7 +231,8 @@ interface RolApi {
 }
 
 const { currentUser, guardarSesion } = useAuth()
-const { idEstado } = useGymData()
+const { idEstado, trainers } = useGymData()
+const router = useRouter()
 const users = ref<Usuario[]>([])
 const roles = ref<RolApi[]>([])
 const errorCarga = ref('')
@@ -325,6 +321,12 @@ const openEdit = (user: Usuario) => {
   form.estado = user.estado
   error.value = ''
   modal.value = true
+}
+// Un entrenador se edita en su perfil, porque ahi estan su especialidad y tarifa
+const editar = (user: Usuario) => {
+  if (user.role !== 'Entrenador') return openEdit(user)
+  const entrenador = trainers.value.find((trainer) => trainer.nombreUsuario === user.nombreUsuario)
+  router.push(entrenador ? `/entrenadores/${entrenador.id}` : '/entrenadores')
 }
 const closeModal = () => {
   modal.value = false

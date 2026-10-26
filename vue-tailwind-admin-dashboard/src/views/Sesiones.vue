@@ -10,26 +10,6 @@
         <Button size="sm" @click="openCreateModal">+ Nueva Sesión</Button>
       </header>
 
-      <section class="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        <article
-          v-for="metric in metrics"
-          :key="metric.label"
-          class="rounded-2xl border border-gray-200 bg-white p-5 shadow-theme-xs"
-        >
-          <div class="flex items-center justify-between gap-3">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">
-              {{ metric.label }}
-            </p>
-            <span
-              :class="metric.class"
-              class="flex h-9 w-9 items-center justify-center rounded-full text-sm"
-              >{{ metric.icon }}</span
-            >
-          </div>
-          <p class="mt-4 text-3xl font-semibold text-gray-900">{{ metric.value }}</p>
-        </article>
-      </section>
-
       <section class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500">
         <span
           v-for="status in statusSummary"
@@ -444,32 +424,6 @@ const filteredSessions = computed(() =>
     })
     .sort((a, b) => `${a.fecha}${a.horaInicio}`.localeCompare(`${b.fecha}${b.horaInicio}`)),
 )
-const metrics = computed(() => [
-  {
-    label: 'Sesiones totales',
-    value: sessions.value.length,
-    icon: '▣',
-    class: 'bg-blue-light-50 text-blue-light-600',
-  },
-  {
-    label: 'Programadas',
-    value: sessions.value.filter((session) => session.estado === 'Programada').length,
-    icon: '◷',
-    class: 'bg-brand-50 text-brand-600',
-  },
-  {
-    label: 'Completadas',
-    value: sessions.value.filter((session) => session.estado === 'Completada').length,
-    icon: '✓',
-    class: 'bg-brand-50 text-brand-600',
-  },
-  {
-    label: 'Ingresos (sesiones)',
-    value: `$${sessions.value.reduce((total, session) => total + (session.estado === 'Completada' ? trainerById(session.entrenadorId)?.tarifaPorSesion || 0 : 0), 0).toLocaleString('es-SV')}`,
-    icon: '↗',
-    class: 'bg-orange-50 text-orange-600',
-  },
-])
 const statusSummary = computed(() => [
   {
     label: 'Programada',
@@ -574,7 +528,13 @@ const detailHeader = (estado: SessionStatus) =>
     Cancelada: 'bg-gray-50',
   })[estado]
 const mensajeError = (e: unknown) => (e instanceof Error ? e.message : 'Ocurrió un error inesperado.')
+// El formulario se limpia cada vez que se abre, se haya guardado o cancelado antes
 const openCreateModal = () => {
+  form.clienteId = ''
+  form.entrenadorId = ''
+  form.fecha = fechaHoy()
+  form.horaInicio = '09:00'
+  form.horaFin = '10:00'
   error.value = ''
   modal.value = 'create'
 }

@@ -36,7 +36,12 @@
                 :class="campo"
             /></label>
             <label :class="etiqueta"
-              >Email<input v-model="form.email" required type="email" :class="campo"
+              >Email<input
+                v-model="form.email"
+                required
+                type="email"
+                autocomplete="off"
+                :class="campo"
             /></label>
             <label :class="etiqueta"
               >Teléfono<input
@@ -57,12 +62,10 @@
             /></label>
             <label :class="etiqueta"
               >{{ entrenador ? 'Nueva contraseña (opcional)' : 'Contraseña'
-              }}<input
+              }}<CampoContrasena
                 v-model="form.contrasena"
                 :required="!entrenador"
-                type="password"
-                :placeholder="entrenador ? 'Dejar vacío para no cambiarla' : ''"
-                :class="campo"
+                :placeholder="entrenador ? 'Déjala vacía para no cambiarla' : ''"
             /></label>
             <label :class="[etiqueta, 'sm:col-span-2']"
               >Dirección<input v-model="form.direccion" :class="campo"
@@ -118,6 +121,7 @@
 import { reactive, ref } from 'vue'
 import Alert from '@/components/ui/Alert.vue'
 import Button from '@/components/ui/Button.vue'
+import CampoContrasena from '@/components/ui/CampoContrasena.vue'
 import Modal from '@/components/ui/Modal.vue'
 import {
   useGymData,
